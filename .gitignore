@@ -1,0 +1,17 @@
+.venv/*
+.idea/*
+__pycache__/
+Lib/*
+Scripts/*
+pyvenv.cfg
+.streamlit/secrets.toml
+etc/*
+share/*
+.DS_Store
+*/.DS_Store
+.vscode/*
+twelve_chat.bat
+.env
+user_info.json
+
+

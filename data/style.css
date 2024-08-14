@@ -1,0 +1,257 @@
+@font-face {
+    font-family: "Gilroy-Medium";
+    src: replace_font_url_medium format("truetype");
+}
+
+@font-face {
+    font-family: "Gilroy-Light";
+    src: replace_font_url_light format("truetype");
+}
+
+div[data-testid="stToolbar"] { 
+    display: none;
+}
+
+div[data-testid="stSidebarContent"]::-webkit-scrollbar {
+    width: 10px;
+}
+
+div[data-testid="stSidebarContent"]:hover::-webkit-scrollbar-thumb {
+    background-color: #ffffff44;
+}
+
+div[data-testid="stSidebarContent"]::-webkit-scrollbar-thumb:hover {
+    background-color: #ffffff88;
+}
+
+div[data-testid="stSidebarUserContent"] {
+    padding-top: 2.5rem;
+}
+
+/* Make Navigation Bar White */
+a[data-testid="stSidebarNavLink"]>span {
+    color: rgb(255, 255, 255);
+}
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stMarkdownContainer"] {
+    color: rgb(255, 255, 255);
+}
+
+/* Share feedback link button */
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stLinkButton"] {
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    border-radius: 4px;
+}
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stLinkButton"]:hover {
+    background-color: #009940;
+    transition: 0.4s;
+}
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stLinkButton"]>a {
+    background-color: transparent;
+    font-weight: 600;
+    margin: 0;
+    height: 35px;
+    padding: 10px 0;
+    width: 100%;
+    color: var(--text-color);
+}
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stLinkButton"]>a:hover {
+    background-color: transparent;
+    border: 0;
+}
+
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stLinkButton"]>a>div {
+    color: var(--text-color);
+}
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stLinkButton"]>a:hover>div {
+    color: white;
+}
+
+div[data-testid="stSidebarUserContent"] div[data-testid="stLinkButton"]>a>div>p {
+    font-weight: 600;
+}
+
+/* Dropdowns */
+
+ul[data-testid="stVirtualDropdown"]>div>div>li[aria-selected="true"] {
+    background: #009f66;
+}
+
+div[data-testid="stSelectbox"]>div>div {
+    background: #ffffff;
+}
+
+div[data-testid="stMultiSelect"]>div>div>div {
+    background: #ffffff;
+}
+
+div[data-testid="stNumberInput"]>div>div>div {
+    background: #ffffff;
+}
+
+div[data-testid="stNumberInput"]>div>div>button {
+    background: #ffffff;
+}
+
+button[data-testid="baseButton-header"] {
+    color: rgb(255, 255, 255);
+}
+
+/* [data-testid="stSidebarNav"] {
+    background-image: replace_logo_url;
+    background-repeat: no-repeat;
+    padding-top: 5%;
+    background-position: 20px 20px;
+    background-size: 70%;
+} */
+
+/* [data-testid="stSidebarNav"]::before {
+    content: "Features";
+    display: block;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    position: relative;
+    top: 100px;
+    color: white;
+    font-family: "Source Sans Pro", sans-serif;
+} */
+
+section[tabindex="0"]>div[data-testid="stAppViewBlockContainer"] {
+    max-width: 70rem;
+}
+
+div[data-testid="stSidebarNavSeparator"] {
+    border-bottom: 1px solid #008141;
+}
+
+[data-testid="stMarkdownContainer"]>hr {
+    border-bottom: 1px solid #008141;
+}
+
+button[data-testid="StyledFullScreenButton"] {
+    opacity: 0.6 !important;
+    position: absolute;
+    right: 0.1rem;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 20%;
+    top: 0.1rem;
+    transform: scale(1) !important;
+    /* transition: none !important; */
+}
+
+div[data-testid="stSidebarUserContent"] button[data-testid="StyledFullScreenButton"] {
+    visibility: hidden;
+}
+
+button[data-testid="StyledFullScreenButton"]:hover {
+    opacity: 1 !important;
+}
+
+button[data-testid="StyledFullScreenButton"]>svg {
+    opacity: 1;
+}
+
+div[data-testid="stForm"] {
+    background-color: #002c1c;
+}
+
+div[data-testid="stChatInput"]>div {
+    background-color: #ffffff;
+}
+
+div[data-testid="stTextInput"] {
+    width: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+div[data-testid="stTextInput"]>div>div {
+    background-color: #ffffff;
+}
+
+/* div[data-testid="stRadio"] {
+    border-bottom: #008141;
+} */
+
+div[data-testid="stRadio"]>div>label>div:first-child {
+    visibility: hidden;
+    width: 0;
+}
+
+div[data-testid="stRadio"]>div>label:has(>input[tabindex="0"]) {
+    border: 1px solid #008141;
+}
+
+div[data-testid="stRadio"]>div>label:has(>input[tabindex="0"])>div:last-child {
+    color: #008141;
+}
+
+div[data-testid="stRadio"]>div>label>div:last-child {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+div[data-test="stHorizontalBlock"]:has(>div>div>div>div>div>div>button[title="View fullscreen"] + div.stPlotlyChart) {
+    justify-content: center;
+}
+
+div[data-testid="column"]:has(>div>div>div>div>div>button[title="View fullscreen"] + div.stPlotlyChart) {
+    container-type: inline-size;
+    min-width: 400px;
+    max-width: 500px;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"][height="499"] {
+    background-color: #002c1c;
+    color: white;
+    width: 70%;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+    border-radius: 1rem;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"][height="499"] button[data-testid="StyledFullScreenButton"] {
+    visibility: hidden;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"][height="499"] img {
+    width: 20%;
+    left: 75%;
+    position: relative;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"][height="499"] button {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #008141;
+    background-color: white;
+    width: 40%;
+    font-weight: 600;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"][height="499"] button>div>p {
+    font-weight: 600;
+}
+
+button[data-testid="baseButton-primary"] {
+    position: relative;
+    color: black;
+    background-color: white;
+    border-color: darkgrey;
+    left: 3.2rem;
+}
