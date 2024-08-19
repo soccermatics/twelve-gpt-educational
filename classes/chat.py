@@ -5,7 +5,7 @@ from itertools import groupby
 from types import GeneratorType
 import pandas as pd
 
-from settings import GPT4_BASE, GPT4_VERSION, GPT4_KEY, GPT4_ENGINE
+from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 from classes.description import (
     PlayerDescription,
@@ -86,12 +86,12 @@ class Chat:
         st.expander("GPT Messages", expanded=False).write(messages)  
 
         # Call the GPT-4 API
-        openai.api_base = GPT4_BASE
-        openai.api_version = GPT4_VERSION
-        openai.api_key = GPT4_KEY
+        openai.api_base = GPT_BASE
+        openai.api_version = GPT_VERSION
+        openai.api_key = GPT_KEY
 
         response = openai.ChatCompletion.create(
-            engine=GPT4_ENGINE,
+            engine=GPT_ENGINE,
             messages=messages
             )
     
