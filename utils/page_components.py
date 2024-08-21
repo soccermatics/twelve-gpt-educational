@@ -3,6 +3,9 @@ Page components for app.py and pages/*.py
 """
 
 # Stdlib imports
+import base64
+from pathlib import Path
+
 from typing import Optional
 import traceback
 import copy
@@ -17,16 +20,68 @@ import requests
 from classes.chat import Chat
 from classes.data_source import PlayerStats
 from classes.data_point import Player
-from utils.frontend import (
-    insert_local_css,
-    set_page_config,
-)
+
 from utils.sentences import pronouns
 
 
+def insert_local_css():
+    """
+    Injects the local CSS file into the app.
+    Replaces the logo and font URL placeholders in the CSS file with base64 encoded versions.
+    """
+    with open("data/style.css", "r") as f:
+        css = f.read()
+
+    logo_url = (
+        "url(data:image/png;base64,"
+        + base64.b64encode(
+            Path('data/ressources/img/twelve_logo_light.png')
+            .read_bytes()
+        ).decode()
+        + ")"
+    )
+    font_url_medium = (
+        "url(data:font/otf;base64,"
+        + base64.b64encode(
+            Path('data/ressources/fonts/Gilroy-Medium.otf')
+            .read_bytes()
+        ).decode()
+        + ")"
+    )
+    font_url_light = (
+        "url(data:font/otf;base64,"
+        + base64.b64encode(
+            Path('data/ressources/fonts/Gilroy-Light.otf')
+            .read_bytes()
+        ).decode()
+        + ")"
+    )
+    
+    css = css.replace("replace_logo_url", logo_url)
+    css = css.replace("replace_font_url_medium", font_url_medium)
+    css = css.replace("replace_font_url_light", font_url_light)
+
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+
+
+def set_page_config():
+    """
+    Sets the page configuration for the app.
+    """
+    st.set_page_config(
+        layout="centered",
+        page_title="TwelveGPT Scout",
+        page_icon="data/ressources/img/TwelveGPT OpenSource.svg",
+        initial_sidebar_state="expanded",
+        menu_items={
+            "Report a bug": "mailto:matthias@twelve.football?subject=Bug report"
+        },
+    )
+
+
 def add_page_selector():
-    st.image("data/ressources/img/twelve_new_logo.svg")
-    st.write("OPEN SOURCE")
+    st.image("data/ressources/img/TwelveGPT OpenSource.svg")
     st.page_link("app.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
     
