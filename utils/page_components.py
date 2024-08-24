@@ -78,7 +78,44 @@ def select_player(container,players,gender,position):
         
     return player
 
+import copy
+import streamlit as st
+
+def select_two_players(container, players, gender, position):
+    # Make a copy of the Players object for each player
+    player1 = copy.deepcopy(players)
+    player2 = copy.deepcopy(players)
+
+    with container:
+        # Filter and select the first player
+        player1.select_and_filter(
+            column_name="player_name",
+            label="Select the first player",
+        )
+
+        # Manually handle the Streamlit key for the second player selection
+        player2_selectbox = st.selectbox(
+            "Select the second player",
+            player2.df["player_name"].unique(),
+            key="player2_select"
+        )
+        player2.df = player2.df[player2.df["player_name"] == player2_selectbox]
+
+    # Convert the selections into data points
+    player1 = player1.to_data_point(gender, position)
+    player2 = player2.to_data_point(gender, position)
+    
+    return player1, player2
+
+
 def create_chat(to_hash, chat_class, *args, **kwargs):
     chat_hash_state = hash(to_hash)
     chat = chat_class(chat_hash_state, *args, **kwargs)
     return chat
+
+def add_page_selector():
+    st.image("data/ressources/img/twelve_new_logo.svg")
+    st.write("OPEN SOURCE")
+    st.page_link("app.py", label="Football Scout")
+    st.page_link("pages/embedder.py", label="Embdedding Tool")
+    st.page_link("pages/player_comparison.py", label="Player Comparison (Ana)")

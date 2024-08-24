@@ -213,3 +213,102 @@ class DistributionPlot(Visual):
         self.add_title(title, subtitle)
 
 
+class ComparisonDistributionPlot(Visual):
+    def __init__(self, columns, *args, **kwargs):
+        self.columns = columns
+        super().__init__(*args, **kwargs)
+        self._setup_axes()
+
+    def _setup_axes(self):
+        self.fig.update_xaxes(range=[-4, 4], fixedrange=True, tickmode="array", tickvals=[-3, 0, 3], ticktext=["Worse", "Average", "Better"])
+        self.fig.update_yaxes(showticklabels=False, fixedrange=True, gridcolor="rgba(0, 56, 33, 1)", zerolinecolor="rgba(0, 56, 33, 1)")
+
+    def add_group_data(self, df_plot, plots, names, legend, hover='', hover_string=""):
+        showlegend = True
+        for i, col in enumerate(self.columns):
+            temp_hover_string = hover_string
+            metric_name = format_metric(col)
+            temp_df = pd.DataFrame(df_plot[col+hover])
+            temp_df['name'] = metric_name
+
+            self.fig.add_trace(
+                go.Scatter(
+                    x=df_plot[col+plots], y=np.ones(len(df_plot))*i,
+                    mode="markers",
+                    marker={
+                        "color": "rgba(0, 169, 56, 0.2)", "size": 10,
+                    },
+                    hovertemplate='%{text}<br>'+temp_hover_string+'<extra></extra>',
+                    text=names,
+                    customdata=df_plot[col+hover],
+                    name=legend,
+                    showlegend=showlegend,
+                )
+            )
+            showlegend = False
+
+    def add_data_point(self, ser_plot, plots, name, color, hover='', hover_string="", text=None):
+        if text is None:
+            text = [name]
+        elif isinstance(text, str):
+            text = [text]
+        legend = True
+
+        for i, col in enumerate(self.columns):
+            temp_hover_string = hover_string
+            metric_name = format_metric(col)
+
+            self.fig.add_trace(
+                go.Scatter(
+                    x=[ser_plot[col+plots]], y=[i], mode="markers",
+                    marker={"color": f"rgba{(*color, 0.5)}", "size": 10, "symbol": "circle", "line_width": 1.5, "line_color": f"rgba{(*color, 1)}"},
+                    hovertemplate='%{text}<br>'+temp_hover_string+'<extra></extra>',
+                    text=text,
+                    customdata=[ser_plot[col+hover]],
+                    name=name,
+                    showlegend=legend
+                )
+            )
+            legend = False
+
+            self.fig.add_annotation(
+                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f} per 90</span>", showarrow=False,
+                font={"color": "rgba(255, 255, 255, 1)", "family": "Gilroy-Light",
+                        "size": 12 * self.font_size_multiplier},
+            )
+
+    def add_players(self, player1: Player, player2: Player, metrics, players: PlayerStats):
+        n_group = len(players.df)
+
+        self.add_group_data(
+            df_plot=players.df,
+            plots='_Z',
+            names=players.df["player_name"],
+            hover='_Ranks',
+            hover_string="Rank: %{customdata}/" + str(n_group),
+            legend="Other players  ",
+        )
+
+        self.add_data_point(
+            ser_plot=player1.ser_metrics,
+            plots='_Z',
+            name=player1.name,
+            color=(255, 75, 0),
+            hover='_Ranks',
+            hover_string=f"Rank: {{customdata}}/{n_group}",
+        )
+
+        self.add_data_point(
+            ser_plot=player2.ser_metrics,
+            plots='_Z',
+            name=player2.name,
+            color=(0, 149, 255),
+            hover='_Ranks',
+            hover_string=f"Rank: {{customdata}}/{n_group}",
+        )
+
+    def add_title_from_players(self, player1: Player, player2: Player):
+        title = f"Comparison of {player1.name} and {player2.name}"
+        subtitle = f"{player1.name}: {player1.minutes_played} mins, {player2.name}: {player2.minutes_played} mins"
+
+        self.add_title(title, subtitle)

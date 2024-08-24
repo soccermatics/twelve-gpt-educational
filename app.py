@@ -24,6 +24,8 @@ from utils.page_components import (
     create_chat,
 )
 
+from classes.description import (PlayerDescriptionComparison,)
+
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
 sidebar_container = st.sidebar.container()

@@ -262,3 +262,70 @@ class PlayerDescription(Description):
         )
         return [{"role": "user", "content": prompt}]
 
+class PlayerDescriptionComparison(Description):
+    output_token_limit = 150
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/Compare.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/Forward.xlsx",f"{self.describe_base}/Compare.xlsx"]
+
+    def __init__(self, player1: Player, player2:Player):
+        self.player1 = player1
+        self.player2 = player2
+        super().__init__()
+    
+    def synthesize_text(self):
+        player1 = self.player1
+        player2 = self.player2
+        metrics = player1.relevant_metrics  # Assuming both players have the same relevant metrics
+
+        description = f"Here is a statistical comparison between {player1.name} and {player2.name}, who played for {player1.minutes_played} and {player2.minutes_played} minutes respectively as {player1.position}.\n\n"
+
+        subject_p1, object_p1, possessive_p1 = sentences.pronouns(player1.gender)
+        subject_p2, object_p2, possessive_p2 = sentences.pronouns(player2.gender)
+        
+        for metric in metrics:
+            player1_metric_value = player1.ser_metrics[metric + "_Z"]
+            player2_metric_value = player2.ser_metrics[metric + "_Z"]
+            
+            description += f"In terms of {sentences.write_out_metric(metric)}, "
+
+            #Player 1's performance
+            description += f"{player1.name} was "
+            description += sentences.describe_level(player1_metric_value)
+            description += " compared to other players in the same position. "
+
+            #Player 2's performance
+            description += f"{player2.name} was "
+            description += sentences.describe_level(player2_metric_value)
+            description += " compared to other players in the same position. "
+
+            if player1_metric_value > player2_metric_value:
+                description += f"{player1.name} outperformed {player2.name} in this metric. "
+            elif player1_metric_value < player2_metric_value:
+                description += f"{player2.name} outperformed {player1.name} in this metric. "
+            else:
+                description += f"Both players performed similarly in this metric. "
+
+            description += "\n"
+
+        return description
+
+
+    def get_prompt_messages(self):
+        prompt = (
+        "Please generate a detailed comparison between two players using the statistical descriptions provided. "
+        "The response should be structured into five distinct paragraphs: "
+        "1. **Introduction**: Provide an overview of how the two players differ in their overall playing style. "
+        "2. **Strengths**: Highlight the specific strengths of each player based on the metrics, such as 'Player X is better at [specific skill] than Player A' or 'Player B excels at [skill], but Player A is even stronger'. "
+        "3. **Weaknesses**: Discuss the areas where one player might be stronger or weaker than the other, using comparative language like 'Player B is good at [metric], but Player A is superior in [metric]'. "
+        "4. **Playing Style**: Describe the playing style of each player, highlighting how their approach to the game might differ. "
+        "5. **Overall Comparison**: Summarize how the two players compare directly to each other overall, considering all metrics."
+    )
+        return [{"role": "user", "content": prompt}]
+
+

@@ -8,7 +8,7 @@ import pandas as pd
 from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 from classes.description import (
-    PlayerDescription,
+    PlayerDescription,PlayerDescriptionComparison
 )
 from classes.embeddings import PlayerEmbeddings
 
@@ -208,3 +208,60 @@ class PlayerChat(Chat):
         
         return ret_val
         
+class PlayerChatComparison(Chat):
+    def __init__(self, chat_state_hash, player1, player2, players, state="empty"):
+        self.embeddings = PlayerEmbeddings()
+        self.player1 = player1
+        self.player2 = player2
+        self.players = players
+        super().__init__(chat_state_hash, state=state)
+
+    def instruction_messages(self):
+        """
+        Instruction for the agent.
+        """
+        first_messages = [
+            {"role": "system", "content": "You are a UK-based football scout."},
+            {"role": "user", "content": (
+                f"The user has selected players {self.player1.name} and {self.player2.name}, and the conversation will be about comparing them. "
+                "You will receive relevant information to answer a user's questions and then be asked to provide a response. "
+                "All user messages will be prefixed with 'User:' and enclosed with ```. "
+                "When responding to the user, speak directly to them. "
+                "Use the information provided before the query to provide concise answers."
+                "Do not deviate from this information or provide additional information that is not in the text returned by the functions."
+                )
+            },
+        ]
+        return first_messages
+
+    def get_relevant_info(self, query):
+        """
+        Retrieves relevant information for comparing the two players based on the query.
+        """
+        if query == '':
+            query = self.visible_messages[-1]["content"]
+        
+        ret_val = "Here is a comparison of the two players based on their data: \n\n"   
+        description = PlayerDescriptionComparison(self.player1, self.player2)
+        ret_val += description.synthesize_text()
+
+        # Search for relevant embeddings
+        results = self.embeddings.search(query, top_n=5)
+        ret_val += "\n\nHere is some additional relevant information:  \n"   
+        ret_val += "\n".join(results["assistant"].to_list())
+        
+        ret_val += "\n\nIf none of this information is relevant to the user's query, remind them about the chat functionality: \n"
+        ret_val += "This chat can answer questions about how the two players compare based on their statistics."
+        ret_val += "The user can select different players using the menu to the left."
+        
+        return ret_val
+
+    def get_input(self):
+        """
+        Get input from streamlit.
+        """
+        if x := st.chat_input(placeholder=f"What else would you like to know about comparing {self.player1.name} and {self.player2.name}?"):
+            if len(x) > 500:
+                st.error(f"Your message is too long ({len(x)} characters). Please keep it under 500 characters.")
+
+            self.handle_input(x)
