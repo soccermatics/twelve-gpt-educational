@@ -86,6 +86,7 @@ def add_page_selector():
         label="Football Scout",
     )
     st.page_link(path + "pages/embedder.py", label="Embdedding Tool")
+    st.page_link(path + "pages/compare_players.py", label="Comparison Tool")
 
 
 def add_common_page_elements():
