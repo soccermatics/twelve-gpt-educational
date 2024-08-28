@@ -18,7 +18,6 @@ The design and code for this project was by Matthias Green, David Sumpter and Á
 
 This application was made with Streamlit.  To run locally, first create .streamlit/secrets.toml with keys, etc... then run:
 ```bash
-# Tested on Python 3.9.13
 conda create --name streamlit_env
 conda activate streamlit_env
 pip install -r requirements.txt
@@ -81,6 +80,3 @@ The get_relevant_info(input) both retrieves the synthesize_text() from the descr
 ### Embeddings
 
 Certain files in /data/describe/ contain question-answer pairs that are embedded by pages/embedder.py. You can run this app by clicking on 'Embedding Tool' in top left corner of the app. This is then used to search (using cosine similarity) for the best question-answer pairs for answering the users query.
-
-
-
