@@ -15,50 +15,76 @@ from utils.datalib.pandas_helper import pandas as pd
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
-def get_embedding(text: str, engine="text-similarity-davinci-001", **kwargs) -> List[float]:
+def get_embedding(text: str, engine="text-similarity-davinci-001", use_gemini=False, **kwargs) -> List[float]:
 
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 
-    return openai.Embedding.create(input=[text], engine=engine, **kwargs)["data"][0]["embedding"]
+    if use_gemini:
+        import google.generativeai as genai
+        # FIXME: ignores kwargs
+        embedding = genai.embed_content(
+            model=engine,
+            content=text,
+            task_type="retrieval_document"
+        )["embedding"]
+    else:
+        embedding = openai.Embedding.create(input=[text], engine=engine, **kwargs)["data"][0]["embedding"]
+    return embedding
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 async def aget_embedding(
-    text: str, engine="text-similarity-davinci-001", **kwargs
+    text: str, engine="text-similarity-davinci-001", use_gemini=False, **kwargs
 ) -> List[float]:
 
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 
-    return (await openai.Embedding.acreate(input=[text], engine=engine, **kwargs))["data"][0][
-        "embedding"
-    ]
+    if use_gemini:
+        import google.generativeai as genai
+        return (await genai.embed_content_async(model=engine, content=text, task_type="retrieval_document"))["embedding"]
+    else:
+        return (await openai.Embedding.acreate(input=[text], engine=engine, **kwargs))["data"][0][
+            "embedding"
+        ]
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 def get_embeddings(
-    list_of_text: List[str], engine="text-similarity-babbage-001", **kwargs
+    list_of_text: List[str], engine="text-similarity-babbage-001", use_gemini=False, **kwargs
 ) -> List[List[float]]:
     assert len(list_of_text) <= 2048, "The batch size should not be larger than 2048."
 
     # replace newlines, which can negatively affect performance.
     list_of_text = [text.replace("\n", " ") for text in list_of_text]
 
-    data = openai.Embedding.create(input=list_of_text, engine=engine, **kwargs).data
+    if use_gemini:
+        import google.generativeai as genai
+        # FIXME: to be checked
+        data = genai.embed_content(
+            model=engine,
+            content=list_of_text,
+            task_type="retrieval_document"
+        )
+    else:
+        data = openai.Embedding.create(input=list_of_text, engine=engine, **kwargs).data
     return [d["embedding"] for d in data]
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 async def aget_embeddings(
-    list_of_text: List[str], engine="text-similarity-babbage-001", **kwargs
+    list_of_text: List[str], engine="text-similarity-babbage-001", use_gemini=False, **kwargs
 ) -> List[List[float]]:
     assert len(list_of_text) <= 2048, "The batch size should not be larger than 2048."
 
     # replace newlines, which can negatively affect performance.
     list_of_text = [text.replace("\n", " ") for text in list_of_text]
-
-    data = (await openai.Embedding.acreate(input=list_of_text, engine=engine, **kwargs)).data
+    if use_gemini:
+        import google.generativeai as genai
+        data = (await genai.embed_content_async(model=engine, content=list_of_text, task_type="retrieval_document"))
+    else:
+        data = (await openai.Embedding.acreate(input=list_of_text, engine=engine, **kwargs)).data
     return [d["embedding"] for d in data]
 
 

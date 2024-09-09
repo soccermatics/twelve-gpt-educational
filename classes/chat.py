@@ -5,7 +5,7 @@ from itertools import groupby
 from types import GeneratorType
 import pandas as pd
 
-from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
+from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE, USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
 
 from classes.description import (
     PlayerDescription,
@@ -18,6 +18,7 @@ from classes.visual import (
 )
 
 import utils.sentences as sentences
+from utils.gemini import convert_messages_format
 
 openai.api_type = "azure"
 
@@ -85,17 +86,32 @@ class Chat:
         # Show the messages in an expander
         st.expander("GPT Messages", expanded=False).write(messages)  
 
-        # Call the GPT-4 API
-        openai.api_base = GPT_BASE
-        openai.api_version = GPT_VERSION
-        openai.api_key = GPT_KEY
+        # Check if use gemini is set to true
+        if USE_GEMINI:
+            import google.generativeai as genai
+            converted_msgs = convert_messages_format(messages)
 
-        response = openai.ChatCompletion.create(
-            engine=GPT_ENGINE,
-            messages=messages
+            genai.configure(api_key=GEMINI_API_KEY)
+            model = genai.GenerativeModel(
+                model_name=GEMINI_CHAT_MODEL,
+                system_instruction=converted_msgs["system_instruction"]
             )
-    
-        answer=response['choices'][0]['message']['content']
+            chat = model.start_chat(history=converted_msgs["history"])
+            response = chat.send_message(content=converted_msgs["content"])
+
+            answer = response.text
+        else:
+            # Call the GPT-4 API
+            openai.api_base = GPT_BASE
+            openai.api_version = GPT_VERSION
+            openai.api_key = GPT_KEY
+
+            response = openai.ChatCompletion.create(
+                engine=GPT_ENGINE,
+                messages=messages
+                )
+        
+            answer=response['choices'][0]['message']['content']
         message = {"role": "assistant", "content": answer}
         
         # Add the returned value to the messages.
