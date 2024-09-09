@@ -8,9 +8,10 @@ import openai
 import numpy as np
 
 import utils.sentences as sentences
+from utils.gemini import convert_messages_format
 from classes.data_point import Player
 
-from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE, GPT_DEFAULT
+from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE, GPT_DEFAULT, USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
 
 import streamlit as st
 
@@ -159,19 +160,35 @@ class Description(ABC):
         Yields:
             str
         """
-        openai.api_base = GPT_BASE
-        openai.api_version = GPT_VERSION
-        openai.api_key = GPT_KEY
 
         st.expander("Description messages", expanded=False).write(self.messages)
 
-        response = openai.ChatCompletion.create(
-            engine=GPT_ENGINE,
-            messages=self.messages,
-            temperature= temperature,
+        if USE_GEMINI:
+            import google.generativeai as genai
+            converted_msgs = convert_messages_format(self.messages)
+
+            genai.configure(api_key=GEMINI_API_KEY)
+            model = genai.GenerativeModel(
+                model_name=GEMINI_CHAT_MODEL,
+                system_instruction=converted_msgs["system_instruction"]
             )
-    
-        answer=response['choices'][0]['message']['content']
+            chat = model.start_chat(history=converted_msgs["history"])
+            response = chat.send_message(content=converted_msgs["content"])
+
+            answer = response.text
+        else:
+            # Use OpenAI API
+            openai.api_base = GPT_BASE
+            openai.api_version = GPT_VERSION
+            openai.api_key = GPT_KEY
+
+            response = openai.ChatCompletion.create(
+                engine=GPT_ENGINE,
+                messages=self.messages,
+                temperature= temperature,
+                )
+        
+            answer=response['choices'][0]['message']['content']
 
         return answer
 

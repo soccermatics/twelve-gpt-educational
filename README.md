@@ -25,7 +25,7 @@ streamlit run app.py
 ```
 Once you have made changes to the code, save, move focus to the streamlit tab, then press c to clear caches if necessary, then r to rerun. 
 
-You also need to have access to GPT API to use this package. We hope to have a Llama compatible version soon. 
+You also need to have access to GPT API to use this package. Alternatively, you need access to Gemini API but that requires changes to the [.streamlit/secrets.toml](.streamlit/secrets.toml) file (see below).
 
 ## How does it work?
 ### App
@@ -80,3 +80,18 @@ The get_relevant_info(input) both retrieves the synthesize_text() from the descr
 ### Embeddings
 
 Certain files in /data/describe/ contain question-answer pairs that are embedded by pages/embedder.py. You can run this app by clicking on 'Embedding Tool' in top left corner of the app. This is then used to search (using cosine similarity) for the best question-answer pairs for answering the users query.
+
+
+### Using Gemini API
+If, instead of using OpenAI's API, you want to use Google's. You need to add the following lines to your [.streamlit/secrets.toml](.streamlit/secrets.toml) file.
+
+```toml
+USE_GEMINI = true
+GEMINI_API_KEY = "YOUR_API_KEY"
+
+# Can use any chat model
+GEMINI_CHAT_MODEL = "gemini-1.5-flash"
+
+# Can use any embedding model
+GEMINI_EMBEDDING_MODEL = "models/text-embedding-004"
+```
