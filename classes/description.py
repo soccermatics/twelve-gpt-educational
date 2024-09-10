@@ -11,7 +11,13 @@ import utils.sentences as sentences
 from utils.gemini import convert_messages_format
 from classes.data_point import Player
 
-from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE, GPT_DEFAULT, USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
+
+from settings import USE_GEMINI
+
+if USE_GEMINI:
+    from settings import USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
+else:
+    from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 import streamlit as st
 

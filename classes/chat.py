@@ -5,8 +5,13 @@ from itertools import groupby
 from types import GeneratorType
 import pandas as pd
 
-from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE, USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
+from settings import USE_GEMINI
 
+if USE_GEMINI:
+    from settings import USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
+else:
+    from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
+    
 from classes.description import (
     PlayerDescription,
 )
