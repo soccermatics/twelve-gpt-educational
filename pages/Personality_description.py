@@ -1,87 +1,87 @@
 import streamlit as st
+import json
+import openai
+from itertools import groupby
+from types import GeneratorType
 import pandas as pd
-import argparse
-import tiktoken
-import os
-from utils.utils import normalize_text
+import plotly.graph_objects as go
+import plotly.express as px
 
 from classes.data_source import PersonalityStats
 from classes.data_point import Person
 
-
-from utils.page_components import (
-    add_common_page_elements
-)
-
-from classes.embeddings import Embeddings
+from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 
+import utils.sentences as sentences
 
-def file_walk(path):
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            if not name.endswith('.DS_Store'):  # Skip .DS_Store files
-                yield root, name
-
-
-def get_format(path):
-    file_format = "." + path.split(".")[-1]
-    if file_format == ".xlsx":
-        read_func = pd.read_excel
-    elif file_format == ".csv":
-        read_func = pd.read_csv
-    else:
-        raise ValueError(f"File format {file_format} not supported.")
-        print("unected file: " + path )
-    return file_format, read_func
-
-
-def embed(file_path,embeddings):
-        file_format, read_func = get_format(file_path)
-        
-        df = read_func(file_path)
-        embedding_path = file_path.replace("describe", "embeddings").replace(file_format, ".parquet")
-
-        st.write(embedding_path)
-
-        st.write(df)
-        # Check if the content of user exceeds max token length
-        tokenizer = tiktoken.get_encoding("cl100k_base")
-        df["user_tokens"] = df["user"].apply(lambda x: len(tokenizer.encode(x)))
-        df = df[df.user_tokens < 8192]
-        df = df.drop("user_tokens", axis=1)
-
-        # Check for common errors in the text
-        df["user"] = df["user"].apply(lambda x: normalize_text(x))
-        
-                    
-        df["user_embedded"] = df["user"].apply(
-            lambda x: str(embeddings.return_embedding(x))
-        )
-
-
-        
-        directory = os.path.dirname(embedding_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        
-        df.to_parquet(embedding_path, index=False)
+from utils.page_components import (add_common_page_elements)
 
 
 sidebar_container = add_common_page_elements()
+page_container = st.sidebar.container()
+sidebar_container = st.sidebar.container()
 
 st.divider()
 
-embeddings = Embeddings()
 
-directory= st.text_input("Directory to embedd", "")
-st.write("Starting to embedd " + directory)
+def radarPlot(data_p):
+    # Data import
+    data_r = data_p.to_list()  
+    labels = ['Extraversion', 'Neuroticism', 'Agreeableness', 'Conscientiousness', 'Openness']
+    df = pd.DataFrame({'data': data_r,'label': labels})
+    
+    # Create the radar plot
+    fig = px.line_polar(df, r='data', theta='label', line_close=True, markers=True)
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True,range=[0, 40])),showlegend=True, title= 'Candidate profile')
+    fig.update_traces(fill='toself', hoverinfo='r', marker=dict(size=5))
+    # Display the plot in Streamlit
+    st.plotly_chart(fig) 
 
-path_describe = os.path.normpath("data/describe/"+directory)
-path_embedded = os.path.normpath("data/embeddings/"+directory)
+
+def violin_and_point_plot(data, point_data):
+    # Create a figure object
+    fig = go.Figure()
+
+    # Labels for the columns
+    labels = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+
+    # Loop through each label to add a violin plot trace
+    for label in labels:
+        fig.add_trace(go.Violin(
+            x=data[label],  # Use x for the data
+            name=label,      # Label each violin plot correctly
+            box_visible=True,
+            meanline_visible=True,
+            line_color='black',  # Color of the violin outline
+            fillcolor='rgba(0,100,200,0.3)',  # Color of the violin fill
+            opacity=0.6,
+            orientation='h'  # Set orientation to horizontal
+        )
+    )
+    for label, value in point_data.items():
+        fig.add_trace(
+            go.Scatter(x=[value], y=[label], mode='markers', marker=dict(color='red', size=10, symbol='cross'), name=f'{label} Candidate Point'))
+
+    # Update layout for better visualization
+    fig.update_layout(
+        title='Distribution of Personality Traits',
+        xaxis_title='Score',  
+        yaxis_title='Trait',
+        xaxis=dict(range=[0, 40]),
+        violinmode='overlay', 
+        showlegend=True)
+
+    # Display the plot in Streamlit
+    st.plotly_chart(fig)
 
 
-st.write("Updating all embeddings...")
-for root, name in file_walk(path_describe):
-    print_path = os.path.join(root, name).replace(path_describe, "")[1:]
-    embed(os.path.join(root, name),embeddings)
+# Upload the dataset
+data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
+# Reduce the dataset
+df = data.iloc[0:1000, -6:-1]
+# Pick one candidate
+data_p = df.iloc[0, -5:]
+
+radarPlot(data_p)
+violin_and_point_plot(df, data_p)
