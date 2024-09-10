@@ -148,4 +148,26 @@ class PlayerStats(Stats):
         
         return self.data_point_class(id=id,name=name,minutes_played=minutes_played,gender=gender,position=position,ser_metrics=ser_metrics,relevant_metrics=self.metrics)
 
+
+class PersonalityStats(Stats):
+    data_point_class = data_point.Person
     
+    def __init__(self):
+        super().__init__()
+
+    def get_raw_data(self):
+        df = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
+        return df
+
+    def to_data_point(self,name,extraversion,neurotiscism,agreeableness,conscientiousness,openness) -> data_point.Person:
+        
+        id = self.df.index[0]
+        name = self.name[0]
+        extraversion = self.extraversion[0]
+        neurotiscism = self.neurotiscism[0]
+        agreeableness = self.agreeableness[0]
+        conscientiousness = self.conscientiousness[0]
+        openness = self.openness[0]
+
+        
+        return self.data_point_class(id=id,name=name, extraversion=extraversion,neurotiscism=neurotiscism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
