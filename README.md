@@ -91,6 +91,7 @@ GPT_BASE = "address of you deployment of Chat GPT"
 GPT_VERSION = "version date"
 GPT_KEY = "your key"
 GPT_ENGINE = "model name"
+```
 
 ### Using Gemini API
 If, instead of using OpenAI's API, you want to use Google's. You need to add the following lines to your [.streamlit/secrets.toml](.streamlit/secrets.toml) file.
