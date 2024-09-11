@@ -9,6 +9,7 @@ import plotly.express as px
 
 from classes.data_source import PersonalityStats
 from classes.data_point import Person
+from classes.personality_description import*
 
 from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
@@ -61,7 +62,7 @@ def violin_and_point_plot(data, point_data):
     )
     for label, value in point_data.items():
         fig.add_trace(
-            go.Scatter(x=[value], y=[label], mode='markers', marker=dict(color='red', size=10, symbol='cross'), name=f'{label} Candidate Point'))
+            go.Scatter(x=[value], y=[label], mode='markers', marker=dict(color='red', size=8, symbol='cross'), name=f'{label} Candidate Point'))
 
     # Update layout for better visualization
     fig.update_layout(
@@ -79,9 +80,14 @@ def violin_and_point_plot(data, point_data):
 # Upload the dataset
 data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
 # Reduce the dataset
-df = data.iloc[0:1000, -6:-1]
+df = data.iloc[0:10000, -6:-1]
 # Pick one candidate
 data_p = df.iloc[0, -5:]
 
 radarPlot(data_p)
 violin_and_point_plot(df, data_p)
+
+
+data2 = pd.read_csv('data/data-final.csv', sep='\t')
+
+st.write(get_description(data2, 0))
