@@ -60,6 +60,8 @@ def violin_and_point_plot(data, point_data):
             orientation='h'  # Set orientation to horizontal
         )
     )
+        
+    # This part can be done with visual.add_data_point where visual has class ViolinPlot
     for label, value in point_data.items():
         fig.add_trace(
             go.Scatter(x=[value], y=[label], mode='markers', marker=dict(color='red', size=8, symbol='cross'), name=f'{label} Candidate Point'))
