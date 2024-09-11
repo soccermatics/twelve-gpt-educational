@@ -85,6 +85,7 @@ def add_page_selector():
     st.page_link("app.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
     st.page_link("pages/own_page.py", label="Your Own Page")
+    st.page_link("pages/personality_test.py", label="Personality page")
     
 
 def add_common_page_elements():
