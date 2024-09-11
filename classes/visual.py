@@ -98,8 +98,7 @@ class Visual():
             x=0.5, y=-0.07, text=text, showarrow=False,
             font={"color": rgb_to_color(self.white,0.5), "family": "Gilroy-Light", "size": 12*self.font_size_multiplier},
         )
-
-    
+  
 
 class DistributionPlot(Visual):
     def __init__(self, columns, *args, **kwargs):
@@ -213,3 +212,31 @@ class DistributionPlot(Visual):
         self.add_title(title, subtitle)
 
 
+class ViolinPlot(DistributionPlot):   
+      def add_group_data(self, df_plot, plots, names, legend, hover='', hover_string=""):
+        showlegend = True
+
+        for i, col in enumerate(self.columns):
+            temp_hover_string = hover_string
+
+            metric_name = format_metric(col)
+
+            temp_df = pd.DataFrame(df_plot[col+hover])
+            temp_df['name'] = metric_name
+            
+            self.fig.add_trace(
+                go.Violin(
+                    # But with correct parameters.
+                    x=df_plot[col+plots], y=np.ones(len(df_plot))*i,
+                    mode="markers",
+                    marker={
+                        "color": rgb_to_color(self.bright_green, opacity=0.2), "size": 10,
+                    },
+                    hovertemplate='%{text}<br>'+temp_hover_string+'<extra></extra>',
+                    text=names,
+                    customdata=df_plot[col+hover],
+                    name=legend,
+                    showlegend=showlegend,
+                )
+            )
+            showlegend = False
