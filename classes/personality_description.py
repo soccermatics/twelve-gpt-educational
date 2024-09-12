@@ -1,32 +1,33 @@
 import numpy as np
 import pandas as pd
-import utils.sentences as sentences
 
-
-
-def z_score(data, data_p):
-    mean_ext = data['extraversion'].mean()
-    std_ext = data['extraversion'].std(ddof=0)
-    mean_neu = data['neuroticism'].mean()
-    std_neu = data['neuroticism'].std(ddof=0)
-    mean_agr = data['agreeableness'].mean()
-    std_agr = data['agreeableness'].std(ddof=0)
-    mean_con = data['conscientiousness'].mean()
-    std_con = data['conscientiousness'].std(ddof=0)
-    mean_ope = data['openness'].mean()
-    std_ope = data['openness'].std(ddof=0)
-    data_p['extraversion_zscore'] = (data_p['extraversion'] - mean_ext)/std_ext
-    data_p['neuroticism_zscore'] = (data_p['neuroticism'] - mean_neu)/std_neu
-    data_p['agreeableness_zscore'] = (data_p['agreeableness'] - mean_agr)/std_agr
-    data_p['conscientiousness_zscore'] = (data_p['conscientiousness'] - mean_con)/std_con
-    data_p['openness_zscore'] = (data_p['openness'] - mean_ope)/std_ope
-    return data_p
-
-
-
-def personality_plot(person_list, matching, questions):
-    data_temp =pd.DataFrame([person_list], columns= [column for column in matching])
+def get_stat(dataset):
+    # List of columns to compute statistics for
+    columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
     
+    # Dictionary to store mean and std for each column
+    stats = {}
+    
+    for column in columns:
+        stats[column] = {
+            'mean': dataset[column].mean(),
+            'std': dataset[column].std(ddof=0)  # Use ddof=0 for population standard deviation
+        }
+    
+    return stats
+
+def dataset_z_score(dataset, stats):
+    columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+    
+    for column in columns:
+        mean = stats[column]['mean']
+        std = stats[column]['std']
+        dataset[f'{column}_zscore'] = (dataset[column] - mean) / std
+    
+    return dataset
+
+def convert_list_to_dataset(person_list, matching, questions):
+    data_temp =pd.DataFrame([person_list], columns= [column for column in matching])   
     for column in data_temp.columns:
         data_temp[column] = data_temp[column] * questions[column][1]
     data_temp['extraversion'] = data_temp.iloc[:,0:10].sum(axis=1) + 20
@@ -34,125 +35,28 @@ def personality_plot(person_list, matching, questions):
     data_temp['agreeableness'] = data_temp.iloc[:,20:30].sum(axis=1) +14 
     data_temp['conscientiousness'] = data_temp.iloc[:,30:40].sum(axis=1) + 14
     data_temp['openness'] = data_temp.iloc[:,40:50].sum(axis=1) + 8
+    
     return data_temp
 
-def personality_score(data_p):
-    return data_p.iloc[:,-5:].values.tolist()[0]
-
-def person_description(data_p, data, questions):
-    data_pz = z_score(data,data_p) 
-    text = []
-    
-    for i in range(0,5):
+def categorie_description(dataset):
+    if dataset <= -2:
+        text = 'The candidate is extremely '
+    elif (dataset < -2) & (dataset <= -1):
+        text = 'The candidate is very '
+    elif (dataset > -1) & (dataset <= -0.5):
+        text = 'The candidate is quite '
+    elif (dataset > -0.5) & (dataset <= 0.5):
+        text = 'The candidate is relatively '
+    elif (dataset > 0.5) & (dataset <= 1):
+        text = 'The candidate is quite'
+    elif (dataset > 1) & (dataset <= 2):
+        text = 'The candidate is very '
+    elif dataset > 2:
+        text = 'The candidate is extremely '
         
-        # extraversion
-        if i == 0:
-            cat_0 = 'solitary and reserved. '
-            cat_1 = 'outgoing and energetic. '
-        
-            if data_pz['extraversion_zscore'].values > 0:
-                text_t = sentences.categorie_description(data_pz['extraversion_zscore'].values) + cat_1
-                if data_pz['extraversion_zscore'].values > 1:
-                    index_max = data_pz.iloc[0,0:10].idxmax()
-                    text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
-                    text_t = text_t + text_2
-            else:
-                text_t = sentences.categorie_description(data_pz['extraversion_zscore'].values) + cat_0
-                if data_pz['extraversion_zscore'].values < -1:
-                    index_min = data_pz.iloc[0,0:10].idxmin()
-                    text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
-                    text_t = text_t + text_2
-            text.append(text_t)
-                
-        # neuroticism
-        if i == 1:
-            cat_0 = 'resilient and confident. '
-            cat_1 = 'sensitive and nervous. '
-            
-            if data_pz['neuroticism_zscore'].values > 0:
-                text_t = sentences.categorie_description(data_pz['neuroticism_zscore'].values) + cat_1  \
-                + 'The candidate tends to feel more negative emotions, anxiety. '
-                if data_pz['neuroticism_zscore'].values > 1:
-                    index_max = data_pz.iloc[0,10:20].idxmax()
-                    text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
-                    text_t = text_t + text_2
-                
-            else:
-                text_t = sentences.categorie_description(data_pz['neuroticism_zscore'].values) + cat_0  \
-                + 'The candidate tends to feel less negative emotions, anxiety. '
-                if data_pz['neuroticism_zscore'].values < -1:
-                    index_min = data_pz.iloc[0,10:20].idxmin()
-                    text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
-                    text_t = text_t + text_2
-            text.append(text_t)
-            
-        # agreeableness        
-        if i == 2:
-            cat_0 = 'critical and rational. '
-            cat_1 = 'friendly and compassionate. '
-            
-            if data_pz['agreeableness_zscore'].values > 0:
-                text_t = sentences.categorie_description(data_pz['agreeableness_zscore'].values) + cat_1  \
-                + 'The candidate tends to be more cooperative, polite, kind and friendly. '
-                if data_pz['agreeableness_zscore'].values > 1:
-                    index_max = data_pz.iloc[0,20:30].idxmax()
-                    text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
-                    text_t = text_t + text_2
-
-            else:
-                text_t = sentences.categorie_description(data_pz['agreeableness_zscore'].values) + cat_0  \
-                + 'The candidate tends to be less cooperative, polite, kind and friendly. '
-                if data_pz['agreeableness_zscore'].values < -1:
-                    index_min = data_pz.iloc[0,20:30].idxmin()
-                    text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
-                    text_t = text_t + text_2
-            text.append(text_t)
-            
-        # conscientiousness
-        if i == 3:  
-            cat_0 = 'extravagant and careless. '
-            cat_1 = 'efficient and organized. '
-            
-            if data_pz['conscientiousness_zscore'].values > 0:
-                text_t = sentences.categorie_description(data_pz['conscientiousness_zscore'].values) + cat_1  \
-                + 'The candidate tends to be more careful or diligent. '
-                if data_pz['conscientiousness_zscore'].values > 1:
-                    index_max = data_pz.iloc[0,30:40].idxmax()
-                    text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
-                    text_t = text_t + text_2
-            else:
-                text_t = sentences.categorie_description(data_pz['conscientiousness_zscore'].values) + cat_0  \
-                + 'The candidate tends to be less careful or diligent. '
-                if data_pz['conscientiousness_zscore'].values < -1:
-                    index_min = data_pz.iloc[0,30:40].idxmin()
-                    text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
-                    text_t = text_t + text_2
-            text.append(text_t)
-        
-        # openness
-        if i == 4:
-            cat_0 = 'consistent and cautious. '
-            cat_1 = 'inventive and curious. '
-            
-            if data_pz['openness_zscore'].values > 0:
-                text_t = sentences.categorie_description(data_pz['openness_zscore'].values) + cat_1  \
-                + 'The candidate tends to be more open. '
-                if data_pz['openness_zscore'].values > 1:
-                    index_max = data_pz.iloc[0,40:50].idxmax()
-                    text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
-                    text_t = text_t + text_2
-            else:
-                text_t = sentences.categorie_description(data_pz['openness_zscore'].values) + cat_0  \
-                + 'The candidate tends to be less open. '
-                if data_pz['openness_zscore'].values < -1:
-                    index_min = data_pz.iloc[0,40:50].idxmin()
-                    text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
-                    text_t = text_t + text_2
-            text.append(text_t)
-        i+=1
-        
-    
     return text
+
+
 
 def prepare_dataset(data):
     data = data.copy()
@@ -237,26 +141,142 @@ def prepare_dataset(data):
     data['agreeableness'] = data.iloc[:, 20:30].sum(axis=1) +14 
     data['conscientiousness'] = data.iloc[:, 30:40].sum(axis=1) + 14
     data['openness'] = data.iloc[:, 40:50].sum(axis=1) + 8
+    data['name'] = data.index.to_series().apply(lambda idx: 'C_' + str(idx))
 
     return data, questions, matching
 
-def get_description(data, name):
-    data,questions, matching = prepare_dataset(data)
-    list_j = data.iloc[name,:-5].to_list()
-    data_p = personality_plot(list_j, matching, questions) # return a dataset
-    data_p.iloc[:,-5:]
-    data_pz = z_score(data,data_p) 
-    data_pz
-
-    description = person_description(data_p, data, questions)
-    description = ''.join(description)
-    description = description.replace(',','')
-    return description
 
 
-#data = pd.read_csv('data-final.csv', sep='\t')
+def get_description(candidate_data, dataset):
+    
+    # Upload the dataset
+    data, questions, matching = prepare_dataset(dataset)
+    stats = get_stat(dataset)
+    data = dataset_z_score(data, stats)
 
+    # First we want to check if the user want a certain candidate from the dataset 
+    # or if the user did the test so it return a list
+    if isinstance(candidate_data, list):
+        data_c = convert_list_to_dataset(candidate_data, matching, questions)
+        data_c = dataset_z_score(data_c, stats)
+        
+    
+    elif isinstance(candidate_data,(int, float)):
+        if candidate_data < 0:
+            print('The number should be greater or equal to 0')
+        else:
+            data_c = pd.DataFrame([data.iloc[candidate_data]])
+        
+    text = []
+    
+    for i in range(0,5):
+        
+        # extraversion
+        if i == 0:
+            cat_0 = 'solitary and reserved. '
+            cat_1 = 'outgoing and energetic. '
+        
+            if data_c['extraversion_zscore'].values > 0:
+                text_t = categorie_description(data_c['extraversion_zscore'].values) + cat_1
+                if data_c['extraversion_zscore'].values > 1:
+                    index_max = data_c.iloc[0,0:10].idxmax()
+                    text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
+                    text_t = text_t + text_2
+            else:
+                text_t = categorie_description(data_c['extraversion_zscore'].values) + cat_0
+                if data_c['extraversion_zscore'].values < -1:
+                    index_min = data_c.iloc[0,0:10].idxmin()
+                    text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
+                    text_t = text_t + text_2
+            text.append(text_t)
+                
+        # neuroticism
+        if i == 1:
+            cat_0 = 'resilient and confident. '
+            cat_1 = 'sensitive and nervous. '
+            
+            if data_c['neuroticism_zscore'].values > 0:
+                text_t = categorie_description(data_c['neuroticism_zscore'].values) + cat_1  \
+                + 'The candidate tends to feel more negative emotions, anxiety. '
+                if data_c['neuroticism_zscore'].values > 1:
+                    index_max = data_c.iloc[0,10:20].idxmax()
+                    text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
+                    text_t = text_t + text_2
+                
+            else:
+                text_t = categorie_description(data_c['neuroticism_zscore'].values) + cat_0  \
+                + 'The candidate tends to feel less negative emotions, anxiety. '
+                if data_c['neuroticism_zscore'].values < -1:
+                    index_min = data_c.iloc[0,10:20].idxmin()
+                    text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
+                    text_t = text_t + text_2
+            text.append(text_t)
+            
+        # agreeableness        
+        if i == 2:
+            cat_0 = 'critical and rational. '
+            cat_1 = 'friendly and compassionate. '
+            
+            if data_c['agreeableness_zscore'].values > 0:
+                text_t = categorie_description(data_c['agreeableness_zscore'].values) + cat_1  \
+                + 'The candidate tends to be more cooperative, polite, kind and friendly. '
+                if data_c['agreeableness_zscore'].values > 1:
+                    index_max = data_c.iloc[0,20:30].idxmax()
+                    text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                    text_t = text_t + text_2
 
-
-
-
+            else:
+                text_t = categorie_description(data_c['agreeableness_zscore'].values) + cat_0  \
+                + 'The candidate tends to be less cooperative, polite, kind and friendly. '
+                if data_c['agreeableness_zscore'].values < -1:
+                    index_min = data_c.iloc[0,20:30].idxmin()
+                    text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                    text_t = text_t + text_2
+            text.append(text_t)
+            
+        # conscientiousness
+        if i == 3:  
+            cat_0 = 'extravagant and careless. '
+            cat_1 = 'efficient and organized. '
+            
+            if data_c['conscientiousness_zscore'].values > 0:
+                text_t = categorie_description(data_c['conscientiousness_zscore'].values) + cat_1  \
+                + 'The candidate tends to be more careful or diligent. '
+                if data_c['conscientiousness_zscore'].values > 1:
+                    index_max = data_c.iloc[0,30:40].idxmax()
+                    text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                    text_t = text_t + text_2
+            else:
+                text_t = categorie_description(data_c['conscientiousness_zscore'].values) + cat_0  \
+                + 'The candidate tends to be less careful or diligent. '
+                if data_c['conscientiousness_zscore'].values < -1:
+                    index_min = data_c.iloc[0,30:40].idxmin()
+                    text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                    text_t = text_t + text_2
+            text.append(text_t)
+        
+        # openness
+        if i == 4:
+            cat_0 = 'consistent and cautious. '
+            cat_1 = 'inventive and curious. '
+            
+            if data_c['openness_zscore'].values > 0:
+                text_t = categorie_description(data_c['openness_zscore'].values) + cat_1  \
+                + 'The candidate tends to be more open. '
+                if data_c['openness_zscore'].values > 1:
+                    index_max = data_c.iloc[0,40:50].idxmax()
+                    text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                    text_t = text_t + text_2
+            else:
+                text_t = categorie_description(data_c['openness_zscore'].values) + cat_0  \
+                + 'The candidate tends to be less open. '
+                if data_c['openness_zscore'].values < -1:
+                    index_min = data_c.iloc[0,40:50].idxmin()
+                    text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                    text_t = text_t + text_2
+            text.append(text_t)
+        i+=1
+        
+    text = ''.join(text)
+    text = text.replace(',','')
+    return text
