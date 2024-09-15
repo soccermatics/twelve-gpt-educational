@@ -200,7 +200,6 @@ class Description(ABC):
 
 
 class PlayerDescription(Description):
-    output_token_limit = 150
 
     @property
     def gpt_examples_path(self):
@@ -285,3 +284,78 @@ class PlayerDescription(Description):
         )
         return [{"role": "user", "content": prompt}]
 
+
+
+
+class TrolleyDescription(Description):
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/Trolley.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/Trolley.xlsx"]
+
+    def __init__(self, currentArguments,overallArgument,stance):
+        self.currentArguments = currentArguments
+        self.overallArgument = overallArgument
+        self.stance = stance
+        
+        super().__init__()
+
+
+    def get_intro_messages(self) -> List[Dict[str, str]]:
+        """
+        Constant introduction messages for the assistant.
+
+        Returns:
+        List of dicts with keys "role" and "content".
+        """
+        intro = [
+            {
+            "role": "system", "content": (
+                "You are talking to a human user about the following thesis: " + self.overallArgument + ". "
+                " You are currently arguing " + self.stance + " thesis."
+                )
+            },
+            {
+                "role": "user",
+                "content": "Are you aggresive when you argue?",
+            },
+            {
+                "role": "assistant",
+                "content": (
+                    "No. I am not aggresive when I argue. I try to make my arguments politely and with an ac"
+                ),
+            },
+        ]
+        if len(self.describe_paths) > 0:
+            intro += [
+                {
+                    "role": "user",
+                    "content": "First, could you answer some questions about the question we will discuss for me?",
+                },
+                {"role": "assistant", "content": "Sure!"},
+            ]
+
+        return intro
+
+    def synthesize_text(self):
+
+        description = f"Here are some arguments {self.stance} the thesis: {self.overallArgument}. \n\n "
+
+        for i,argument in self.currentArguments.iterrows():
+            
+            description += argument['user'] + ". "
+
+        return description
+
+    def get_prompt_messages(self):
+        prompt = (
+            f"Please use the information enclosed with ``` to give a concise, 2-3 sentence "
+            f"argument {self.stance} the thesis that {self.overallArgument}."
+            f"The first sentence should layout the strongest argument out of all of those provided {self.stance} the thesis. Then the remaining one or two sentences should support"
+              "your main point using arguments provided. Be forceful but polite and only outline your own argument, not objections to that argument. Only argue {self.stance} the thesis. "
+        )
+        return [{"role": "user", "content": prompt}]

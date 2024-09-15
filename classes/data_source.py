@@ -148,4 +148,55 @@ class PlayerStats(Stats):
         
         return self.data_point_class(id=id,name=name,minutes_played=minutes_played,gender=gender,position=position,ser_metrics=ser_metrics,relevant_metrics=self.metrics)
 
-    
+# Base class for an argument
+# This class consists of a list of verbal arguments and where they fit into a larger discusion.
+# Code 1.1 means the first argument at the top level. 
+# These can either be pro or con arguments.
+class Arguments(Data):
+    """
+    Builds upon DataSource for data sources which have metrics and info
+    """
+
+    def __init__(self):
+        # Dataframe specs:
+        # df_info: index = player, columns = basic info
+        # df_metrics: index = player/team_id, columns = multiindex (Raw, Z, Rank), (metrics)
+        self.df = self.get_processed_data()
+
+    def get_raw_data(self):
+
+        df = pd.read_csv("data/trolley/Trolley.csv",encoding='unicode_escape')
+
+        return df
+
+    def process_data(self, df_raw):
+
+        return df_raw
+
+        
+    def get_arguments(self, argument,stance):
+        
+        df = self.df
+        
+        # df['assistant'] contains the tree structure.
+        # df['category'] contains the stance.
+        
+        # Find all rows of dateframe where df['assistant'] starts with 'argument'
+        argument_df = df[df['assistant'].str.startswith(argument)]
+        # Find all rows of dateframe where df['assistant'] is longer but no more than two characters longer than 'argument'
+        argument_df = argument_df[argument_df['assistant'].str.len() <= len(argument)+2]
+        argument_df = argument_df[argument_df['assistant'].str.len() > len(argument)]
+        argument_df = argument_df[argument_df['category']==stance]
+        # Unique list of all 'assistant' values
+        list_of_arguments = argument_df['assistant'].unique()
+
+        # For each argument in the list, find all rows of dateframe where df['assistant'] is within 2 and 4 and they are 'Pro
+        for subargument in list_of_arguments:
+            argument_df2 = df[df['assistant'].str.startswith(subargument)]
+            argument_df2 = argument_df2[argument_df2['assistant'].str.len() <= len(argument)+4]
+            argument_df2 = argument_df2[argument_df2['assistant'].str.len() > len(argument) + 2 ]
+            argument_df2 = argument_df2[argument_df2['category']=='Pro']
+            # Add these to the arguments.
+            argument_df = pd.concat([argument_df,argument_df2])
+
+        return argument_df

@@ -28,7 +28,6 @@ def tick_text_color(color, text, alpha=1.0):
         str(int(color[5:], 16)) + "," + str(alpha) + ")'>" + str(text) + "</span>"
     return s
 class Visual():
-    # Can't use streamlit options due to report generation
     dark_green = hex_to_rgb("#002c1c") # hex_to_rgb(st.get_option("theme.secondaryBackgroundColor"))
     medium_green = hex_to_rgb("#003821")
     bright_green = hex_to_rgb("#00A938") # hex_to_rgb(st.get_option("theme.primaryColor"))
@@ -41,12 +40,10 @@ class Visual():
     light_gray = hex_to_rgb("#d3d3d3")
     table_green = hex_to_rgb('#009940')
     table_red = hex_to_rgb('#FF4B00')
-    def __init__(self, pdf=False):
-        self.pdf = pdf
-        if pdf:
-            self.font_size_multiplier = 1.4
-        else:
-            self.font_size_multiplier = 1.
+
+    def __init__(self):
+
+        self.font_size_multiplier = 1.
         self.fig = go.Figure()
         self._setup_styles()
 
@@ -212,4 +209,69 @@ class DistributionPlot(Visual):
 
         self.add_title(title, subtitle)
 
+
+class TreePlot(Visual):
+
+    def __init__(self, columns, labels, *args, **kwargs):
+        self.empty = True
+        self.columns = columns
+        self.labels = labels
+        
+        self.marker_color = (c for c in [Visual.white, Visual.bright_yellow, Visual.bright_blue])
+        self.marker_shape = (s for s in ["square", "hexagon", "diamond"])
+        super().__init__(*args, **kwargs)
+        self._setup_axes()
+
+    def _setup_axes(self):
+        self.fig.update_yaxes(range=[0, 6], fixedrange=True, tickmode="array",autorange='reversed')
+        self.fig.update_xaxes(showticklabels=False, fixedrange=True, gridcolor=rgb_to_color(self.medium_green), zerolinecolor=rgb_to_color(self.medium_green))
+        self.fig.update_layout(showlegend=False)
+
+    def _setup_styles(self):
+        side_margin = 60
+        top_margin =  75
+        pad = 16
+        self.fig.update_layout(
+            autosize=True,
+            height=500,
+            margin=dict(
+                l=side_margin, r=side_margin, b=70, t=top_margin, pad=pad
+            ),
+            paper_bgcolor=rgb_to_color(self.dark_green),
+            plot_bgcolor=rgb_to_color(self.dark_green),
+   
+           )
+
+    def add_tree(self, legend):
+        # THIS CODE IS UNFINISHED. BUT MAKES A TREE OF THE STORY.
+        labels=self.labels
+        # Parse the labels to create a list of edges
+        edges = []
+        for label in labels:
+            nodes = label.split('.')
+            for i in range(len(nodes) - 1):
+
+                edges.append(('.'.join(nodes[:i+1]), '.'.join(nodes[:i+2])))
+
+        # Create a scatter plot for the nodes
+        nodes = sorted(set(node for edge in edges for node in edge))
+        y = [node.count('.') for node in nodes]
+        x = list(range(len(nodes), 0, -1))
+ 
+        scatter = go.Scatter(x=x, y=y, mode='markers', hovertemplate=self.columns)
+
+        # Add lines for the edges
+        lines = []
+        for edge in edges:
+            lines.append(go.Scatter(x=[x[nodes.index(edge[0])], x[nodes.index(edge[1])]], y=[y[nodes.index(edge[0])], y[nodes.index(edge[1])]], mode='lines', line=dict(color=rgb_to_color(self.bright_green))))
+
+        # Create the figure and add the scatter plot and lines
+        traces = [scatter] + lines
+
+        # Add each trace to the figure
+        for trace in traces:
+            self.fig.add_trace(trace)
+        
+  
+ 
 

@@ -13,10 +13,12 @@ else:
     from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
     
 from classes.description import (
-    PlayerDescription,
+    PlayerDescription
 )
-from classes.embeddings import PlayerEmbeddings
 
+from classes.data_source import Arguments
+
+from classes.embeddings import PlayerEmbeddings,TrolleyEmbeddings
 
 from classes.visual import (
     Visual,DistributionPlot
@@ -58,7 +60,7 @@ class Chat:
         """
         Get input from streamlit."""
   
-        if x := st.chat_input(placeholder=f"What else would you like to know about {self.player.name}?"):
+        if x := st.chat_input(placeholder=f"What else would you like to know?"):
             if len(x) > 500:
                 st.error(f"Your message is too long ({len(x)} characters). Please keep it under 500 characters.")
 
@@ -228,4 +230,100 @@ class PlayerChat(Chat):
 
         
         return ret_val
+
+
+    def get_input(self):
+        """
+        Get input from streamlit."""
+  
+        if x := st.chat_input(placeholder=f"What else would you like to know about {self.player.name}?"):
+            if len(x) > 500:
+                st.error(f"Your message is too long ({len(x)} characters). Please keep it under 500 characters.")
+
+            self.handle_input(x)
+
+class TrolleyChat(Chat):
+    def __init__(self, chat_state_hash, arguments, overallArgument, stance, argumentsMade=[], state="empty"):
+        self.embeddings = TrolleyEmbeddings()
+        self.arguments =arguments
+        self.overallArgument = overallArgument
+        self.stance = stance
+        self.argumentsMade = argumentsMade
+
+        super().__init__(chat_state_hash, state=state)
+
+    def instruction_messages(self):
+        """
+        Instruction for the agent.
+        """
+        first_messages = [
+            {"role": "system", "content": (
+                "You are talking to a human user about the following thesis: " + self.overallArgument + ". "
+                " You are currently arguing the " + self.stance + " side of the argument."
+                )
+            },
+            {"role": "user", "content": (
+                "After these messages you will be interacting with a user who will argue against you. "
+                "You will receive relevant information to address the user's argument and then be asked to provide a response. "
+                "All user messages will be prefixed with 'User:' and enclosed with ```. "
+                "When responding to the user, speak directly to them. "
+                "Use the information provided before the query to provide 2-3 sentence answers."
+                " Do not deviate from this information and provide minimal additional information. Only talk about the thesis and the arguments."
+                )
+            },
+        ]
+        return first_messages
+
+
+    def get_relevant_info(self, query):
+ 
+        #If there is no query then use the last message from the user
+        if query=='':
+            query = self.visible_messages[-1]["content"]
+       
+        # This finds some relevant information
+        results = self.embeddings.search(query, top_n=10)
+        st.write(results)
+        ret_val = "\n\nHere is a description of what the user is trying to argue:  \n"   
+        ret_val +="\n".join(results["user"].to_list())
         
+        # Find the first result in results that is not in the argumentsMade list
+        for argumentCode in self.argumentsMade:
+            results = results[results["assistant"] != argumentCode]
+        
+        currentArguments= []
+        i=0
+        while len(currentArguments) == 0:    
+            argumentCode = results.iloc[i]["assistant"]
+            # Get arguments which oppose top stance.
+            currentArguments= self.arguments.get_arguments(argumentCode,'Con')
+            # Remove the argument from the list of arguments
+            self.argumentsMade.append(argumentCode)
+            i=i+1
+
+        st.write(self.argumentsMade)
+
+        
+        ret_val = f"Here is a description of the points which you can make to refute their argument ('''{query}'''): \n\n"   
+        
+        for i,a in currentArguments.iterrows():
+            
+            ret_val += a['user'] + ". "
+
+        ret_val += "\n\nWrite at most three sentences arguing against the user's point, using the points above. "
+        ret_val += "In the first sentence, restate the user's argument. In the second sentence, provide a counter-argument. In the third sentence, provide a conclusion."
+        ret_val += "Always address the user directly as 'you' in the first person and write natural sounding lanaguage, with no headers. Write as if you are having a conversation with the user."
+
+        st.write(ret_val)
+
+        return ret_val
+    
+    def get_input(self):
+        """
+        Get input from streamlit."""
+  
+        if x := st.chat_input(placeholder=f"Please make your argument here"):
+            if len(x) > 500:
+                st.error(f"Your message is too long ({len(x)} characters). Please keep it under 500 characters.")
+
+            self.handle_input(x)

@@ -86,3 +86,29 @@ class PlayerEmbeddings(Embeddings):
 
         return df_embeddings
     
+
+class TrolleyEmbeddings(Embeddings):
+    def __init__(self):
+        self.df_dict = TrolleyEmbeddings.get_embeddings()
+
+    def get_embeddings():
+        # Gets all embeddings 
+        df_embeddings_dict = dict()
+
+        files = [
+            "TrolleyTree",
+        ]
+
+        df_embeddings = pd.DataFrame()
+        for file in files:
+            # Read in
+            df_temp = pd.read_parquet(f"data/embeddings/{file}.parquet")
+            if "category" not in df_temp:
+                df_temp["category"] = None
+            if "format" not in df_temp:
+                df_temp["format"] = None
+            df_temp = df_temp[["user", "assistant", "category", "user_embedded", "format"]]
+            df_temp["user_embedded"] = df_temp.user_embedded.apply(eval).to_list()
+            df_embeddings = pd.concat([df_embeddings, df_temp], ignore_index=True)
+
+        return df_embeddings
