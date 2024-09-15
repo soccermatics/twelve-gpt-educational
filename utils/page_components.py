@@ -82,7 +82,8 @@ def set_page_config():
 
 def add_page_selector():
     st.image("data/ressources/img/TwelveGPT OpenSource.svg")
-    st.page_link("app.py", label="Football Scout")
+    st.page_link("app.py", label="About")
+    st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
     st.page_link("pages/own_page.py", label="Your Own Page")
     
