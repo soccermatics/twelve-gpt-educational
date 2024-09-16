@@ -72,7 +72,7 @@ def set_page_config():
     st.set_page_config(
         layout="centered",
         page_title="TwelveGPT Scout",
-        page_icon="data/ressources/img/TwelveGPT OpenSource.svg",
+        page_icon="data/ressources/img/TwelveEdu.png",
         initial_sidebar_state="expanded",
         menu_items={
             "Report a bug": "mailto:matthias@twelve.football?subject=Bug report"
@@ -81,7 +81,7 @@ def set_page_config():
 
 
 def add_page_selector():
-    st.image("data/ressources/img/TwelveGPT OpenSource.svg")
+    st.image("data/ressources/img/TwelveEdu.png")
     st.page_link("app.py", label="About")
     st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
