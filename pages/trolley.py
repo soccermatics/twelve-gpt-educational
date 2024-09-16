@@ -47,9 +47,14 @@ st.write('You should argue ' + stanceFullName[userStance] + ' this thesis. I wil
 if 'argumentsMade' not in st.session_state:
     st.session_state.argumentsMade = []
 
-to_hash = (current, )
 
-chat = create_chat(to_hash, TrolleyChat, arguments, overallArgument, stance=stanceFullName[stanceSwap[userStance]],argumentsMade=st.session_state.argumentsMade)
+if 'totalscore' not in st.session_state:
+    st.session_state.totalscore = 0
+
+
+to_hash = (current)
+
+chat = create_chat(to_hash, TrolleyChat, arguments, overallArgument, stance=stanceFullName[stanceSwap[userStance]],argumentsMade=st.session_state.argumentsMade,totalscore=st.session_state.totalscore)
 
 # Now we want to add basic content to chat if it's empty
 if chat.state == "empty":
@@ -80,6 +85,7 @@ if chat.state == "empty":
 # Now we want to get the user input, display the messages and save the state
 chat.get_input()
 chat.display_messages()
+st.session_state.totalscore =  chat.totalscore
 st.session_state.argumentsMade = chat.argumentsMade
 chat.save_state()
 

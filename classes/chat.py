@@ -4,6 +4,7 @@ import openai
 from itertools import groupby
 from types import GeneratorType
 import pandas as pd
+import numpy as np
 
 from settings import USE_GEMINI
 
@@ -243,12 +244,17 @@ class PlayerChat(Chat):
             self.handle_input(x)
 
 class TrolleyChat(Chat):
-    def __init__(self, chat_state_hash, arguments, overallArgument, stance, argumentsMade=[], state="empty"):
+    def __init__(self, chat_state_hash, arguments, overallArgument, stance, argumentsMade=[],totalscore=0, state="empty"):
         self.embeddings = TrolleyEmbeddings()
         self.arguments =arguments
         self.overallArgument = overallArgument
         self.stance = stance
         self.argumentsMade = argumentsMade
+
+        # Initialize the total score as an int and originality score as float
+        self.totalscore = totalscore
+        self.originalityscore = np.float64(0.0)
+        
 
         super().__init__(chat_state_hash, state=state)
 
@@ -281,30 +287,82 @@ class TrolleyChat(Chat):
         if query=='':
             query = self.visible_messages[-1]["content"]
        
+        numberofarguments = 10
+
         # This finds some relevant information
-        results = self.embeddings.search(query, top_n=10)
+        results = self.embeddings.search(query, top_n=numberofarguments)
+        
+        
         st.write(results)
+
+        sidebar_container = st.sidebar.container()
+
+        if results.iloc[0]['similarities'] < 0.8:
+            ret_val = "\n\nThe user said:  \n"   
+            ret_val +="\n".join(results["user"].to_list())
+            ret_val = "but this is not a releavant argument. "
+            ret_val += "Tell the user that they should try to make an argument that is more relevant to the thesis. "
+            with sidebar_container:
+                    st.write(f'Novelty: 0/{numberofarguments}')
+                    st.write(f'Total score: {self.totalscore}')
+            return ret_val
+
         ret_val = "\n\nHere is a description of what the user is trying to argue:  \n"   
         ret_val +="\n".join(results["user"].to_list())
-        
-        # Find the first result in results that is not in the argumentsMade list
+
+
+
+        # Remove the results that are not in the argumentsMade list
+        # Keep a track of similarity to previous arguments
+        similaritytoprevious = results[results['assistant'].isin(self.argumentsMade)]['similarities'].mean()
+
+        # Remove the results that are not in the argumentsMade list
         for argumentCode in self.argumentsMade:
             results = results[results["assistant"] != argumentCode]
         
-        currentArguments= []
+        st.write(self.argumentsMade)
+
+        # Count how many arguments that haven't been made yet that have similarity > 0.8
+        # This makes up the first part of the originality score.
+        count = results[results['similarities'] > 0.8]['assistant'].isin(self.argumentsMade).sum()
+        self.originalityscore = np.float64((len(results)-count)/2)
+
+        st.write(results)
+
+        # Relevance score is based on maximum similarity score of non-excluded argument  
+        if len(results) == 0:
+            ret_val += ". But the user has already made all the arguments that can be made against the user's argument. "
+            ret_val += "Tell the user that they have done a good job arguing their point and that you have no further arguments to make. "
+            ret_val += "Then let them know that their total score in the argument game is " + str(self.totalscore)
+            with sidebar_container:
+                st.write(f'Novelty: 0/{numberofarguments}')
+                st.write(f'Total score: {self.totalscore}')
+
+            return ret_val
+
         i=0
+        currentArguments= []
         while len(currentArguments) == 0:    
             argumentCode = results.iloc[i]["assistant"]
             # Get arguments which oppose top stance.
             currentArguments= self.arguments.get_arguments(argumentCode,'Con')
-            # Remove the argument from the list of arguments
-            self.argumentsMade.append(argumentCode)
-            i=i+1
 
-        st.write(self.argumentsMade)
+            i=i+1
+        
+        # Remove the argument from the list of arguments
+        self.argumentsMade.append(argumentCode)
+        
+        with sidebar_container:
+            st.write(f'Sim prev: {similaritytoprevious}/{numberofarguments}')
+            st.write(f'Novelty 1: {self.originalityscore}/{numberofarguments}')
+            self.originalityscore = min(10.0,self.originalityscore+10*np.float64(numberofarguments)*(results.iloc[0]["similarities"]-min(similaritytoprevious,8.0)))
+            st.write(f'Novelty: {self.originalityscore}/{numberofarguments}')
+            self.totalscore = self.totalscore+np.ceil(self.originalityscore)
+            st.write(f'Total score: {self.totalscore}')
+
 
         
-        ret_val = f"Here is a description of the points which you can make to refute their argument ('''{query}'''): \n\n"   
+        ret_val = f"Here is a description of the points which you can make to refute their argument, which is: {query}: \n\n"   
         
         for i,a in currentArguments.iterrows():
             

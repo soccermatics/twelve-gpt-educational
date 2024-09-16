@@ -285,8 +285,6 @@ class PlayerDescription(Description):
         return [{"role": "user", "content": prompt}]
 
 
-
-
 class TrolleyDescription(Description):
 
     @property
