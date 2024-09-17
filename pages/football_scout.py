@@ -52,6 +52,8 @@ players.calculate_statistics(metrics=metrics)
 # Now select the focal player
 player = select_player(sidebar_container, players, gender="male", position="Forward")
 
+st.write("This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key.")
+
 st.expander("Dataframe used", expanded=False).write(players.df)
 
 # Chat state hash determines whether or not we should load a new chat or continue an old one
