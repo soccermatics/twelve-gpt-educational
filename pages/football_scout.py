@@ -52,7 +52,7 @@ players.calculate_statistics(metrics=metrics)
 # Now select the focal player
 player = select_player(sidebar_container, players, gender="male", position="Forward")
 
-st.write("This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run with your own Gemini key.")
+st.write("This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key.")
 
 st.expander("Dataframe used", expanded=False).write(players.df)
 
