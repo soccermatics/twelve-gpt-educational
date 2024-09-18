@@ -28,8 +28,14 @@ class Player(Stat):
 
 
 class Person(Stat):
-    def __init__(self,id):
+    
+    def __init__(self,id,name,extraversion,neurotiscism,agreeableness,conscientiousness,openness):
 
         # Unpack ser_info
         self.id=id
-        self.ser_metrics = ser_metrics
+        self.name = name
+        self.extraversion = extraversion
+        self.neurotiscism = neurotiscism
+        self.agreeableness = agreeableness
+        self.conscientiousness = conscientiousness
+        self.openness = openness
