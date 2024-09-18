@@ -35,7 +35,10 @@ arguments = Arguments()
 overall='1.'
 
 # Selcet random Pro or Con stance
-userStance = np.random.choice(['Pro', 'Con'])
+if 'argumentsMade' not in st.session_state:
+    st.session_state.userStance = np.random.choice(['Pro', 'Con'])
+userstance = st.session_state.userStance
+
 # make a dictionary to give opposite Pro and Con arguments
 stanceSwap = {'Pro': 'Con', 'Con': 'Pro'}
 stanceFullName = {'Pro': 'in support of', 'Con': 'against'}

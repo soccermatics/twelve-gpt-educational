@@ -293,6 +293,8 @@ class TrolleyChat(Chat):
         numberofarguments = 10
         sidebar_container = st.sidebar.container()
 
+        similaritythreshold = 0.75
+
         if self.totalscore>=100:
             ret_val = "The user has already won the game by getting the maximum score of 100. "
             ret_val += "They are the winners!!!You will not respond more to arguments"
@@ -319,7 +321,7 @@ class TrolleyChat(Chat):
         results = self.embeddings.search(query, top_n=numberofarguments)
 
         # All the arguments are not relevant, so tell the user and return
-        if results.iloc[0]['similarities'] < 0.8:
+        if results.iloc[0]['similarities'] < similaritythreshold:
             ret_val = "\n\nThe user said:  \n"   
             ret_val +="\n".join(results["user"].to_list())
             ret_val = "but this is not a releavant argument. "
@@ -330,16 +332,16 @@ class TrolleyChat(Chat):
             return ret_val
 
         # Keep a track of similarity to previous arguments made
-        # Set to 0.8 as minimum.
+        # Set to similaritythreshold as minimum.
         if len(self.argumentsMade) > 0:
             previousArguments = results['assistant'].isin(self.argumentsMade)
             #Check if previousArgumnets contains at least one True value
             if previousArguments.any():
                 similaritytoprevious = results[previousArguments]['similarities'].mean()
             else:
-                similaritytoprevious = 0.8
+                similaritytoprevious = similaritythreshold
         else:
-            similaritytoprevious = 0.8
+            similaritytoprevious = similaritythreshold
 
 
         # Remove the results that are in the argumentsMade list
