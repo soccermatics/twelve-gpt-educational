@@ -152,6 +152,8 @@ class PlayerStats(Stats):
         return self.data_point_class(id=id,name=name,minutes_played=minutes_played,gender=gender,position=position,ser_metrics=ser_metrics,relevant_metrics=self.metrics)
 
 
+
+
 class PersonalityStats(Stats):
     data_point_class = data_point.Person
     
@@ -159,12 +161,47 @@ class PersonalityStats(Stats):
         super().__init__()
 
     def get_raw_data(self):
-        df = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
-        return df
+        data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
+        return data
 
-    def process_data(self, df_raw):
-        # Something like this!
-        data = self.df_raw
+
+    def get_stat(dataset):
+        # List of columns to compute statistics for
+        columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+    
+        # Dictionary to store mean and std for each column
+        stats = {}
+    
+        for column in columns:
+            stats[column] = {'mean': dataset[column].mean(),'std': dataset[column].std(ddof=0)}
+    
+        return stats
+
+    def dataset_z_score(dataset, stats):
+        columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+    
+        for column in columns:
+            mean = stats[column]['mean']
+            std = stats[column]['std']
+            dataset[f'{column}_zscore'] = (dataset[column] - mean) / std
+    
+        return dataset
+
+    def convert_list_to_dataset(person_list, matching, questions):
+        data_temp =pd.DataFrame([person_list], columns= [column for column in matching])   
+        for column in data_temp.columns:
+            data_temp[column] = data_temp[column] * questions[column][1]
+        data_temp['extraversion'] = data_temp.iloc[:,0:10].sum(axis=1) + 20
+        data_temp['neuroticism'] = data_temp.iloc[:,10:20].sum(axis=1) +38
+        data_temp['agreeableness'] = data_temp.iloc[:,20:30].sum(axis=1) +14 
+        data_temp['conscientiousness'] = data_temp.iloc[:,30:40].sum(axis=1) + 14
+        data_temp['openness'] = data_temp.iloc[:,40:50].sum(axis=1) + 8
+    
+        return data_temp
+
+
+    def prepare_dataset(data):
+        data = data.copy()
         data.drop(data.columns[50:107], axis=1, inplace=True)
         data.drop(data.columns[50:], axis=1, inplace=True) # here 50 to remove the country
         data.dropna(inplace=True)
@@ -172,61 +209,59 @@ class PersonalityStats(Stats):
         # Groups and Questions modify version
         # (1) extraversion, (2) neuroticism, (3) agreeableness, (4)conscientiousness , and (5) openness
         ext_questions = {'EXT1' : ['they are the life of the party',1],
-                        'EXT2' : ['they dont talk a lot',-1],
-                        'EXT3' : ['they feel comfortable around people',1],
-                        'EXT4' : ['they keep in the background',-1],
-                        'EXT5' : ['they start conversations',1],
-                        'EXT6' : ['they have little to say',-1],
-                        'EXT7' : ['they talk to a lot of different people at parties',1],
-                        'EXT8' : ['they dont like to draw attention to themself',-1],
-                        'EXT9' : ['they dont mind being the center of attention',1],
-                        'EXT10': ['they are quiet around strangers',-1]}
-        
+                         'EXT2' : ['they dont talk a lot',-1],
+                         'EXT3' : ['they feel comfortable around people',1],
+                         'EXT4' : ['they keep in the background',-1],
+                         'EXT5' : ['they start conversations',1],
+                         'EXT6' : ['they have little to say',-1],
+                         'EXT7' : ['they talk to a lot of different people at parties',1],
+                         'EXT8' : ['they dont like to draw attention to themself',-1],
+                         'EXT9' : ['they dont mind being the center of attention',1],
+                         'EXT10': ['they are quiet around strangers',-1]}
         est_questions = {'EST1' : ['they get stressed out easily',-1],
-                        'EST2' : ['they are relaxed most of the time',1],
-                        'EST3' : ['they worry about things',-1],
-                        'EST4' : ['they seldom feel blue',1],
-                        'EST5' : ['they are easily disturbed',-1],
-                        'EST6' : ['they get upset easily',-1],
-                        'EST7' : ['they change their mood a lot',-1],
-                        'EST8' : ['they have frequent mood swings',-1],
-                        'EST9' : ['they get irritated easily',-1],
-                        'EST10': ['they often feel blue',-1]}
-        
+                         'EST2' : ['they are relaxed most of the time',1],
+                         'EST3' : ['they worry about things',-1],
+                         'EST4' : ['they seldom feel blue',1],
+                         'EST5' : ['they are easily disturbed',-1],
+                         'EST6' : ['they get upset easily',-1],
+                         'EST7' : ['they change their mood a lot',-1],
+                         'EST8' : ['they have frequent mood swings',-1],
+                         'EST9' : ['they get irritated easily',-1],
+                         'EST10': ['they often feel blue',-1]}
         agr_questions = {'AGR1' : ['they feel little concern for others',-1],
-                        'AGR2' : ['they interested in people',1],
-                        'AGR3' : ['they insult people',-1],
-                        'AGR4' : ['they sympathize with others feelings',1],
-                        'AGR5' : ['they are not interested in other peoples problems',-1],
-                        'AGR6' : ['they have a soft heart',1],
-                        'AGR7' : ['they not really interested in others',-1],
-                        'AGR8' : ['they take time out for others',1],
-                        'AGR9' : ['they feel others emotions',1],
-                        'AGR10': ['they make people feel at ease',1]}
-        
+                         'AGR2' : ['they interested in people',1],
+                         'AGR3' : ['they insult people',-1],
+                         'AGR4' : ['they sympathize with others feelings',1],
+                         'AGR5' : ['they are not interested in other peoples problems',-1],
+                         'AGR6' : ['they have a soft heart',1],
+                         'AGR7' : ['they not really interested in others',-1],
+                         'AGR8' : ['they take time out for others',1],
+                         'AGR9' : ['they feel others emotions',1],
+                         'AGR10': ['they make people feel at ease',1]}
+    
 
         csn_questions = {'CSN1' : ['they are always prepared',1],
-                        'CSN2' : ['they leave their belongings around',-1],
-                        'CSN3' : ['they pay attention to details',1],
-                        'CSN4' : ['they make a mess of things',-1],
-                        'CSN5' : ['they get chores done right away',1],
-                        'CSN6' : ['they often forget to put things back in their proper place',-1],
-                        'CSN7' : ['they like order',1],
-                        'CSN8' : ['they shirk their duties',-1],
-                        'CSN9' : ['they follow a schedule',1],
-                        'CSN10' : ['they are exacting in their work',1]}
+                         'CSN2' : ['they leave their belongings around',-1],
+                         'CSN3' : ['they pay attention to details',1],
+                         'CSN4' : ['they make a mess of things',-1],
+                         'CSN5' : ['they get chores done right away',1],
+                         'CSN6' : ['they often forget to put things back in their proper place',-1],
+                         'CSN7' : ['they like order',1],
+                         'CSN8' : ['they shirk their duties',-1],
+                         'CSN9' : ['they follow a schedule',1],
+                         'CSN10' : ['they are exacting in their work',1]}
 
         opn_questions = {'OPN1' : ['they have a rich vocabulary',1],
-                        'OPN2' : ['they have difficulty understanding abstract ideas',-1],
-                        'OPN3' : ['they have a vivid imagination',1],
-                        'OPN4' : ['they are not interested in abstract ideas',-1],
-                        'OPN5' : ['they have excellent ideas',1],
-                        'OPN6' : ['they do not have a good imagination',-1],
-                        'OPN7' : ['they are quick to understand things',1],
-                        'OPN8' : ['they use difficult words',1],
-                        'OPN9' : ['they spend time reflecting on things',1],
-                        'OPN10': ['they are full of ideas',1]}
-        
+                         'OPN2' : ['they have difficulty understanding abstract ideas',-1],
+                         'OPN3' : ['they have a vivid imagination',1],
+                         'OPN4' : ['they are not interested in abstract ideas',-1],
+                         'OPN5' : ['they have excellent ideas',1],
+                         'OPN6' : ['they do not have a good imagination',-1],
+                         'OPN7' : ['they are quick to understand things',1],
+                         'OPN8' : ['they use difficult words',1],
+                         'OPN9' : ['they spend time reflecting on things',1],
+                         'OPN10': ['they are full of ideas',1]}
+    
         questions = ext_questions | est_questions | agr_questions | csn_questions  | opn_questions
 
         # Group Names and Columns
@@ -248,21 +283,38 @@ class PersonalityStats(Stats):
         data['agreeableness'] = data.iloc[:, 20:30].sum(axis=1) +14 
         data['conscientiousness'] = data.iloc[:, 30:40].sum(axis=1) + 14
         data['openness'] = data.iloc[:, 40:50].sum(axis=1) + 8
+        data['name'] = data.index.to_series().apply(lambda idx: 'C_' + str(idx))
 
-        return data
+        return data, questions, matching
 
-
+    
+    
     def to_data_point(self,name,extraversion,neurotiscism,agreeableness,conscientiousness,openness) -> data_point.Person:
-        
-        #Reindexing dataframe
-        id = self.df.index[0]
-        self.df.reset_index(drop=True, inplace=True)
+        data, questions, matching = prepare_dataset(dataset)
+        stats = get_stat(dataset)
+        data = dataset_z_score(data, stats)
 
-        # Drops the ids from the dataframe.
-        self.df=self.df.drop(columns=["id"])
-
-        # Convert to series
-        # keeps all the metrics.
-        ser_metrics = self.df.squeeze()
+        # First we want to check if the user want a certain candidate from the dataset 
+        # or if the user did the test so it return a list
+        if isinstance(name, list):
+            data_c = convert_list_to_dataset(name, matching, questions)
+            data_c = dataset_z_score(data_c, stats)
         
-        return self.data_point_class(id=id)
+    
+        elif isinstance(name,(int, float)):
+            if name < 0:
+                print('The number should be greater or equal to 0')
+            else:
+                data_c = pd.DataFrame([data.iloc[name]])
+
+        
+        id = self.data_c.index[0]
+        name = self.data_c['name']
+        extraversion = self.data_c['extraversion_zscore'].values
+        neurotiscism = self.data_c['neurotiscism_zscore'].values
+        agreeableness = self.data_c[' agreeableness_zscore'].values
+        conscientiousness = self.data_c['conscientiousness_zscore'].values
+        openness = self.data_c['openness_zscore'].values
+
+        
+        return self.data_point_class(id=id,name=name, extraversion=extraversion,neurotiscism=neurotiscism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
