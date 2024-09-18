@@ -352,9 +352,9 @@ class TrolleyChat(Chat):
             overall = self.arguments.df[self.arguments.df['assistant']==assistant].iloc[0]['overall']
             results.at[r[0],'overall'] = overall     
         results = results[results["overall"] == self.userOverallStance]
-        st.write(results)
+        #st.write(results)
 
-        # The first part of the originality score are number of arguments remaining unused.
+        # The first part of the originality score are number of arguments remaining unused, which shows relevance to the question.
         self.originalityscore = len(results)/2
 
         if len(results) == 0:
@@ -379,13 +379,12 @@ class TrolleyChat(Chat):
         
         # Remove that argument from the list of arguments
         self.argumentsMade.append(argumentCode)
-        st.write(self.argumentsMade)
+        #st.write(self.argumentsMade)
 
+        # Add a score based on how original is compared to arguments made so far.
         with sidebar_container:
-            #st.write(f'Part 1: {self.originalityscore}/{numberofarguments}')
             part2 = 10*numberofarguments*(results.iloc[0]["similarities"]-similaritytoprevious)
-            self.originalityscore = self.originalityscore+max(min(5.0,part2),0.0)
-            #st.write(f'Part 2: {part2}/{numberofarguments}')
+            self.originalityscore = min(10.0,self.originalityscore+max(part2,0.0))
             st.write(f'Novelty: {int(np.ceil(self.originalityscore))}/{numberofarguments}')
             self.totalscore = self.totalscore+np.ceil(self.originalityscore)
             st.write(f'Total score: {int(np.ceil(self.totalscore))}')

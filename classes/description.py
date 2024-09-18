@@ -354,6 +354,6 @@ class TrolleyDescription(Description):
             f"Please use the information enclosed with ``` to give a concise, 2-3 sentence "
             f"argument {self.stance} the thesis that {self.overallArgument}."
             f"The first sentence should layout the strongest argument out of all of those provided {self.stance} the thesis. Then the remaining one or two sentences should support"
-              "your main point using arguments provided. Be forceful but polite and only outline your own argument, not objections to that argument. Only argue {self.stance} the thesis. Address the user directly. Do not summarise what you are going to do or repsond to this request with words like 'certainly'."
+              "your main point using arguments provided. Be forceful but polite and only outline your own argument, not objections to that argument. Only argue {self.stance} the thesis. Address the user directly. Do not give a prelude to what you are going to do or respond to this request with words like 'certainly'."
         )
         return [{"role": "user", "content": prompt}]
