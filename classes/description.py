@@ -262,3 +262,229 @@ class PlayerDescription(Description):
         )
         return [{"role": "user", "content": prompt}]
 
+
+
+
+
+
+class PersonDescription(Description):
+    output_token_limit = 150
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/Forward.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/Forward.xlsx"]
+
+    def __init__(self, player: Player):
+        self.player = player
+        super().__init__()
+
+
+    def get_intro_messages(self) -> List[Dict[str, str]]:
+        """
+        Constant introduction messages for the assistant.
+
+        Returns:
+        List of dicts with keys "role" and "content".
+        """
+        intro = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a recruiter. "
+                    "You use the information given to you from the data and answers "
+                    "to earlier user/assistant pairs to give summaries of candidates."
+                ),
+            },
+            {
+                "role": "assistant",
+                "content": (
+                    "I refer to the game as football. "
+                    "When I say football, I don't mean American football, I mean what Americans call soccer. "
+                    "But I always talk about football, as people do in the United Kingdom."
+                ),
+            },
+        ]
+        if len(self.describe_paths) > 0:
+            intro += [
+                {
+                    "role": "user",
+                    "content": "First, could you answer some questions about a candidate for me?",
+                },
+                {"role": "assistant", "content": "Sure!"},
+            ]
+
+        return intro
+
+
+
+    def categorie_description(value):
+        if value <= -2:
+            text = 'The candidate is extremely '
+        elif (value < -2) & (value <= -1):
+            text = 'The candidate is very '
+        elif (value > -1) & (value <= -0.5):
+            text = 'The candidate is quite '
+        elif (value > -0.5) & (value <= 0.5):
+            text = 'The candidate is relatively '
+        elif (value > 0.5) & (value <= 1):
+            text = 'The candidate is quite'
+        elif (value > 1) & (value <= 2):
+            text = 'The candidate is very '
+        elif value > 2:
+            text = 'The candidate is extremely '
+        
+        return text
+
+    def get_description(candidate_data, dataset):
+    
+        # Upload the dataset
+        data, questions, matching = ds.prepare_dataset(dataset)
+        stats = ds.get_stat(dataset)
+        data = ds.dataset_z_score(data, stats)
+
+        # First we want to check if the user want a certain candidate from the dataset 
+        # or if the user did the test so it return a list
+        if isinstance(candidate_data, list):
+            data_c = ds.convert_list_to_dataset(candidate_data, matching, questions)
+            data_c = ds.dataset_z_score(data_c, stats)
+        
+    
+        elif isinstance(candidate_data,(int, float)):
+            if candidate_data < 0:
+                print('The number should be greater or equal to 0')
+            else:
+                data_c = pd.DataFrame([data.iloc[candidate_data]])
+        
+        text = []
+    
+        for i in range(0,5):
+        
+            # extraversion
+            if i == 0:
+                cat_0 = 'solitary and reserved. '
+                cat_1 = 'outgoing and energetic. '
+        
+                if data_c['extraversion_zscore'].values > 0:
+                    text_t = categorie_description(data_c['extraversion_zscore'].values) + cat_1
+                    if data_c['extraversion_zscore'].values > 1:
+                        index_max = data_c.iloc[0,0:10].idxmax()
+                        text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
+                        text_t = text_t + text_2
+                else:
+                    text_t = categorie_description(data_c['extraversion_zscore'].values) + cat_0
+                    if data_c['extraversion_zscore'].values < -1:
+                        index_min = data_c.iloc[0,0:10].idxmin()
+                        text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
+                        text_t = text_t + text_2
+                text.append(text_t)
+                
+            # neuroticism
+            if i == 1:
+                cat_0 = 'resilient and confident. '
+                cat_1 = 'sensitive and nervous. '
+            
+                if data_c['neuroticism_zscore'].values > 0:
+                    text_t = categorie_description(data_c['neuroticism_zscore'].values) + cat_1  \
+                    + 'The candidate tends to feel more negative emotions, anxiety. '
+                    if data_c['neuroticism_zscore'].values > 1:
+                        index_max = data_c.iloc[0,10:20].idxmax()
+                        text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
+                        text_t = text_t + text_2
+                
+                else:
+                    text_t = categorie_description(data_c['neuroticism_zscore'].values) + cat_0  \
+                    + 'The candidate tends to feel less negative emotions, anxiety. '
+                    if data_c['neuroticism_zscore'].values < -1:
+                        index_min = data_c.iloc[0,10:20].idxmin()
+                        text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
+                        text_t = text_t + text_2
+                text.append(text_t)
+            
+            # agreeableness        
+            if i == 2:
+                cat_0 = 'critical and rational. '
+                cat_1 = 'friendly and compassionate. '
+            
+                if data_c['agreeableness_zscore'].values > 0:
+                    text_t = categorie_description(data_c['agreeableness_zscore'].values) + cat_1  \
+                    + 'The candidate tends to be more cooperative, polite, kind and friendly. '
+                    if data_c['agreeableness_zscore'].values > 1:
+                        index_max = data_c.iloc[0,20:30].idxmax()
+                        text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                        text_t = text_t + text_2
+
+                else:
+                    text_t = categorie_description(data_c['agreeableness_zscore'].values) + cat_0  \
+                    + 'The candidate tends to be less cooperative, polite, kind and friendly. '
+                    if data_c['agreeableness_zscore'].values < -1:
+                        index_min = data_c.iloc[0,20:30].idxmin()
+                        text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                        text_t = text_t + text_2
+                text.append(text_t)
+            
+            # conscientiousness
+            if i == 3:  
+                cat_0 = 'extravagant and careless. '
+                cat_1 = 'efficient and organized. '
+            
+                if data_c['conscientiousness_zscore'].values > 0:
+                    text_t = categorie_description(data_c['conscientiousness_zscore'].values) + cat_1  \
+                    + 'The candidate tends to be more careful or diligent. '
+                    if data_c['conscientiousness_zscore'].values > 1:
+                        index_max = data_c.iloc[0,30:40].idxmax()
+                        text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                        text_t = text_t + text_2
+                else:
+                    text_t = categorie_description(data_c['conscientiousness_zscore'].values) + cat_0  \
+                    + 'The candidate tends to be less careful or diligent. '
+                    if data_c['conscientiousness_zscore'].values < -1:
+                        index_min = data_c.iloc[0,30:40].idxmin()
+                        text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                        text_t = text_t + text_2
+                text.append(text_t)
+        
+            # openness
+            if i == 4:
+                cat_0 = 'consistent and cautious. '
+                cat_1 = 'inventive and curious. '
+            
+                if data_c['openness_zscore'].values > 0:
+                    text_t = categorie_description(data_c['openness_zscore'].values) + cat_1  \
+                    + 'The candidate tends to be more open. '
+                    if data_c['openness_zscore'].values > 1:
+                        index_max = data_c.iloc[0,40:50].idxmax()
+                        text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                        text_t = text_t + text_2
+                else:
+                    text_t = categorie_description(data_c['openness_zscore'].values) + cat_0  \
+                    + 'The candidate tends to be less open. '
+                    if data_c['openness_zscore'].values < -1:
+                        index_min = data_c.iloc[0,40:50].idxmin()
+                        text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                        text_t = text_t + text_2
+                text.append(text_t)
+            i+=1
+        
+        text = ''.join(text)
+        text = text.replace(',','')
+        return text
+
+    
+    def get_prompt_messages(self):
+        prompt = (
+            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the player's playing style, strengths and weaknesses. "
+            f"The first sentence should use varied language to give an overview of the player. "
+            "The second sentence should describe the player's specific strengths based on the metrics. "
+            "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
+            "Finally, summarise exactly how the player compares to others in the same position. "
+        )
+        return [{"role": "user", "content": prompt}]
+
+
+
+
+
