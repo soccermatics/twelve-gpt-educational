@@ -47,7 +47,7 @@ displaytext= (
     "## The Argument Game\n\n"
     "Do you think you can see all sides of an argument? Let's find out! "
     "In the argument game you will be given a thesis and a stance. You will then be asked to argue for or against that thesis. "
-    "Each argument you make will be given a score out of 10 based on its novelty, including whether you have already made it."
+    "Each argument you make will be given a score out of 10 based on its novelty. "
     "The aim is to get to 100 points. But watch out ... if you are too repetitive in your arguments the game will end before you get there!\n\n" 
     "**Good luck and let's get started!**\n\n"
     )
