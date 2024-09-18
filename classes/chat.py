@@ -244,12 +244,15 @@ class PlayerChat(Chat):
             self.handle_input(x)
 
 class TrolleyChat(Chat):
-    def __init__(self, chat_state_hash, arguments, overallArgument, stance, argumentsMade=[],totalscore=0, state="empty"):
+    def __init__(self, chat_state_hash, arguments, userstance, overallThesis,argumentsMade=[],totalscore=0, state="empty",gameOver=False):
         self.embeddings = TrolleyEmbeddings()
         self.arguments =arguments
-        self.overallArgument = overallArgument
-        self.stance = stance
+        stanceSwap = {'Pro': 'Con', 'Con': 'Pro'}
+        self.stance = stanceSwap[userstance]
+        self.userOverallStance = userstance
         self.argumentsMade = argumentsMade
+        self.overallThesis =overallThesis
+        self.gameOver=gameOver
 
         # Initialize the total score as an int and originality score as float
         self.totalscore = totalscore
@@ -264,12 +267,12 @@ class TrolleyChat(Chat):
         """
         first_messages = [
             {"role": "system", "content": (
-                "You are talking to a human user about the following thesis: " + self.overallArgument + ". "
+                "You are talking to a human user about the following thesis: " + self.overallThesis + ". "
                 " You are currently arguing the " + self.stance + " side of the argument."
                 )
             },
             {"role": "user", "content": (
-                "After these messages you will be interacting with a user who will argue against you. "
+                "After these messages you will be interacting with a user who will argue against your position. "
                 "You will receive relevant information to address the user's argument and then be asked to provide a response. "
                 "All user messages will be prefixed with 'User:' and enclosed with ```. "
                 "When responding to the user, speak directly to them. "
@@ -288,15 +291,34 @@ class TrolleyChat(Chat):
             query = self.visible_messages[-1]["content"]
        
         numberofarguments = 10
-
-        # This finds some relevant information
-        results = self.embeddings.search(query, top_n=numberofarguments)
-        
-        
-        st.write(results)
-
         sidebar_container = st.sidebar.container()
 
+        if self.totalscore>=100:
+            ret_val = "The user has already won the game by getting the maximum score of 100. "
+            ret_val += "They are the winners!!!You will not respond more to arguments"
+            ret_val += "Tell the user to share the game with a friend or play again. "
+            with sidebar_container:
+            
+                st.write(f'You have won!')
+                st.write(f'Total score: 100')
+        
+            return ret_val
+        
+        if self.gameOver==True:
+            ret_val = "Thank the user for playing the game. "
+            ret_val = f"Tell them their final score of {int(np.ceil(self.totalscore))}. "
+                        
+            with sidebar_container:
+            
+                st.write(f'Your argument is over.')
+                st.write(f'Final score: {int(np.ceil(self.totalscore))}')
+        
+            return ret_val
+
+        # This finds the argument that is most similar to the user's query
+        results = self.embeddings.search(query, top_n=numberofarguments)
+
+        # All the arguments are not relevant, so tell the user and return
         if results.iloc[0]['similarities'] < 0.8:
             ret_val = "\n\nThe user said:  \n"   
             ret_val +="\n".join(results["user"].to_list())
@@ -304,75 +326,85 @@ class TrolleyChat(Chat):
             ret_val += "Tell the user that they should try to make an argument that is more relevant to the thesis. "
             with sidebar_container:
                     st.write(f'Novelty: 0/{numberofarguments}')
-                    st.write(f'Total score: {self.totalscore}')
+                    st.write(f'Total score: {int(np.ceil(self.totalscore))}')
             return ret_val
 
-        ret_val = "\n\nHere is a description of what the user is trying to argue:  \n"   
-        ret_val +="\n".join(results["user"].to_list())
+        # Keep a track of similarity to previous arguments made
+        # Set to 0.8 as minimum.
+        if len(self.argumentsMade) > 0:
+            previousArguments = results['assistant'].isin(self.argumentsMade)
+            #Check if previousArgumnets contains at least one True value
+            if previousArguments.any():
+                similaritytoprevious = results[previousArguments]['similarities'].mean()
+            else:
+                similaritytoprevious = 0.8
+        else:
+            similaritytoprevious = 0.8
 
 
-
-        # Remove the results that are not in the argumentsMade list
-        # Keep a track of similarity to previous arguments
-        similaritytoprevious = results[results['assistant'].isin(self.argumentsMade)]['similarities'].mean()
-
-        # Remove the results that are not in the argumentsMade list
+        # Remove the results that are in the argumentsMade list
         for argumentCode in self.argumentsMade:
             results = results[results["assistant"] != argumentCode]
-        
-        st.write(self.argumentsMade)
 
-        # Count how many arguments that haven't been made yet that have similarity > 0.8
-        # This makes up the first part of the originality score.
-        count = results[results['similarities'] > 0.8]['assistant'].isin(self.argumentsMade).sum()
-        self.originalityscore = np.float64((len(results)-count)/2)
-
+        # Remove the results where the overall argument does not match the overall stance
+        for r in results.iterrows():
+            assistant=r[1]['assistant']
+            overall = self.arguments.df[self.arguments.df['assistant']==assistant].iloc[0]['overall']
+            results.at[r[0],'overall'] = overall     
+        results = results[results["overall"] == self.userOverallStance]
         st.write(results)
 
-        # Relevance score is based on maximum similarity score of non-excluded argument  
+        # The first part of the originality score are number of arguments remaining unused.
+        self.originalityscore = len(results)/2
+
         if len(results) == 0:
-            ret_val += ". But the user has already made all the arguments that can be made against the user's argument. "
-            ret_val += "Tell the user that they have done a good job arguing their point and that you have no further arguments to make. "
-            ret_val += "Then let them know that their total score in the argument game is " + str(self.totalscore)
+            ret_val = " Tell the user that they are no longer providing sufficiently novel arguments anymore or our perhaps making arguments that do not support their position. "
+            ret_val += "Tell the user that you have no further arguments to make against theirs, but maybe next time they play they can try broader arguments. "
+            ret_val += "Then let them know that their final score in the argument game is " + str(int(self.totalscore))
             with sidebar_container:
-                st.write(f'Novelty: 0/{numberofarguments}')
-                st.write(f'Total score: {self.totalscore}')
+                st.write(f'Game over! Try again.')
+                st.write(f'Total score: {int(np.ceil(self.totalscore))}')
+            self.gameOver=True
 
             return ret_val
 
-        i=0
+        # Get the 10 best arguments which oppose the current stance.
         currentArguments= []
-        while len(currentArguments) == 0:    
-            argumentCode = results.iloc[i]["assistant"]
-            # Get arguments which oppose top stance.
-            currentArguments= self.arguments.get_arguments(argumentCode,'Con')
-
-            i=i+1
+        for _,r in results.iterrows():    
+            argumentCode = r["assistant"]
+            currentArgumentsdf=self.arguments.get_arguments(argumentCode,'Con')
+            currentArguments = currentArguments + list(currentArgumentsdf['user'])
+            if len(currentArguments) > 10:
+                break
         
-        # Remove the argument from the list of arguments
+        # Remove that argument from the list of arguments
         self.argumentsMade.append(argumentCode)
-        
+        st.write(self.argumentsMade)
+
         with sidebar_container:
-            st.write(f'Sim prev: {similaritytoprevious}/{numberofarguments}')
-            st.write(f'Novelty 1: {self.originalityscore}/{numberofarguments}')
-            self.originalityscore = min(10.0,self.originalityscore+10*np.float64(numberofarguments)*(results.iloc[0]["similarities"]-min(similaritytoprevious,8.0)))
-            st.write(f'Novelty: {self.originalityscore}/{numberofarguments}')
+            #st.write(f'Part 1: {self.originalityscore}/{numberofarguments}')
+            part2 = 10*numberofarguments*(results.iloc[0]["similarities"]-similaritytoprevious)
+            self.originalityscore = self.originalityscore+max(min(5.0,part2),0.0)
+            #st.write(f'Part 2: {part2}/{numberofarguments}')
+            st.write(f'Novelty: {int(np.ceil(self.originalityscore))}/{numberofarguments}')
             self.totalscore = self.totalscore+np.ceil(self.originalityscore)
-            st.write(f'Total score: {self.totalscore}')
-
-
+            st.write(f'Total score: {int(np.ceil(self.totalscore))}')
         
-        ret_val = f"Here is a description of the points which you can make to refute their argument, which is: {query}: \n\n"   
+        if len(currentArguments) == 0:
+            ret_val = "Write at most three sentences arguing against the user's point, based on the previous discussion. "
+        else:
+            ret_val = f"Here is a description of the points which you can make to refute their argument, which is: {query}: \n\n"   
+            for a in currentArguments:
+                ret_val += a + "\n"
+            ret_val += "\n\nWrite two (or at most three) sentences arguing against the user's point, using the points above. "
         
-        for i,a in currentArguments.iterrows():
-            
-            ret_val += a['user'] + ". "
-
-        ret_val += "\n\nWrite at most three sentences arguing against the user's point, using the points above. "
-        ret_val += "In the first sentence, restate the user's argument. In the second sentence, provide a counter-argument. In the third sentence, provide a conclusion."
+        ret_val += "In the first sentence, restate the user's argument. In the second (and possibly third) sentence, provide a counter-argument."
         ret_val += "Always address the user directly as 'you' in the first person and write natural sounding lanaguage, with no headers. Write as if you are having a conversation with the user."
 
-        st.write(ret_val)
+        if self.totalscore>=100:
+            ret_val += "In addition to the above, also congratulate the user for winning game and getting the maximum score of 100. "
+            ret_val += "They are the winners!!! "
+            
 
         return ret_val
     

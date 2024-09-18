@@ -171,7 +171,41 @@ class Arguments(Data):
 
     def process_data(self, df_raw):
 
-        return df_raw
+        # Assuming df is your DataFrame
+        df = df_raw.sort_values('assistant')
+        overall = []
+
+        for _, row in df.iterrows():
+            parts = row['assistant']
+            category = row['category']
+
+            opposite_dict={'Pro':'Con','Con':'Pro'}
+
+            current_view =''
+            for i in range(int(len(parts)/2)):
+                prefix = parts[:i*2+2]
+
+                
+                new_view=df[df['assistant']==prefix]['category'].values[0]
+                if new_view == 'Thesis':
+                    current_view = new_view
+                if current_view == 'Thesis':
+                    current_view = new_view
+                elif current_view == 'Con' and new_view == 'Pro':
+                    current_view = 'Con'
+                elif current_view == 'Con' and new_view == 'Con':
+                    current_view = 'Pro'
+                elif current_view == 'Pro' and new_view == 'Con':
+                    current_view = 'Con'
+                elif current_view == 'Pro' and new_view == 'Pro':
+                    current_view = 'Pro'
+
+
+            overall.append(current_view)  
+
+        df['overall'] = overall
+
+        return df
 
         
     def get_arguments(self, argument,stance):
