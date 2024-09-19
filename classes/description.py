@@ -278,8 +278,8 @@ class PersonDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/Forward.xlsx"]
 
-    def __init__(self, player: Player):
-        self.player = player
+    def __init__(self, person:Person):
+        self.person = person
         super().__init__()
 
 
@@ -321,7 +321,7 @@ class PersonDescription(Description):
 
 
 
-    def categorie_description(value):
+    def categorie_description(self, value):
         if value <= -2:
             text = 'The candidate is extremely '
         elif (value < -2) & (value <= -1):
@@ -339,25 +339,21 @@ class PersonDescription(Description):
         
         return text
 
-    def get_description(candidate_data, dataset):
-    
-        # Upload the dataset
-        data, questions, matching = ds.prepare_dataset(dataset)
-        stats = ds.get_stat(dataset)
-        data = ds.dataset_z_score(data, stats)
 
-        # First we want to check if the user want a certain candidate from the dataset 
-        # or if the user did the test so it return a list
-        if isinstance(candidate_data, list):
-            data_c = ds.convert_list_to_dataset(candidate_data, matching, questions)
-            data_c = ds.dataset_z_score(data_c, stats)
+    def get_description(self, person_id):
+        dataset = ds.get_raw_data() # here we need the dataset to check the min and max score of the person
         
-    
-        elif isinstance(candidate_data,(int, float)):
-            if candidate_data < 0:
-                print('The number should be greater or equal to 0')
-            else:
-                data_c = pd.DataFrame([data.iloc[candidate_data]])
+        person = ds.to_data_point(person_id,dataset)
+        questions = ds.get_questions()
+        
+        name = Person.name
+        extraversion = Person.extraversion
+        neurotiscism = Person.neurotiscism
+        agreeableness = Person.agreeableness
+        conscientiousness = Person.conscientiousness
+        openness = Person.openness
+        
+        data_c = dataset.loc[dataset['name'] == name]
         
         text = []
     
@@ -368,15 +364,15 @@ class PersonDescription(Description):
                 cat_0 = 'solitary and reserved. '
                 cat_1 = 'outgoing and energetic. '
         
-                if data_c['extraversion_zscore'].values > 0:
-                    text_t = categorie_description(data_c['extraversion_zscore'].values) + cat_1
-                    if data_c['extraversion_zscore'].values > 1:
+                if extraversions > 0:
+                    text_t = self.categorie_description(extraversion) + cat_1
+                    if extraversion > 1:
                         index_max = data_c.iloc[0,0:10].idxmax()
                         text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
                         text_t = text_t + text_2
                 else:
-                    text_t = categorie_description(data_c['extraversion_zscore'].values) + cat_0
-                    if data_c['extraversion_zscore'].values < -1:
+                    text_t = self.categorie_description(extraversion) + cat_0
+                    if extraversion < -1:
                         index_min = data_c.iloc[0,0:10].idxmin()
                         text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
                         text_t = text_t + text_2
@@ -387,18 +383,18 @@ class PersonDescription(Description):
                 cat_0 = 'resilient and confident. '
                 cat_1 = 'sensitive and nervous. '
             
-                if data_c['neuroticism_zscore'].values > 0:
-                    text_t = categorie_description(data_c['neuroticism_zscore'].values) + cat_1  \
+                if neuroticism > 0:
+                    text_t = self.categorie_description(neuroticism) + cat_1  \
                     + 'The candidate tends to feel more negative emotions, anxiety. '
-                    if data_c['neuroticism_zscore'].values > 1:
+                    if neuroticism > 1:
                         index_max = data_c.iloc[0,10:20].idxmax()
                         text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
                         text_t = text_t + text_2
                 
                 else:
-                    text_t = categorie_description(data_c['neuroticism_zscore'].values) + cat_0  \
+                    text_t = self.categorie_description(neuroticism) + cat_0  \
                     + 'The candidate tends to feel less negative emotions, anxiety. '
-                    if data_c['neuroticism_zscore'].values < -1:
+                    if neuroticism < -1:
                         index_min = data_c.iloc[0,10:20].idxmin()
                         text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
                         text_t = text_t + text_2
@@ -409,18 +405,18 @@ class PersonDescription(Description):
                 cat_0 = 'critical and rational. '
                 cat_1 = 'friendly and compassionate. '
             
-                if data_c['agreeableness_zscore'].values > 0:
-                    text_t = categorie_description(data_c['agreeableness_zscore'].values) + cat_1  \
+                if agreeableness > 0:
+                    text_t = self.categorie_description(agreeableness) + cat_1  \
                     + 'The candidate tends to be more cooperative, polite, kind and friendly. '
-                    if data_c['agreeableness_zscore'].values > 1:
+                    if agreeableness > 1:
                         index_max = data_c.iloc[0,20:30].idxmax()
                         text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                         text_t = text_t + text_2
 
                 else:
-                    text_t = categorie_description(data_c['agreeableness_zscore'].values) + cat_0  \
+                    text_t = self.categorie_description(agreeableness) + cat_0  \
                     + 'The candidate tends to be less cooperative, polite, kind and friendly. '
-                    if data_c['agreeableness_zscore'].values < -1:
+                    if agreeableness.values < -1:
                         index_min = data_c.iloc[0,20:30].idxmin()
                         text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
                         text_t = text_t + text_2
@@ -431,17 +427,17 @@ class PersonDescription(Description):
                 cat_0 = 'extravagant and careless. '
                 cat_1 = 'efficient and organized. '
             
-                if data_c['conscientiousness_zscore'].values > 0:
-                    text_t = categorie_description(data_c['conscientiousness_zscore'].values) + cat_1  \
+                if conscientiousness > 0:
+                    text_t = self.categorie_description(conscientiousness) + cat_1  \
                     + 'The candidate tends to be more careful or diligent. '
-                    if data_c['conscientiousness_zscore'].values > 1:
+                    if conscientiousness > 1:
                         index_max = data_c.iloc[0,30:40].idxmax()
                         text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                         text_t = text_t + text_2
                 else:
-                    text_t = categorie_description(data_c['conscientiousness_zscore'].values) + cat_0  \
+                    text_t = self.categorie_description(conscientiousness) + cat_0  \
                     + 'The candidate tends to be less careful or diligent. '
-                    if data_c['conscientiousness_zscore'].values < -1:
+                    if conscientiousness < -1:
                         index_min = data_c.iloc[0,30:40].idxmin()
                         text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
                         text_t = text_t + text_2
@@ -452,17 +448,17 @@ class PersonDescription(Description):
                 cat_0 = 'consistent and cautious. '
                 cat_1 = 'inventive and curious. '
             
-                if data_c['openness_zscore'].values > 0:
-                    text_t = categorie_description(data_c['openness_zscore'].values) + cat_1  \
+                if openness > 0:
+                    text_t = self.categorie_description(openness) + cat_1  \
                     + 'The candidate tends to be more open. '
-                    if data_c['openness_zscore'].values > 1:
+                    if openness > 1:
                         index_max = data_c.iloc[0,40:50].idxmax()
                         text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                         text_t = text_t + text_2
                 else:
-                    text_t = categorie_description(data_c['openness_zscore'].values) + cat_0  \
+                    text_t = self.categorie_description(openness) + cat_0  \
                     + 'The candidate tends to be less open. '
-                    if data_c['openness_zscore'].values < -1:
+                    if openness < -1:
                         index_min = data_c.iloc[0,40:50].idxmin()
                         text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
                         text_t = text_t + text_2
@@ -483,7 +479,6 @@ class PersonDescription(Description):
             "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
-
 
 
 
