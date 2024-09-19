@@ -154,18 +154,20 @@ class PlayerStats(Stats):
 
 
 
+
 class PersonalityStats(Stats):
     data_point_class = data_point.Person
+    
     
     def __init__(self):
         super().__init__()
 
     def get_raw_data(self):
-        data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
+        data = pd.read_csv("Documents/personality-gpt/data/events/dataset.csv",encoding='unicode_escape')
         return data
 
 
-    def get_stat(dataset):
+    def get_stat(self,dataset):
         # List of columns to compute statistics for
         columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
     
@@ -177,7 +179,7 @@ class PersonalityStats(Stats):
     
         return stats
 
-    def dataset_z_score(dataset, stats):
+    def dataset_z_score(self,dataset, stats):
         columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
     
         for column in columns:
@@ -187,7 +189,7 @@ class PersonalityStats(Stats):
     
         return dataset
 
-    def convert_list_to_dataset(person_list, matching, questions):
+    def convert_list_to_dataset(self,person_list, matching, questions):
         data_temp =pd.DataFrame([person_list], columns= [column for column in matching])   
         for column in data_temp.columns:
             data_temp[column] = data_temp[column] * questions[column][1]
@@ -200,12 +202,40 @@ class PersonalityStats(Stats):
         return data_temp
 
 
-    def prepare_dataset(data):
+    def prepare_dataset(self, question):
+        data = self.get_raw_data()
         data = data.copy()
         data.drop(data.columns[50:107], axis=1, inplace=True)
         data.drop(data.columns[50:], axis=1, inplace=True) # here 50 to remove the country
         data.dropna(inplace=True)
 
+        questions = question
+
+        # Group Names and Columns
+        EXT = [column for column in data if column.startswith('EXT')]
+        EST = [column for column in data if column.startswith('EST')]
+        AGR = [column for column in data if column.startswith('AGR')]
+        CSN = [column for column in data if column.startswith('CSN')]
+        OPN = [column for column in data if column.startswith('OPN')]
+
+        matching = EXT+EST+AGR+CSN+OPN
+
+        # Here we update the dataframe by applying the new coefficient
+        for column in data.columns:
+            data[column] = data[column] * questions[column][1]
+
+        # reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf 
+        data['extraversion'] = data.iloc[:, 0:10].sum(axis=1) + 20
+        data['neuroticism'] = data.iloc[:, 10:20].sum(axis=1) +38
+        data['agreeableness'] = data.iloc[:, 20:30].sum(axis=1) +14 
+        data['conscientiousness'] = data.iloc[:, 30:40].sum(axis=1) + 14
+        data['openness'] = data.iloc[:, 40:50].sum(axis=1) + 8
+        data['name'] = data.index.to_series().apply(lambda idx: 'C_' + str(idx))
+
+        return data, matching
+
+    def get_question(self):
+        
         # Groups and Questions modify version
         # (1) extraversion, (2) neuroticism, (3) agreeableness, (4)conscientiousness , and (5) openness
         ext_questions = {'EXT1' : ['they are the life of the party',1],
@@ -218,6 +248,7 @@ class PersonalityStats(Stats):
                          'EXT8' : ['they dont like to draw attention to themself',-1],
                          'EXT9' : ['they dont mind being the center of attention',1],
                          'EXT10': ['they are quiet around strangers',-1]}
+        
         est_questions = {'EST1' : ['they get stressed out easily',-1],
                          'EST2' : ['they are relaxed most of the time',1],
                          'EST3' : ['they worry about things',-1],
@@ -228,6 +259,7 @@ class PersonalityStats(Stats):
                          'EST8' : ['they have frequent mood swings',-1],
                          'EST9' : ['they get irritated easily',-1],
                          'EST10': ['they often feel blue',-1]}
+        
         agr_questions = {'AGR1' : ['they feel little concern for others',-1],
                          'AGR2' : ['they interested in people',1],
                          'AGR3' : ['they insult people',-1],
@@ -239,7 +271,6 @@ class PersonalityStats(Stats):
                          'AGR9' : ['they feel others emotions',1],
                          'AGR10': ['they make people feel at ease',1]}
     
-
         csn_questions = {'CSN1' : ['they are always prepared',1],
                          'CSN2' : ['they leave their belongings around',-1],
                          'CSN3' : ['they pay attention to details',1],
@@ -263,49 +294,29 @@ class PersonalityStats(Stats):
                          'OPN10': ['they are full of ideas',1]}
     
         questions = ext_questions | est_questions | agr_questions | csn_questions  | opn_questions
-
-        # Group Names and Columns
-        EXT = [column for column in data if column.startswith('EXT')]
-        EST = [column for column in data if column.startswith('EST')]
-        AGR = [column for column in data if column.startswith('AGR')]
-        CSN = [column for column in data if column.startswith('CSN')]
-        OPN = [column for column in data if column.startswith('OPN')]
-
-        matching = EXT+EST+AGR+CSN+OPN
-
-        # Here we update the dataframe by applying the new coefficient
-        for column in data.columns:
-            data[column] = data[column] * questions[column][1]
-
-        # reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf 
-        data['extraversion'] = data.iloc[:, 0:10].sum(axis=1) + 20
-        data['neuroticism'] = data.iloc[:, 10:20].sum(axis=1) +38
-        data['agreeableness'] = data.iloc[:, 20:30].sum(axis=1) +14 
-        data['conscientiousness'] = data.iloc[:, 30:40].sum(axis=1) + 14
-        data['openness'] = data.iloc[:, 40:50].sum(axis=1) + 8
-        data['name'] = data.index.to_series().apply(lambda idx: 'C_' + str(idx))
-
-        return data, questions, matching
+        return questions
 
     
     
-    def to_data_point(self,name,extraversion,neurotiscism,agreeableness,conscientiousness,openness) -> data_point.Person:
-        data, questions, matching = prepare_dataset(dataset)
-        stats = get_stat(dataset)
-        data = dataset_z_score(data, stats)
+    def to_data_point(self,person_data) -> data_point.Person:
+        questions = self.get_question()
+        dataset = self.get_raw_data()
+        data, matching = prepare_dataset(dataset)
+        stats = self.get_stat(dataset)
+        data = self.dataset_z_score(data, stats)
 
         # First we want to check if the user want a certain candidate from the dataset 
         # or if the user did the test so it return a list
-        if isinstance(name, list):
-            data_c = convert_list_to_dataset(name, matching, questions)
-            data_c = dataset_z_score(data_c, stats)
+        if isinstance(person_data, list):
+            data_c = self.convert_list_to_dataset(person_data, matching, questions)
+            data_c = self.dataset_z_score(data_c, stats)
         
     
-        elif isinstance(name,(int, float)):
-            if name < 0:
+        elif isinstance(person_data,(int, float)):
+            if person_data < 0:
                 print('The number should be greater or equal to 0')
             else:
-                data_c = pd.DataFrame([data.iloc[name]])
+                data_c = pd.DataFrame([data.iloc[person_data]])
 
         
         id = self.data_c.index[0]
