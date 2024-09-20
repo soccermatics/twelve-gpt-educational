@@ -35,7 +35,7 @@ class Person(Stat):
         self.id=id
         self.name = name
         self.extraversion = extraversion
-        self.neurotiscism = neurotiscism
+        self.neuroticism = neuroticism
         self.agreeableness = agreeableness
         self.conscientiousness = conscientiousness
         self.openness = openness
