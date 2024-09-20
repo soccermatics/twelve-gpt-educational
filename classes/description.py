@@ -280,9 +280,10 @@ class PersonDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/Forward.xlsx"]
 
-    def __init__(self, person: Person, personstat = PersonStat):
+    def __init__(self, person: Person):
         self.person = person
-        self.dataset = personstat.get_raw_data()
+        self.data = DataPersonality()
+        self.statpersonality = StatPersonality()
         super().__init__()
 
 
@@ -343,20 +344,24 @@ class PersonDescription(Description):
         return text
 
 
-    def get_description(self, person_id):
-         # here we need the dataset to check the min and max score of the person
+    def get_description(self, person):
+        # here we need the dataset to check the min and max score of the person
         
-        person = PersonStat.to_data_point(person_id)
-        questions = StatPersonality.get_question()
+        self.person = person # here it should be the person point
+
+        dataset = self.data.get_raw_data()
+        questions = self.statpersonality.get_question()
+
         
-        name = person.name
+        name = str(person.name)
         extraversion = person.extraversion
         neuroticism = person.neuroticism
         agreeableness = person.agreeableness
         conscientiousness = person.conscientiousness
         openness = person.openness
+
         
-        data_c = self.dataset.loc[self.dataset['name'] == name]
+        data_c = dataset.loc[dataset['name'] == name]
         
         text = []
     
@@ -367,7 +372,7 @@ class PersonDescription(Description):
                 cat_0 = 'solitary and reserved. '
                 cat_1 = 'outgoing and energetic. '
         
-                if extraversions > 0:
+                if extraversion > 0:
                     text_t = self.categorie_description(extraversion) + cat_1
                     if extraversion > 1:
                         index_max = data_c.iloc[0,0:10].idxmax()
