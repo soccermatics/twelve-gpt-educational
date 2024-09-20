@@ -152,26 +152,37 @@ class PlayerStats(Stats):
         return self.data_point_class(id=id,name=name,minutes_played=minutes_played,gender=gender,position=position,ser_metrics=ser_metrics,relevant_metrics=self.metrics)
 
 
+# -------------------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------------------
 
+class DataPersonality():
+    """
+    Get, process, and manage various forms of data.
+    """
+    data_point_class = None
 
-
-class PersonalityStats(Stats):
-    data_point_class = data_point.Person
-    
-    
     def __init__(self):
-        super().__init__()
+        self.data = self.get_raw_data()
 
     def get_raw_data(self):
         data = pd.read_csv("Documents/personality-gpt/data/events/dataset.csv",encoding='unicode_escape')
         return data
 
 
-    def get_stat(self,dataset):
-        # List of columns to compute statistics for
-        columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+
+class StatPersonality(DataPersonality):
+    data_point_class = data_point.Person
     
-        # Dictionary to store mean and std for each column
+    def __init__(self):
+        self.data = self.get_raw_data()
+
+
+
+    def get_stat(self,dataset):
+        ''' This function is used to obtain the mean and standard deviation for each trait. It is used to calculate the z score'''
+        
+        columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+
         stats = {}
     
         for column in columns:
@@ -203,6 +214,8 @@ class PersonalityStats(Stats):
 
 
     def prepare_dataset(self, question):
+        ''' This function get the dataset, the questions, then get the dataset ready'''
+        
         data = self.get_raw_data()
         data = data.copy()
         data.drop(data.columns[50:107], axis=1, inplace=True)
@@ -235,6 +248,7 @@ class PersonalityStats(Stats):
         return data, matching
 
     def get_question(self):
+        ''' This function is to have access to the questions'''
         
         # Groups and Questions modify version
         # (1) extraversion, (2) neuroticism, (3) agreeableness, (4)conscientiousness , and (5) openness
@@ -297,19 +311,29 @@ class PersonalityStats(Stats):
         return questions
 
     
+class PersonStat(StatPersonality):   
     
-    def to_data_point(self,person_data) -> data_point.Person:
+    data_point_class = data_point.Person
+
+    def __init__(self, data, questions):
+        self.data = self.get_raw_data()
         questions = self.get_question()
-        dataset = self.get_raw_data()
-        data, matching = prepare_dataset(dataset)
-        stats = self.get_stat(dataset)
-        data = self.dataset_z_score(data, stats)
+        super().__init__()
+
+    def process_data(self, person_data):
+        ''' This fonction get the person or candidate data with a number id or a list, and return a dataframe of the person '''
+    
+        questions = self.questions # to get the questions
+        dataset = self.data # here is the general dataset
+        data, matching = prepare_dataset(dataset) # Here we prepare the dataset with the general transformation
+        stats = self.get_stat(data) # here we get the mean and std. It is use for the z-score
+        data = self.dataset_z_score(data, stats) # we calcul the z-score for the 5 traits and apply it on the general dataset
 
         # First we want to check if the user want a certain candidate from the dataset 
         # or if the user did the test so it return a list
         if isinstance(person_data, list):
             data_c = self.convert_list_to_dataset(person_data, matching, questions)
-            data_c = self.dataset_z_score(data_c, stats)
+            data_c = self.dataset_z_score(data_c, stats) 
         
     
         elif isinstance(person_data,(int, float)):
@@ -317,8 +341,14 @@ class PersonalityStats(Stats):
                 print('The number should be greater or equal to 0')
             else:
                 data_c = pd.DataFrame([data.iloc[person_data]])
-
+                
+        return data_c
+    
+    def to_data_point(self, person_data) -> data_point.Person:
+        ''' This fonction get the person or candidate data with a number id or a list, and return the id, name, and the 5 traits '''
         
+        data_c = self.process_data(person_data)
+
         id = self.data_c.index[0]
         name = self.data_c['name']
         extraversion = self.data_c['extraversion_zscore'].values
