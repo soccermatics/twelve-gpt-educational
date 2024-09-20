@@ -348,7 +348,7 @@ class PersonDescription(Description):
         
         name = Person.name
         extraversion = Person.extraversion
-        neurotiscism = Person.neurotiscism
+        neuroticism = Person.neuroticism
         agreeableness = Person.agreeableness
         conscientiousness = Person.conscientiousness
         openness = Person.openness
