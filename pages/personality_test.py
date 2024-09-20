@@ -27,4 +27,10 @@ st.divider()
 
 
 
-st.write(PersonDescription.get_description(4))
+
+data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
+person_stat = PersonStat()
+person = person_stat.to_data_point(3)
+description =  PersonDescription(person, person_stat)
+
+st.write(description.get_description(person))
