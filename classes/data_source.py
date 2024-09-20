@@ -155,6 +155,10 @@ class PlayerStats(Stats):
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
 
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------------------
+
 class DataPersonality():
     """
     Get, process, and manage various forms of data.
@@ -165,7 +169,7 @@ class DataPersonality():
         self.data = self.get_raw_data()
 
     def get_raw_data(self):
-        data = pd.read_csv("Documents/personality-gpt/data/events/dataset.csv",encoding='unicode_escape')
+        data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
         return data
 
 
@@ -175,6 +179,7 @@ class StatPersonality(DataPersonality):
     
     def __init__(self):
         self.data = self.get_raw_data()
+        self.questions = self.get_question()
 
 
 
@@ -196,7 +201,7 @@ class StatPersonality(DataPersonality):
         for column in columns:
             mean = stats[column]['mean']
             std = stats[column]['std']
-            dataset[f'{column}_zscore'] = (dataset[column] - mean) / std
+            dataset[f'{column}'] = (dataset[column] - mean) / std
     
         return dataset
 
@@ -314,18 +319,19 @@ class StatPersonality(DataPersonality):
 class PersonStat(StatPersonality):   
     
     data_point_class = data_point.Person
+    
 
-    def __init__(self, data, questions):
+    def __init__(self):
         self.data = self.get_raw_data()
-        questions = self.get_question()
+        
         super().__init__()
 
     def process_data(self, person_data):
         ''' This fonction get the person or candidate data with a number id or a list, and return a dataframe of the person '''
     
-        questions = self.questions # to get the questions
+        questions = StatPersonality().get_question() # to get the questions
         dataset = self.data # here is the general dataset
-        data, matching = prepare_dataset(dataset) # Here we prepare the dataset with the general transformation
+        data, matching = self.prepare_dataset(dataset) # Here we prepare the dataset with the general transformation
         stats = self.get_stat(data) # here we get the mean and std. It is use for the z-score
         data = self.dataset_z_score(data, stats) # we calcul the z-score for the 5 traits and apply it on the general dataset
 
@@ -349,13 +355,13 @@ class PersonStat(StatPersonality):
         
         data_c = self.process_data(person_data)
 
-        id = self.data_c.index[0]
-        name = self.data_c['name']
-        extraversion = self.data_c['extraversion_zscore'].values
-        neurotiscism = self.data_c['neurotiscism_zscore'].values
-        agreeableness = self.data_c[' agreeableness_zscore'].values
-        conscientiousness = self.data_c['conscientiousness_zscore'].values
-        openness = self.data_c['openness_zscore'].values
+        id = data_c.index[0]
+        name = data_c['name']
+        extraversion = data_c['extraversion'].values
+        neuroticism = data_c['neuroticism'].values
+        agreeableness = data_c['agreeableness'].values
+        conscientiousness = data_c['conscientiousness'].values
+        openness = data_c['openness'].values
 
         
-        return self.data_point_class(id=id,name=name, extraversion=extraversion,neurotiscism=neurotiscism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
+        return self.data_point_class(id=id,name=name, extraversion=extraversion,neuroticism=neuroticism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
