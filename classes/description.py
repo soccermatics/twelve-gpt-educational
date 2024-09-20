@@ -265,6 +265,8 @@ class PlayerDescription(Description):
 
 
 
+# -------------------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------------------
 
 
 class PersonDescription(Description):
@@ -278,8 +280,9 @@ class PersonDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/Forward.xlsx"]
 
-    def __init__(self, person:Person):
+    def __init__(self, person: Person, personstat = PersonStat):
         self.person = person
+        self.dataset = personstat.get_raw_data()
         super().__init__()
 
 
@@ -341,19 +344,19 @@ class PersonDescription(Description):
 
 
     def get_description(self, person_id):
-        dataset = ds.get_raw_data() # here we need the dataset to check the min and max score of the person
+         # here we need the dataset to check the min and max score of the person
         
-        person = ds.to_data_point(person_id,dataset)
-        questions = ds.get_questions()
+        person = PersonStat.to_data_point(person_id)
+        questions = StatPersonality.get_question()
         
-        name = Person.name
-        extraversion = Person.extraversion
-        neuroticism = Person.neuroticism
-        agreeableness = Person.agreeableness
-        conscientiousness = Person.conscientiousness
-        openness = Person.openness
+        name = person.name
+        extraversion = person.extraversion
+        neuroticism = person.neuroticism
+        agreeableness = person.agreeableness
+        conscientiousness = person.conscientiousness
+        openness = person.openness
         
-        data_c = dataset.loc[dataset['name'] == name]
+        data_c = self.dataset.loc[self.dataset['name'] == name]
         
         text = []
     
@@ -479,7 +482,5 @@ class PersonDescription(Description):
             "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
-
-
 
 
