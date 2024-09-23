@@ -35,34 +35,30 @@ def insert_local_css():
     logo_url = (
         "url(data:image/png;base64,"
         + base64.b64encode(
-            Path('data/ressources/img/twelve_logo_light.png')
-            .read_bytes()
+            Path("data/ressources/img/twelve_logo_light.png").read_bytes()
         ).decode()
         + ")"
     )
     font_url_medium = (
         "url(data:font/otf;base64,"
         + base64.b64encode(
-            Path('data/ressources/fonts/Gilroy-Medium.otf')
-            .read_bytes()
+            Path("data/ressources/fonts/Gilroy-Medium.otf").read_bytes()
         ).decode()
         + ")"
     )
     font_url_light = (
         "url(data:font/otf;base64,"
         + base64.b64encode(
-            Path('data/ressources/fonts/Gilroy-Light.otf')
-            .read_bytes()
+            Path("data/ressources/fonts/Gilroy-Light.otf").read_bytes()
         ).decode()
         + ")"
     )
-    
+
     css = css.replace("replace_logo_url", logo_url)
     css = css.replace("replace_font_url_medium", font_url_medium)
     css = css.replace("replace_font_url_light", font_url_light)
 
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-
 
 
 def set_page_config():
@@ -85,14 +81,15 @@ def add_page_selector():
     st.page_link("app.py", label="About")
     st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
+    st.page_link("pages/wvs_chat.py", label="World Values Survey")
     st.page_link("pages/own_page.py", label="Your Own Page")
-    
+
 
 def add_common_page_elements():
     """
     Sets page config, injects local CSS, adds page selector and login button.
     Returns a container that MUST be used instead of st.sidebar in the rest of the app.
-    
+
     Returns:
         sidebar_container: A container in the sidebar to hold all other sidebar elements.
     """
@@ -112,13 +109,13 @@ def add_common_page_elements():
 
     sidebar_container.divider()
 
-    return sidebar_container    
+    return sidebar_container
 
 
-def select_player(container,players,gender,position):
+def select_player(container, players, gender, position):
 
     # Make a copy of Players object
-    player=copy.deepcopy(players)
+    player = copy.deepcopy(players)
 
     # Filter players by position and select a player with sidebar selectors
     with container:
@@ -131,9 +128,10 @@ def select_player(container,players,gender,position):
 
         # Return data point
 
-        player=player.to_data_point(gender,position)
-        
+        player = player.to_data_point(gender, position)
+
     return player
+
 
 def create_chat(to_hash, chat_class, *args, **kwargs):
     chat_hash_state = hash(to_hash)
