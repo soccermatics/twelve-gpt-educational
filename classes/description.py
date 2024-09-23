@@ -360,118 +360,112 @@ class PersonDescription(Description):
         conscientiousness = person.conscientiousness
         openness = person.openness
 
+
         
         data_c = dataset.loc[dataset['name'] == name]
         
         text = []
-    
-        for i in range(0,5):
-        
-            # extraversion
-            if i == 0:
-                cat_0 = 'solitary and reserved. '
-                cat_1 = 'outgoing and energetic. '
-        
-                if extraversion > 0:
-                    text_t = self.categorie_description(extraversion) + cat_1
-                    if extraversion > 1:
-                        index_max = data_c.iloc[0,0:10].idxmax()
-                        text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
-                        text_t = text_t + text_2
-                else:
-                    text_t = self.categorie_description(extraversion) + cat_0
-                    if extraversion < -1:
-                        index_min = data_c.iloc[0,0:10].idxmin()
-                        text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
-                        text_t = text_t + text_2
-                text.append(text_t)
-                
-            # neuroticism
-            if i == 1:
-                cat_0 = 'resilient and confident. '
-                cat_1 = 'sensitive and nervous. '
-            
-                if neuroticism > 0:
-                    text_t = self.categorie_description(neuroticism) + cat_1  \
-                    + 'The candidate tends to feel more negative emotions, anxiety. '
-                    if neuroticism > 1:
-                        index_max = data_c.iloc[0,10:20].idxmax()
-                        text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
-                        text_t = text_t + text_2
-                
-                else:
-                    text_t = self.categorie_description(neuroticism) + cat_0  \
-                    + 'The candidate tends to feel less negative emotions, anxiety. '
-                    if neuroticism < -1:
-                        index_min = data_c.iloc[0,10:20].idxmin()
-                        text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
-                        text_t = text_t + text_2
-                text.append(text_t)
-            
-            # agreeableness        
-            if i == 2:
-                cat_0 = 'critical and rational. '
-                cat_1 = 'friendly and compassionate. '
-            
-                if agreeableness > 0:
-                    text_t = self.categorie_description(agreeableness) + cat_1  \
-                    + 'The candidate tends to be more cooperative, polite, kind and friendly. '
-                    if agreeableness > 1:
-                        index_max = data_c.iloc[0,20:30].idxmax()
-                        text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
-                        text_t = text_t + text_2
 
-                else:
-                    text_t = self.categorie_description(agreeableness) + cat_0  \
+            
+        # extraversion
+        cat_0 = 'solitary and reserved. '
+        cat_1 = 'outgoing and energetic. '
+                
+        if extraversion > 0:
+            text_t = self.categorie_description(extraversion) + cat_1
+            if extraversion > 1:
+                index_max = data_c.iloc[:,0:10].idxmax(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
+                text_t +=  text_2
+        else:
+            text_t = self.categorie_description(extraversion) + cat_0
+            if extraversion < -1:
+                index_min = data_c.iloc[:,0:10].idxmin(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
+                text_t += text_2
+        text.append(text_t)
+            
+        # neuroticism
+        cat_0 = 'resilient and confident. '
+        cat_1 = 'sensitive and nervous. '
+            
+        if neuroticism > 0:
+            text_t = self.categorie_description(neuroticism) + cat_1  \
+                    + 'The candidate tends to feel more negative emotions, anxiety. '
+            if neuroticism > 1:
+                index_max = data_c.iloc[:,10:20].idxmax(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
+                text_t += text_2
+                
+        else:
+            text_t = self.categorie_description(neuroticism) + cat_0  \
+                    + 'The candidate tends to feel less negative emotions, anxiety. '
+            if neuroticism < -1:
+                index_min = data_c.iloc[:,10:20].idxmin(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
+                text_t += text_2
+        text.append(text_t)
+            
+        # agreeableness  
+        cat_0 = 'critical and rational. '
+        cat_1 = 'friendly and compassionate. '
+            
+        if agreeableness > 0:
+            text_t = self.categorie_description(agreeableness) + cat_1  \
+                    + 'The candidate tends to be more cooperative, polite, kind and friendly. '
+            if agreeableness > 1:
+                index_max = data_c.iloc[:,20:30].idxmax(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                text_t += text_2
+
+        else:
+            text_t = self.categorie_description(agreeableness) + cat_0  \
                     + 'The candidate tends to be less cooperative, polite, kind and friendly. '
-                    if agreeableness.values < -1:
-                        index_min = data_c.iloc[0,20:30].idxmin()
-                        text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
-                        text_t = text_t + text_2
-                text.append(text_t)
+            if agreeableness < -1:
+                index_min = data_c.iloc[:,20:30].idxmin(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                text_t += text_2
+        text.append(text_t)
+       
+       # conscientiousness
+        cat_0 = 'extravagant and careless. '
+        cat_1 = 'efficient and organized. '
             
-            # conscientiousness
-            if i == 3:  
-                cat_0 = 'extravagant and careless. '
-                cat_1 = 'efficient and organized. '
-            
-                if conscientiousness > 0:
-                    text_t = self.categorie_description(conscientiousness) + cat_1  \
+        if conscientiousness > 0:
+            text_t = self.categorie_description(conscientiousness) + cat_1  \
                     + 'The candidate tends to be more careful or diligent. '
-                    if conscientiousness > 1:
-                        index_max = data_c.iloc[0,30:40].idxmax()
-                        text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
-                        text_t = text_t + text_2
-                else:
-                    text_t = self.categorie_description(conscientiousness) + cat_0  \
+            if conscientiousness > 1:
+                index_max = data_c.iloc[:,30:40].idxmax(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                text_t += text_2
+        else:
+            text_t = self.categorie_description(conscientiousness) + cat_0  \
                     + 'The candidate tends to be less careful or diligent. '
-                    if conscientiousness < -1:
-                        index_min = data_c.iloc[0,30:40].idxmin()
-                        text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
-                        text_t = text_t + text_2
-                text.append(text_t)
+            if conscientiousness < -1:
+                index_min = data_c.iloc[:,30:40].idxmin(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                text_t += text_2
+        text.append(text_t)
         
-            # openness
-            if i == 4:
-                cat_0 = 'consistent and cautious. '
-                cat_1 = 'inventive and curious. '
-            
-                if openness > 0:
-                    text_t = self.categorie_description(openness) + cat_1  \
+        # openness
+        cat_0 = 'consistent and cautious. '
+        cat_1 = 'inventive and curious. '
+
+        if openness > 0:
+            text_t = self.categorie_description(openness) + cat_1  \
                     + 'The candidate tends to be more open. '
-                    if openness > 1:
-                        index_max = data_c.iloc[0,40:50].idxmax()
-                        text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
-                        text_t = text_t + text_2
-                else:
-                    text_t = self.categorie_description(openness) + cat_0  \
+            if openness > 1:
+                index_max = data_c.iloc[:,40:50].idxmax(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
+                text_t += text_2
+        else:
+            text_t = self.categorie_description(openness) + cat_0  \
                     + 'The candidate tends to be less open. '
-                    if openness < -1:
-                        index_min = data_c.iloc[0,40:50].idxmin()
-                        text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
-                        text_t = text_t + text_2
-                text.append(text_t)
-            i+=1
+            if openness < -1:
+                index_min = data_c.iloc[:,40:50].idxmin(axis = 'columns').values[0]
+                text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
+                text_t += text_2
+        text.append(text_t)
         
         text = ''.join(text)
         text = text.replace(',','')
@@ -487,5 +481,7 @@ class PersonDescription(Description):
             "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
+
+
 
 
