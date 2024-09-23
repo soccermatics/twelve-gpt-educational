@@ -356,12 +356,12 @@ class PersonStat(StatPersonality):
         data_c = self.process_data(person_data)
 
         id = data_c.index[0]
-        name = data_c['name']
-        extraversion = data_c['extraversion'].values
-        neuroticism = data_c['neuroticism'].values
-        agreeableness = data_c['agreeableness'].values
-        conscientiousness = data_c['conscientiousness'].values
-        openness = data_c['openness'].values
+        name = data_c['name'].values[0]
+        extraversion = data_c['extraversion'].values[0]
+        neuroticism = data_c['neuroticism'].values[0]
+        agreeableness = data_c['agreeableness'].values[0]
+        conscientiousness = data_c['conscientiousness'].values[0]
+        openness = data_c['openness'].values[0]
 
         
         return self.data_point_class(id=id,name=name, extraversion=extraversion,neuroticism=neuroticism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
