@@ -1,27 +1,14 @@
 """
-Page components for app.py and pages/*.py
+Page components for pages/*.py
 """
 
 # Stdlib imports
 import base64
 from pathlib import Path
 
-from typing import Optional
-import traceback
-import copy
-import os
-import json
 import streamlit as st
-import pandas as pd
-import numpy as np
-import pyarrow.parquet as pq
-import requests
 
-from classes.chat import Chat
-from classes.data_source import PlayerStats
-from classes.data_point import Player
-
-from utils.sentences import pronouns
+# from pages import about, football_scout, embedder, wvs_chat, own_page
 
 
 def insert_local_css():
@@ -78,11 +65,34 @@ def set_page_config():
 
 def add_page_selector():
     st.image("data/ressources/img/TwelveEdu.png")
-    st.page_link("app.py", label="About")
+    st.page_link("pages/about.py", label="About")
     st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
     st.page_link("pages/wvs_chat.py", label="World Values Survey")
     st.page_link("pages/own_page.py", label="Your Own Page")
+
+    # st.image("data/ressources/img/TwelveEdu.png")
+
+    # # Define the available pages using their module names, not file paths
+    # pages = {
+    #     "About": about,
+    #     "Football Scout": football_scout,
+    #     "Embedder": embedder,
+    #     "World Values Survey": wvs_chat,
+    #     "Your Own Page": own_page,
+    #     # Add other pages here
+    # }
+
+    # # Sidebar for page selection with default set to "About"
+    # selected_page = st.sidebar.radio(
+    #     "Select a page",
+    #     list(pages.keys()),
+    #     index=0,  # 'index=0' selects "About" by default
+    # )
+
+    # # Load and display the selected page's content by calling its `show` function
+    # page = pages[selected_page]
+    # # page.show()  # Assume each page has a `show()` function to display its content
 
 
 def add_common_page_elements():
@@ -110,30 +120,3 @@ def add_common_page_elements():
     sidebar_container.divider()
 
     return sidebar_container
-
-
-def select_player(container, players, gender, position):
-
-    # Make a copy of Players object
-    player = copy.deepcopy(players)
-
-    # Filter players by position and select a player with sidebar selectors
-    with container:
-
-        # Filter for player name
-        player.select_and_filter(
-            column_name="player_name",
-            label="Player",
-        )
-
-        # Return data point
-
-        player = player.to_data_point(gender, position)
-
-    return player
-
-
-def create_chat(to_hash, chat_class, *args, **kwargs):
-    chat_hash_state = hash(to_hash)
-    chat = chat_class(chat_hash_state, *args, **kwargs)
-    return chat
