@@ -293,3 +293,89 @@ class PlayerDescription(Description):
             "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
+
+
+class CountryDescription(Description):
+    output_token_limit = 150
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/Core_values.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/Core_values.xlsx"]
+
+    def __init__(self, country: Player):
+        self.country = country
+        super().__init__()
+
+    def get_intro_messages(self) -> List[Dict[str, str]]:
+        """
+        Constant introduction messages for the assistant.
+
+        Returns:
+        List of dicts with keys "role" and "content".
+        """
+        intro = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a data analyst. "
+                    "You provide succinct and to the point explanations about countries using data. "
+                    "You use the information given to you from the data and answers "
+                    "to earlier user/assistant pairs to give summaries of countries."
+                ),
+            },
+            # {
+            #     "role": "user",
+            #     "content": "Do you refer to the game you are an expert in as soccer or football?",
+            # },
+            # {
+            #     "role": "assistant",
+            #     "content": (
+            #         "I refer to the game as football. "
+            #         "When I say football, I don't mean American football, I mean what Americans call soccer. "
+            #         "But I always talk about football, as people do in the United Kingdom."
+            #     ),
+            # },
+        ]
+        if len(self.describe_paths) > 0:
+            intro += [
+                {
+                    "role": "user",
+                    "content": "First, could you answer some questions about a country for me?",
+                },
+                {"role": "assistant", "content": "Sure!"},
+            ]
+
+        return intro
+
+    def synthesize_text(self):
+
+        country = self.country
+        metrics = self.country.relevant_metrics
+        description = f"Here is a statistical description of the core values of {country.name.capitalize()}. \n\n "
+
+        # subject_p, object_p, possessive_p = sentences.pronouns(country.gender)
+
+        for metric in metrics:
+
+            description += f"{country.name.capitalize()} was "
+            description += sentences.describe_level(country.ser_metrics[metric + "_Z"])
+            description += " in " + metric  # .replace("_", " ")
+            description += " compared to other countries in the same survey. "
+
+        # st.write(description)
+
+        return description
+
+    def get_prompt_messages(self):
+        prompt = (
+            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the core values of the country. "
+            # f"The first sentence should use varied language to give an overview of the player. "
+            # "The second sentence should describe the player's specific strengths based on the metrics. "
+            # "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
+            # "Finally, summarise exactly how the player compares to others in the same position. "
+        )
+        return [{"role": "user", "content": prompt}]
