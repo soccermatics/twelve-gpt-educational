@@ -91,8 +91,8 @@ class Description(ABC):
 
         return intro
 
-
-    def get_messages_from_excel(self,
+    def get_messages_from_excel(
+        self,
         paths: Union[str, List[str]],
     ) -> List[Dict[str, str]]:
         """
@@ -135,24 +135,33 @@ class Description(ABC):
     def setup_messages(self) -> List[Dict[str, str]]:
         messages = self.get_intro_messages()
         try:
-            paths=self.describe_paths
+            paths = self.describe_paths
             messages += self.get_messages_from_excel(paths)
-        except FileNotFoundError as e:  # FIXME: When merging with new_training, add the other exception
+        except (
+            FileNotFoundError
+        ) as e:  # FIXME: When merging with new_training, add the other exception
             print(e)
         messages += self.get_prompt_messages()
 
-        messages = [message for message in messages if isinstance(message["content"], str)]
-
+        messages = [
+            message for message in messages if isinstance(message["content"], str)
+        ]
 
         try:
             messages += self.get_messages_from_excel(
                 paths=self.gpt_examples_path,
-                
             )
-        except FileNotFoundError as e:  # FIXME: When merging with new_training, add the other exception
+        except (
+            FileNotFoundError
+        ) as e:  # FIXME: When merging with new_training, add the other exception
             print(e)
 
-        messages += [{"role": "user", "content": f"Now do the same thing with the following: ```{self.synthesized_text}```"}]
+        messages += [
+            {
+                "role": "user",
+                "content": f"Now do the same thing with the following: ```{self.synthesized_text}```",
+            }
+        ]
         return messages
 
     def stream_gpt(self, temperature=1):
@@ -162,7 +171,7 @@ class Description(ABC):
         Arguments:
         temperature: optional float
             The temperature of the GPT model.
-        
+
         Yields:
             str
         """
@@ -171,12 +180,13 @@ class Description(ABC):
 
         if USE_GEMINI:
             import google.generativeai as genai
+
             converted_msgs = convert_messages_format(self.messages)
 
             genai.configure(api_key=GEMINI_API_KEY)
             model = genai.GenerativeModel(
                 model_name=GEMINI_CHAT_MODEL,
-                system_instruction=converted_msgs["system_instruction"]
+                system_instruction=converted_msgs["system_instruction"],
             )
             chat = model.start_chat(history=converted_msgs["history"])
             response = chat.send_message(content=converted_msgs["content"])
@@ -191,10 +201,10 @@ class Description(ABC):
             response = openai.ChatCompletion.create(
                 engine=GPT_ENGINE,
                 messages=self.messages,
-                temperature= temperature,
-                )
-        
-            answer=response['choices'][0]['message']['content']
+                temperature=temperature,
+            )
+
+            answer = response["choices"][0]["message"]["content"]
 
         return answer
 
@@ -213,7 +223,6 @@ class PlayerDescription(Description):
     def __init__(self, player: Player):
         self.player = player
         super().__init__()
-
 
     def get_intro_messages(self) -> List[Dict[str, str]]:
         """
@@ -258,20 +267,20 @@ class PlayerDescription(Description):
 
     def synthesize_text(self):
 
-        player=self.player
+        player = self.player
         metrics = self.player.relevant_metrics
         description = f"Here is a statistical description of {player.name}, who played for {player.minutes_played} minutes as a {player.position}. \n\n "
 
         subject_p, object_p, possessive_p = sentences.pronouns(player.gender)
-        
+
         for metric in metrics:
 
             description += f"{subject_p.capitalize()} was "
-            description += sentences.describe_level(player.ser_metrics[metric +"_Z"]) 
+            description += sentences.describe_level(player.ser_metrics[metric + "_Z"])
             description += " in " + sentences.write_out_metric(metric)
-            description += " compared to other players in the same playing position. "                            
+            description += " compared to other players in the same playing position. "
 
-        #st.write(description)
+        # st.write(description)
 
         return description
 
@@ -284,4 +293,3 @@ class PlayerDescription(Description):
             "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
-

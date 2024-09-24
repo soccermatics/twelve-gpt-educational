@@ -3,7 +3,7 @@ import os.path
 import time
 
 from matplotlib import font_manager
-import settings
+import settings as settings
 
 
 class FontHelper:
@@ -24,28 +24,28 @@ class FontHelper:
 
     @staticmethod
     @functools.lru_cache(maxsize=128)
-    def custom_font(font_size=12, font_weight='normal', font_name='Open Sans'):
+    def custom_font(font_size=12, font_weight="normal", font_name="Open Sans"):
 
         start_time = time.time()
-        if font_name == 'Open Sans':
+        if font_name == "Open Sans":
             fontfamily_text = "data/ressources/fonts/OpenSans-Regular.ttf"
-        elif font_name == 'proxima-italic':
-            fontfamily_text = 'data/ressources/fonts/proxima-italic.ttf'
-        elif font_name == 'Open Sans Bold':
-            fontfamily_text = 'data/ressources/fonts/OpenSans.ttf'
-        elif font_name == 'Montserrat Medium':
-            fontfamily_text = 'data/ressources/fonts/Montserrat-Medium.ttf'
-        elif font_name == 'Montserrat Regular':
-            fontfamily_text = 'data/ressources/fonts/Montserrat-Regular.ttf'
+        elif font_name == "proxima-italic":
+            fontfamily_text = "data/ressources/fonts/proxima-italic.ttf"
+        elif font_name == "Open Sans Bold":
+            fontfamily_text = "data/ressources/fonts/OpenSans.ttf"
+        elif font_name == "Montserrat Medium":
+            fontfamily_text = "data/ressources/fonts/Montserrat-Medium.ttf"
+        elif font_name == "Montserrat Regular":
+            fontfamily_text = "data/ressources/fonts/Montserrat-Regular.ttf"
 
-        elif os.path.exists('data/ressources/fonts/{font_name}.ttf'):
-            fontfamily_text = 'data/ressources/fonts/{font_name}.ttf'
+        elif os.path.exists("data/ressources/fonts/{font_name}.ttf"):
+            fontfamily_text = "data/ressources/fonts/{font_name}.ttf"
 
-        elif os.path.exists('data/ressources/fonts/{font_name}.otf'):
-            fontfamily_text = 'data/ressources/fonts/{font_name}.otf'
+        elif os.path.exists("data/ressources/fonts/{font_name}.otf"):
+            fontfamily_text = "data/ressources/fonts/{font_name}.otf"
 
         else:
-            fontfamily_text = 'data/ressources/fonts/Montserrat-SemiBold.ttf'
+            fontfamily_text = "data/ressources/fonts/Montserrat-SemiBold.ttf"
 
         opensans = font_manager.FontProperties(fname=fontfamily_text)
         opensans._size = font_size
@@ -56,11 +56,12 @@ class FontHelper:
 
     @staticmethod
     def get_font_title():
-        return FontHelper.custom_font(24, 'bold', 'Open Sans')
+        return FontHelper.custom_font(24, "bold", "Open Sans")
 
     @staticmethod
     def get_font_sub_title():
-        return FontHelper.custom_font(14, 'bold', 'Monteserrat')
+        return FontHelper.custom_font(14, "bold", "Monteserrat")
+
     #
     # @staticmethod# Adjust the cache size as per your needs
     # @functools.lru_cache(maxsize=128)
