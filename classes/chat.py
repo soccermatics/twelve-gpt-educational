@@ -14,6 +14,7 @@ else:
 
 from classes.description import (
     PlayerDescription,
+    CountryDescription,
 )
 from classes.embeddings import PlayerEmbeddings
 
@@ -57,19 +58,19 @@ class Chat:
         message = {"role": role, "content": content}
         self.messages_to_display.append(message)
 
-    def get_input(self):
-        """
-        Get input from streamlit."""
+    # def get_input(self):
+    #     """
+    #     Get input from streamlit."""
 
-        if x := st.chat_input(
-            placeholder=f"What else would you like to know about {self.player.name}?"
-        ):
-            if len(x) > 500:
-                st.error(
-                    f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
-                )
+    #     if x := st.chat_input(
+    #         placeholder=f"What else would you like to know about {self.player.name}?"
+    #     ):
+    #         if len(x) > 500:
+    #             st.error(
+    #                 f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
+    #             )
 
-            self.handle_input(x)
+    #         self.handle_input(x)
 
     def handle_input(self, input):
         """
@@ -82,7 +83,7 @@ class Chat:
         # Add a copy of the user messages. This is to give the assistant some context.
         messages = messages + self.messages_to_display.copy()
 
-        # Get relevent information from the user input and then generate a response.
+        # Get relevant information from the user input and then generate a response.
         # This is not added to messages_to_display as it is not a message from the assistant.
         get_relevant_info = self.get_relevant_info(input)
 
@@ -202,6 +203,20 @@ class PlayerChat(Chat):
         self.players = players
         super().__init__(chat_state_hash, state=state)
 
+    def get_input(self):
+        """
+        Get input from streamlit."""
+
+        if x := st.chat_input(
+            placeholder=f"What else would you like to know about {self.player.name}?"
+        ):
+            if len(x) > 500:
+                st.error(
+                    f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
+                )
+
+            self.handle_input(x)
+
     def instruction_messages(self):
         """
         Instruction for the agent.
@@ -241,5 +256,72 @@ class PlayerChat(Chat):
         ret_val += f"\n\nIf none of this information is relevent to the users's query then use the information below to remind the user about the chat functionality: \n"
         ret_val += "This chat can answer questions about a player's statistics and what they mean for how they play football."
         ret_val += "The user can select the player they are interested in using the menu to the left."
+
+        return ret_val
+
+
+class WVSChat(Chat):
+    def __init__(self, chat_state_hash, country, countries, state="empty"):
+        # TODO:
+        # self.embeddings = PlayerEmbeddings()
+        self.country = country
+        self.countries = countries
+        super().__init__(chat_state_hash, state=state)
+
+    def get_input(self):
+        """
+        Get input from streamlit."""
+
+        if x := st.chat_input(
+            placeholder=f"What else would you like to know about {self.country.name}?"
+        ):
+            if len(x) > 500:
+                st.error(
+                    f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
+                )
+
+            self.handle_input(x)
+
+    def instruction_messages(self):
+        """
+        Instruction for the agent.
+        """
+        # TODO: Update first_messages
+        first_messages = [
+            {"role": "system", "content": "You are a researcher."},
+            {
+                "role": "user",
+                "content": (
+                    "After these messages you will be interacting with a user of a data analysis platform. "
+                    f"The user has selected the country {self.country.name}, and the conversation will be about different core value measured in the World Value Survey study. "
+                    # "You will receive relevant information to answer a user's questions and then be asked to provide a response. "
+                    "All user messages will be prefixed with 'User:' and enclosed with ```. "
+                    "When responding to the user, speak directly to them. "
+                    "Use the information provided before the query to provide 2 sentence answers."
+                    " Do not deviate from this information or provide additional information that is not in the text returned by the functions."
+                ),
+            },
+        ]
+        return first_messages
+
+    def get_relevant_info(self, query):
+
+        # If there is no query then use the last message from the user
+        if query == "":
+            query = self.visible_messages[-1]["content"]
+
+        ret_val = "Here is a description of the country in terms of data: \n\n"
+        description = CountryDescription(self.country)
+        ret_val += description.synthesize_text()
+
+        # TODO:
+        # # This finds some relevant information
+        # results = self.embeddings.search(query, top_n=5)
+        # ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"
+        # ret_val += "\n".join(results["assistant"].to_list())
+
+        ret_val += f"\n\nIf none of this information is relevant to the users's query then use the information below to remind the user about the chat functionality: \n"
+        ret_val += "This chat can answer questions about a country's core values."
+        ret_val += "The user can select the country they are interested in using the menu to the left."
 
         return ret_val
