@@ -44,12 +44,12 @@ chat = create_chat(to_hash, WVSChat, country, countries)
 # Now we want to add basic content to chat if it's empty
 if chat.state == "empty":
 
-    # # Make a plot of the distribution of the metrics for all players
-    # # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-    # visual = DistributionPlot(metrics[::-1])
-    # visual.add_title_from_player(country)
-    # visual.add_players(countries, metrics=metrics)
-    # visual.add_player(country, len(countries.df), metrics=metrics)
+    # Make a plot of the distribution of the metrics for all players
+    # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
+    visual = DistributionPlot(metrics[::-1])
+    visual.add_title_from_player(country)
+    visual.add_players(countries, metrics=metrics)
+    visual.add_player(country, len(countries.df), metrics=metrics)
 
     # Now call the description class to get the summary of the country
     description = CountryDescription(country)
@@ -62,7 +62,7 @@ if chat.state == "empty":
         user_only=False,
         visible=False,
     )
-    # chat.add_message(visual)
+    chat.add_message(visual)
     chat.add_message(summary)
 
     chat.state = "default"
