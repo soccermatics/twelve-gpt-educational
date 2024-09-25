@@ -175,7 +175,7 @@ class CountryStats(Stats):
 
     def get_raw_data(self):
 
-        df = pd.read_csv("data/wvs/wave0.csv")
+        df = pd.read_csv("data/wvs/wave_7.csv")
 
         return df
 
