@@ -8,6 +8,9 @@ import sys, time, json, re
 import pandas as pd
 
 input_file = 'the-trolley-problem-whats-the-right-solution-921.txt'
+#input_file = 'should-we-adopt-a-universal-language-31699.txt'
+
+input_file = 'god-exists-3491.txt'
 
 with open(input_file, 'r') as fi:
     lines = []
@@ -124,5 +127,5 @@ for index, row in result.iterrows():
 
 # Save the result to a csv file
 
-result.to_csv('TrolleyTree.csv', index=False)
+result.to_csv('GodTree.csv', index=False)
 
