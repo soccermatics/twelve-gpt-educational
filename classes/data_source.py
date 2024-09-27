@@ -316,30 +316,34 @@ class StatPersonality(DataPersonality):
         return questions
 
     
+    
 class PersonStat(StatPersonality):   
     
     data_point_class = data_point.Person
-    
 
     def __init__(self):
         self.data = self.get_raw_data()
+        questions = StatPersonality().get_question() # to get the questions
+        self.data_processed, self.matching = self.prepare_dataset(self.data)
+        self.stats = self.get_stat(self.data_processed)
+        self.data_zscore = self.dataset_z_score(self.data_processed, self.stats)
         
         super().__init__()
 
     def process_data(self, person_data):
         ''' This fonction get the person or candidate data with a number id or a list, and return a dataframe of the person '''
-    
-        questions = StatPersonality().get_question() # to get the questions
-        dataset = self.data # here is the general dataset
-        data, matching = self.prepare_dataset(dataset) # Here we prepare the dataset with the general transformation
-        stats = self.get_stat(data) # here we get the mean and std. It is use for the z-score
-        data = self.dataset_z_score(data, stats) # we calcul the z-score for the 5 traits and apply it on the general dataset
+        #questions = self.questions
+        #questions = StatPersonality().get_question() # to get the questions
+        #dataset = self.data # here is the general dataset
+        #data, matching = self.prepare_dataset(dataset) # Here we prepare the dataset with the general transformation
+        #stats = self.get_stat(data) # here we get the mean and std. It is use for the z-score
+        data = self.data_zscore # we calcul the z-score for the 5 traits and apply it on the general dataset
 
         # First we want to check if the user want a certain candidate from the dataset 
         # or if the user did the test so it return a list
         if isinstance(person_data, list):
-            data_c = self.convert_list_to_dataset(person_data, matching, questions)
-            data_c = self.dataset_z_score(data_c, stats) 
+            data_c = self.convert_list_to_dataset(person_data, self.matching, self.questions)
+            data_c = self.dataset_z_score(data_c, self.stats) 
         
     
         elif isinstance(person_data,(int, float)):
@@ -362,6 +366,3 @@ class PersonStat(StatPersonality):
         agreeableness = data_c['agreeableness'].values[0]
         conscientiousness = data_c['conscientiousness'].values[0]
         openness = data_c['openness'].values[0]
-
-        
-        return self.data_point_class(id=id,name=name, extraversion=extraversion,neuroticism=neuroticism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
