@@ -6,9 +6,8 @@ import pandas as pd
 
 
 from utils.sentences import format_metric
-
-from classes.data_point import Player
-from classes.data_source import PlayerStats
+from classes.data_point import Player, Person
+from classes.data_source import PlayerStats, StatPersonality, DataPersonality, PersonStat
 
 
 def hex_to_rgb(hex_color: str) -> tuple:
