@@ -219,7 +219,7 @@ class DistributionPlotPersonality(Visual):
         self.columns = columns
         self.marker_color = (c for c in [Visual.white, Visual.bright_yellow, Visual.bright_blue])
         self.marker_shape = (s for s in ["square", "hexagon", "diamond"])
-        self.data_processed = PersonStat().data_processed.sample(frac=0.1)
+        self.data_processed = PersonStat().data_zscore.sample(frac=0.1)
         self.metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
 
         super().__init__(*args, **kwargs)
