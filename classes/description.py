@@ -362,7 +362,24 @@ class CountryDescription(Description):
         for metric in metrics:
 
             description += f"{country.name.capitalize()} was "
-            description += sentences.describe_level(country.ser_metrics[metric + "_Z"])
+            description += sentences.describe_level(
+                country.ser_metrics[metric + "_Z"],
+                thresholds=[
+                    1.5,
+                    1,
+                    0.5,
+                    -0.5,
+                    -1,
+                ],
+                words=[
+                    "extremely high",
+                    "very high",
+                    "above average",
+                    "average",
+                    "below average",
+                    "very low",
+                ],
+            )
             description += " in " + metric  # .replace("_", " ")
             description += " compared to other countries in the same survey. "
 
