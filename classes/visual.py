@@ -61,7 +61,7 @@ class Visual:
     table_green = hex_to_rgb("#009940")
     table_red = hex_to_rgb("#FF4B00")
 
-    def __init__(self, pdf=False):
+    def __init__(self, pdf=False, plot_type="scout"):
         self.pdf = pdf
         if pdf:
             self.font_size_multiplier = 1.4
@@ -69,6 +69,13 @@ class Visual:
             self.font_size_multiplier = 1.0
         self.fig = go.Figure()
         self._setup_styles()
+
+        if plot_type == "scout":
+            self.annotation_text = (
+                "<span style=''>{metric_name}: {data:.2f} per 90</span>"
+            )
+        else:
+            self.annotation_text = "<span style=''>{metric_name}: {data:.2f}</span>"
 
     def show(self):
         st.plotly_chart(
@@ -244,7 +251,9 @@ class DistributionPlot(Visual):
             self.fig.add_annotation(
                 x=0,
                 y=i + 0.4,
-                text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f} per 90</span>",
+                text=self.annotation_text.format(
+                    metric_name=metric_name, data=ser_plot[col]
+                ),
                 showarrow=False,
                 font={
                     "color": rgb_to_color(self.white),

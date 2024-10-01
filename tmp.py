@@ -1,12 +1,13 @@
-from classes.data_source import CountryStats
-from classes.data_point import Country
+# %%
+import pandas as pd
 
+annotation_text = "<span style=''>{metric_name}: {data:.2f} per 90</span>"
 
-countries = CountryStats()
+# series with col "goals" and some dummy value
+ser_plot = pd.Series({"goals": 0.5})
+col = "goals"
 
-metrics = [m for m in countries.df.columns if m not in ["country"]]
-
-countries.calculate_statistics(metrics=metrics)
-
-
+print(annotation_text.format(metric_name="Goals", data=ser_plot[col]))
 print()
+
+# %%

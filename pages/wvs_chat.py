@@ -46,7 +46,7 @@ if chat.state == "empty":
 
     # Make a plot of the distribution of the metrics for all players
     # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-    visual = DistributionPlot(metrics[::-1])
+    visual = DistributionPlot(metrics[::-1], plot_type="wvs")
     visual.add_title_from_player(country)
     visual.add_players(countries, metrics=metrics)
     visual.add_player(country, len(countries.df), metrics=metrics)
