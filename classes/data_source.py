@@ -175,11 +175,11 @@ class Shots(Data):
         #self.match = match
         #self.team = team
         self.df_shots = self.get_processed_data()  # Process the raw data directly
-        #self.model_params = ['Intercept', 'C(play_pattern_name)[T.From Counter]', 'C(play_pattern_name)[T.From Free Kick]', 'C(play_pattern_name)[T.From Goal Kick]', 'C(play_pattern_name)[T.From Keeper]', 'C(play_pattern_name)[T.From Kick Off]', 'C(play_pattern_name)[T.From Throw In]', 'C(play_pattern_name)[T.Other]', 'C(play_pattern_name)[T.Regular Play]', 'C(body_part_name)[T.Left Foot]', 'C(body_part_name)[T.Other]', 'C(body_part_name)[T.Right Foot]', 'start_x', 'angle_to_goal', 'distance_to_goal', 'players_in_triangle', 'gk_dist_to_goal', 'dist_to_nearest_opponent', 'angle_to_nearest_opponent']
+        self.model_params = ['start_x' , 'angle_to_goal' , 'distance_to_goal' , 'players_in_triangle' , 'gk_dist_to_goal' , 'dist_to_nearest_opponent' , 'angle_to_nearest_opponent' , 'from_throw_in' , 'from_counter' , 'from_keeper' , 'header']
         self.xG_Model = self.load_model()  # Load the model once
-        #self.df_cum_xG, self.df_contributions = self.get_xG_contributions()
+        self.df_cum_xG, self.df_contributions = self.get_xG_contributions()
         # Add total xG to df_shots
-        #self.df_shots["xG"] = self.df_cum_xG.iloc[:, -1]
+        self.df_shots["xG"] = self.df_cum_xG.iloc[:, -1]
     #@st.cache_data(hash_funcs={"classes.data_source.Shots": lambda self: hash(self.raw_hash_attrs)}, ttl=5*60)
 
 
@@ -360,8 +360,12 @@ class Shots(Data):
             return distances.min() if len(distances) > 0 else np.nan
 
 
+        test_shot['from_throw_in'] = (test_shot['play_pattern_name'] == 'From Throw In').astype(int)
+        test_shot['from_counter'] = (test_shot['play_pattern_name'] == 'From Counter').astype(int)
+        test_shot['from_keeper'] = (test_shot['play_pattern_name'] == 'From Keeper').astype(int)
+        test_shot['right_foot'] = (test_shot['body_part_name'] == 'Right Foot').astype(int)
 
-        model_vars = test_shot[["id", "index", "x", "y", 'play_pattern_name', 'body_part_name']].copy()
+        model_vars = test_shot[["id", "index", "x", "y", 'play_pattern_name', 'from_throw_in', 'from_counter', 'from_keeper', 'right_foot']].copy()
         model_vars["goal"] = test_shot.outcome_name.apply(lambda cell: 1 if cell == "Goal" else 0)
 
         # Add necessary features and correct transformations
@@ -412,17 +416,22 @@ class Shots(Data):
         ])
         cumulative_xG = 1 / (1 + np.exp(-linear_combinations))
         contributions = np.diff(cumulative_xG, prepend=0, axis=1)
+        #st.write(self.model_params)
+        #st.write(self.xG_Model.params[self.model_params])
         df_cum_xG = pd.DataFrame(cumulative_xG, columns=self.model_params, index=df_shots.index)
         df_contributions = pd.DataFrame(contributions, columns=self.model_params, index=df_shots.index)
+        #st.write(df_contributions)
         return df_cum_xG, df_contributions
 
     @staticmethod
     def load_model():
         # Load model from data/...
-        saved_model_path = "c:/Users/ASUS/Desktop/twelve-gpt-educational/data/xG_model.sav"
+        saved_model_path = "data/xG_model.sav"
         model = load(saved_model_path)
         st.write(model.summary())   
         return model
+
+        
 
 
 

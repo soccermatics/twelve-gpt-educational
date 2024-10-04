@@ -1,9 +1,9 @@
 # Library imports
 from pathlib import Path
 import sys
-path_root = Path(__file__).parents[1]
-print(path_root)
-sys.path.append(str(path_root))
+# path_root = Path(__file__).parents[1]
+# print(path_root)
+# sys.path.append(str(path_root))
 
 #importing necessary libraries
 from mplsoccer import Sbopen
