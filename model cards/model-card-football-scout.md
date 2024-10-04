@@ -47,26 +47,25 @@ def describe_level(value):
     words = ["outstanding", "excellent", "good", "average", "below average", "poor"]
     return describe(thresholds, words, value)
 ```
-There are three positive terms and two negative terms in the words used, with no negative equivalent of "outstanding" defined.
+There are three positive terms and two negative terms in the words used, with no negative equivalent of "outstanding" defined. 
 
-In the *tell it how to answer* step, two examples were created, based on data from 
+In the *tell it how to answer* step, two examples were created, based on data from Pedro and Giroud. This somewhat compromises how the texts for these two players are constructed. These example and the prompt used emphasise highlighting positive and negative aspects of the players' performance, and ignoring aspects which are average or typical.
 
-The players' performances in the Premier League are regularly scrutinised in the media and on social media platforms in terms that are much more prejoritive than those used here. Informal discussions by the wordalisations creators with professional football scouts have suggested that the resulting texts can be "too positive" for professional settings, where clubs have to make important financial decisions based on performance. Nevertheless, this does not take away from the fact that the players analysed here are living human-beings, whose performance is being evaluated in words by an automated system that does not understand broader factors. 
+Players' performances in the Premier League are regularly scrutinised in the media and on social media platforms in terms that are much more prejoritive than those used here. Informal discussions by the wordalisations creators with professional football scouts have suggested that the resulting texts can be "too positive" for professional settings, where clubs have to make important financial decisions based on performance. Nevertheless, this does not take away from the fact that the players analysed here are living human beings, whose performance is being evaluated in words by an automated system that does not understand broader factors around their lives. 
 
 ## Evaluation
 
-_Quantitative analyses should be disaggregated, that is, broken down by the chosen factors. Quantitative
-analyses should provide the results of evaluating the model according to the chosen metrics, providing
-confidence interval values when possible._
+No systematic *quantitative analyses* have been carried out on this wordalisation. Ideally, this wordalisation should be subjected to a rigorous *qualitative test* of:
+- Reliability of information. Are there factual errors in the text.
+- 
 
-Review section 4.7 of the [model cards paper](https://arxiv.org/abs/1810.03993).
-
-*Intersectional result*
 
 ## Ethical considerations
 
-_This section is intended to demonstrate the ethical considerations that went into model development,
-surfacing ethical challenges and solutions to stakeholders. Ethical analysis does not always lead to
+Severel ethical challenges have arisen in this project. Firstly, as noted above, there in a gender disparity in the data used. Several datasets for womens football are available and could be easily adapted to the framework here. 
+
+
+ Ethical analysis does not always lead to
 precise solutions, but the process of ethical contemplation is worthwhile to inform on responsible
 practices and next steps in future work._
 
