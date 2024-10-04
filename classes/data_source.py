@@ -175,7 +175,7 @@ class Shots(Data):
         #self.match = match
         #self.team = team
         self.df_shots = self.get_processed_data()  # Process the raw data directly
-        self.model_params = ['start_x' , 'angle_to_goal' , 'distance_to_goal' , 'players_in_triangle' , 'gk_dist_to_goal' , 'dist_to_nearest_opponent' , 'angle_to_nearest_opponent' , 'from_throw_in' , 'from_counter' , 'from_keeper' , 'header']
+        self.model_params = ['Intercept', 'start_x' , 'angle_to_goal' , 'distance_to_goal' , 'players_in_triangle' , 'gk_dist_to_goal' , 'dist_to_nearest_opponent' , 'angle_to_nearest_opponent' , 'from_throw_in' , 'from_counter' , 'from_keeper' , 'header']
         self.xG_Model = self.load_model()  # Load the model once
         self.df_cum_xG, self.df_contributions = self.get_xG_contributions()
         # Add total xG to df_shots
@@ -396,6 +396,7 @@ class Shots(Data):
         # Binary features
         model_vars["is_closer"] = np.where(model_vars["gk_dist_to_goal"] > model_vars["distance_to_goal"], 1, 0)
         model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
+        model_vars['Intercept'] = 1
 
         model_vars.dropna(inplace=True)
 
@@ -416,11 +417,12 @@ class Shots(Data):
         ])
         cumulative_xG = 1 / (1 + np.exp(-linear_combinations))
         contributions = np.diff(cumulative_xG, prepend=0, axis=1)
-        #st.write(self.model_params)
+        #st.write(df_shots[self.model_params])
         #st.write(self.xG_Model.params[self.model_params])
         df_cum_xG = pd.DataFrame(cumulative_xG, columns=self.model_params, index=df_shots.index)
         df_contributions = pd.DataFrame(contributions, columns=self.model_params, index=df_shots.index)
-        #st.write(df_contributions)
+        st.markdown("### Expected Goals (xG) Contributions")
+        st.write(df_contributions)
         return df_cum_xG, df_contributions
 
     @staticmethod
@@ -428,6 +430,7 @@ class Shots(Data):
         # Load model from data/...
         saved_model_path = "data/xG_model.sav"
         model = load(saved_model_path)
+        st.markdown("### Model Summary")
         st.write(model.summary())   
         return model
 

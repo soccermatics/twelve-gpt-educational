@@ -49,9 +49,9 @@ sidebar_container = st.sidebar.container()
 st.divider()
 
 
-st.write("To make your own page create a page_name.py file and link to it in add_page_selector() in utils/page_components.py")
+st.markdown("# This is the shots and xG explanation page")
 
-
+st.markdown("### Shots and xG")
 shots = Shots()
 shots_df= shots.df_shots
 
