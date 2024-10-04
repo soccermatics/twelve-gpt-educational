@@ -2,6 +2,11 @@
 Entrypoint for streamlit app.
 Runs top to bottom every time the user interacts with the app (other than imports and cached functions).
 """
+from pathlib import Path
+
+path_root = Path(__file__).parents[1]
+print(path_root)
+sys.path.append(str(path_root))
 
 # Library imports
 import traceback
