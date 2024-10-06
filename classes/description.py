@@ -134,26 +134,33 @@ class Description(ABC):
 
     def setup_messages(self) -> List[Dict[str, str]]:
         messages = self.get_intro_messages()
+        
         try:
-            paths=self.describe_paths
+            paths = self.describe_paths
             messages += self.get_messages_from_excel(paths)
         except FileNotFoundError as e:  # FIXME: When merging with new_training, add the other exception
             print(e)
-        messages += self.get_prompt_messages()
-
-        messages = [message for message in messages if isinstance(message["content"], str)]
-
-
+        
+        # Ensure messages are in the correct format after getting from excel
+        messages = [msg for msg in messages if isinstance(msg, dict) and "content" in msg and isinstance(msg["content"], str)]
+        
+        messages += self.get_prompt_messages()  # Adding prompt messages
+        
         try:
-            messages += self.get_messages_from_excel(
-                paths=self.gpt_examples_path,
-                
-            )
+            messages += self.get_messages_from_excel(paths=self.gpt_examples_path)
         except FileNotFoundError as e:  # FIXME: When merging with new_training, add the other exception
             print(e)
 
-        messages += [{"role": "user", "content": f"Now do the same thing with the following: ```{self.synthesized_text}```"}]
+        # Ensure that synthesized_text is defined and has a string value
+        synthesized_text = getattr(self, 'synthesized_text', '')
+        if isinstance(synthesized_text, str):
+            messages.append({"role": "user", "content": f"Now do the same thing with the following: ```{synthesized_text}```"})
+
+        # Filter again to ensure no non-string content is present
+        messages = [msg for msg in messages if isinstance(msg, dict) and "content" in msg and isinstance(msg["content"], str)]
+        
         return messages
+
 
     def stream_gpt(self, temperature=1):
         """
@@ -166,6 +173,7 @@ class Description(ABC):
         Yields:
             str
         """
+
 
         st.expander("Description messages", expanded=False).write(self.messages)
 
@@ -284,4 +292,78 @@ class PlayerDescription(Description):
             "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
+
+
+
+
+
+class ShotDescription(Description):
+
+    output_token_limit = 300
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/action/shots.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/action/shots.xlsx"]
+    
+    def __init__(self, shots, shot_id):
+        self.shots = shots
+        self.shot_id = shot_id
+        super().__init__()
+
+    def _synthesize_text(self):
+
+        shots = self.shots
+        shot_data = shots.df_shots[shots.df_shots['id'] == self.shot_id]  # Fix here to use self.shot_id
+
+        if shot_data.empty:
+            raise ValueError(f"No shot found with ID {self.shot_id}")
+
+        start_x = shot_data['start_x'].iloc[0]
+        start_y = shot_data['start_y'].iloc[0]
+        xG = shot_data['xG'].iloc[0]
+        goal_status = shot_data['goal'].iloc[0]
+        
+        # Map goal boolean to readable category
+        labels = {False: 'No Goal', True: 'Goal'}
+        goal_status_text = labels[goal_status]
+        angle_to_goal = shot_data['angle_to_goal'].iloc[0]
+        distance_to_goal = shot_data['distance_to_goal'].iloc[0]
+        distance_to_nearest_opponent = shot_data['dist_to_nearest_opponent'].iloc[0]
+        gk_dist_to_goal = shot_data['gk_dist_to_goal'].iloc[0]
+
+
+
+        # Give a detailed description of the contributions to the shot
+        shot_contributions = self.shots.df_contributions[self.shots.df_contributions['shot_id'] == self.shot_id]
+
+        shot_description = (
+            f"The shot starting from {start_x}, {start_y} with an xG value of {xG} resulted in a {goal_status_text}."
+            f"The angle to goal was {angle_to_goal} degrees, the distance to goal was {distance_to_goal} meters, the distance to the nearest opponent was {distance_to_nearest_opponent} meters, and the distance of the goalkeeper to goal was {gk_dist_to_goal} meters."
+            f"The xG of this shot is {xG} meaning that we expect this shot to result in goal with {xG} chance."
+        )
+        shot_description += sentences.describe_shot_contributions(shot_contributions)
+
+
+        with st.expander("Synthesized Text"):
+            st.write(shot_description)
+        
+        return shot_description 
+
+    def get_prompt_messages(self):
+        # Generate synthesized text first
+        shot_description = self._synthesize_text()
+
+        # Include the synthesized shot description in the message to be sent to the language model
+        prompt = (
+            "Here is a description of a shot in football:\n"
+            f"{shot_description}\n"
+            "Based on this information, please provide insightful commentary."
+        )
+        return [{"role": "user", "content": prompt}]
+
+
 

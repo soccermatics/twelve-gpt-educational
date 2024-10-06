@@ -20,6 +20,7 @@ import numpy as np
 import warnings
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
+import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import os
 import random as rn
@@ -360,6 +361,38 @@ class Shots(Data):
             return distances.min() if len(distances) > 0 else np.nan
 
 
+        # Transposing teammates' and opponents' coordinates into the dataframe
+        def transpose_player_positions(test_shot, track_df):
+            test_shot_id = test_shot["id"]
+
+            # Separate teammates and opponents
+            teammates = track_df[(track_df["id"] == test_shot_id) & (track_df["teammate"] == True)]
+            opponents = track_df[(track_df["id"] == test_shot_id) & (track_df["teammate"] == False)]
+
+            # Transpose and flatten coordinates for teammates
+            teammate_x = teammates["x"].values
+            teammate_y = teammates["y"].values
+            teammate_coords = {
+                f"teammate_{i+1}_x": x for i, x in enumerate(teammate_x)
+            }
+            teammate_coords.update({
+                f"teammate_{i+1}_y": y for i, y in enumerate(teammate_y)
+            })
+
+            # Transpose and flatten coordinates for opponents
+            opponent_x = opponents["x"].values
+            opponent_y = opponents["y"].values
+            opponent_coords = {
+                f"opponent_{i+1}_x": x for i, x in enumerate(opponent_x)
+            }
+            opponent_coords.update({
+                f"opponent_{i+1}_y": y for i, y in enumerate(opponent_y)
+            })
+
+            # Combine both dictionaries into a single row dictionary
+            return {**teammate_coords, **opponent_coords}
+
+
         test_shot['from_throw_in'] = (test_shot['play_pattern_name'] == 'From Throw In').astype(int)
         test_shot['from_counter'] = (test_shot['play_pattern_name'] == 'From Counter').astype(int)
         test_shot['from_keeper'] = (test_shot['play_pattern_name'] == 'From Keeper').astype(int)
@@ -371,6 +404,7 @@ class Shots(Data):
         # Add necessary features and correct transformations
         model_vars["goal_smf"] = model_vars["goal"].astype(object)
         model_vars['start_x'] = model_vars.x
+        model_vars['start_y'] = model_vars.y
         model_vars["x"] = model_vars.x.apply(lambda cell: 105 - cell)  # Adjust x for goal location
         model_vars["c"] = model_vars.y.apply(lambda cell: abs(34 - cell))
 
@@ -391,14 +425,25 @@ class Shots(Data):
         model_vars["nearest_teammate_distance"] = test_shot.apply(nearest_teammate_distance, track_df=track_df, axis=1)
         model_vars["angle_to_nearest_opponent"] = test_shot.apply(nearest_opponent_angle, track_df=track_df, axis=1)
         #model_vars["angle_to_gk"] = shot_df.apply(angle_to_gk, track_df=track_df, axis=1)
+        # Merge player position data by applying the transpose_player_positions function
+        player_position_features = test_shot.apply(transpose_player_positions, track_df=track_df, axis=1)
+
+        # Convert player_position_features (which is a Series of dicts) into a DataFrame and concatenate with model_vars
+        player_position_df = pd.DataFrame(list(player_position_features))
+        model_vars = pd.concat([model_vars.reset_index(drop=True), player_position_df.reset_index(drop=True)], axis=1)
+
 
 
         # Binary features
         model_vars["is_closer"] = np.where(model_vars["gk_dist_to_goal"] > model_vars["distance_to_goal"], 1, 0)
         model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
+        model_vars['goal'] = test_shot.outcome_name.apply(lambda cell: 1 if cell == "Goal" else 0)
         model_vars['Intercept'] = 1
+        #model_vars = sm.add_constant(model_vars)
+        #model_vars.rename(columns={'const': 'Intercept'}, inplace=True)  # Rename 'const' to 'Intercept'
 
-        model_vars.dropna(inplace=True)
+        # model_vars.dropna(inplace=True)
+        #st.write(model_vars.columns)
 
         return model_vars
 
@@ -407,31 +452,110 @@ class Shots(Data):
     def get_xG_contributions(self, df_shots=None):
         if df_shots is None:
             df_shots = self.df_shots
-        
-        linear_combinations = np.array([
-            list(accumulate(
-                zip(shot[self.model_params].to_list(), self.xG_Model.params[self.model_params]),
-                lambda x, y: x + y[0] * y[1],
-                initial=0
-            ))[1:] for _, shot in df_shots.iterrows()
-        ])
-        cumulative_xG = 1 / (1 + np.exp(-linear_combinations))
-        contributions = np.diff(cumulative_xG, prepend=0, axis=1)
-        #st.write(df_shots[self.model_params])
-        #st.write(self.xG_Model.params[self.model_params])
-        df_cum_xG = pd.DataFrame(cumulative_xG, columns=self.model_params, index=df_shots.index)
-        df_contributions = pd.DataFrame(contributions, columns=self.model_params, index=df_shots.index)
-        st.markdown("### Expected Goals (xG) Contributions")
-        st.write(df_contributions)
+
+        # Get model parameters including intercept
+        model_params = self.model_params  # This includes the intercept, assumed to be labeled 'const'
+        #model_params = [param if param != "Intercept" else "const" for param in self.xG_Model.params.index.tolist()]
+
+        intercept = self.xG_Model.params[0]  # Intercept is the first element in the model params
+
+        # Initialize lists to store cumulative xG and contributions for each shot
+        cumulative_xG_list = []
+        contributions_list = []
+        shot_ids = []
+
+        # Loop over each shot in the DataFrame
+        for _, shot in df_shots.iterrows():
+            cumulative_xG_shot = []  # Cumulative xG for this shot
+            prev_xG = 1 / (1 + np.exp(-intercept))  # xG with just intercept
+            shot_ids.append(shot['id'])  # Store the shot ID
+            
+
+            
+            # First, calculate the xG for intercept only and store
+            cumulative_xG_shot.append(prev_xG)
+
+            # Now iteratively add features and calculate xG
+            for i, feature in enumerate(model_params[1:], start=1):  # model_params[1:] skips intercept
+                # Get current subset of parameters
+                relevant_params = model_params[:i+1]  # Include intercept and features up to the current one
+                relevant_weights = self.xG_Model.params[:i+1]  # Corresponding weights
+                
+                # Linear combination for the relevant features
+                linear_combination = np.dot(shot[relevant_params], relevant_weights)
+                
+                # Calculate xG using the sigmoid function
+                current_xG = 1 / (1 + np.exp(-linear_combination))
+                
+                # Append the current xG to the cumulative list
+                cumulative_xG_shot.append(current_xG)
+
+            # Now that cumulative xG is calculated for this shot, we calculate contributions
+            contributions_shot = np.diff(cumulative_xG_shot, prepend=prev_xG)
+
+            # Append cumulative xG and contributions for this shot
+            cumulative_xG_list.append(cumulative_xG_shot)
+            contributions_list.append(contributions_shot)
+
+
+        # Create DataFrames for cumulative xG and contributions
+        df_cum_xG = pd.DataFrame(cumulative_xG_list, index=df_shots.index, columns=model_params)
+        df_contributions = pd.DataFrame(contributions_list, index=df_shots.index, columns=model_params)
+        df_contributions['shot_id'] = shot_ids
+
+        # Output the tables with an introduction
+        #st.markdown("### Cumulative Expected Goals (xG) for Each Feature")
+        #st.write(df_cum_xG)
+        #st.markdown("### Contributions of Each Feature to xG")
+        #st.write(df_contributions)
+
         return df_cum_xG, df_contributions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # def get_xG_contributions(self, df_shots=None):
+    #     if df_shots is None:
+    #         df_shots = self.df_shots
+
+    #     linear_combinations = np.array([
+    #         list(accumulate(
+    #             zip(shot[self.model_params].to_list(), self.xG_Model.params[self.model_params]),
+    #             lambda x, y: x + y[0] * y[1],
+    #             initial=0
+    #         ))[1:] for _, shot in df_shots.iterrows()
+    #     ])
+    #     cumulative_xG = 1 / (1 + np.exp(-linear_combinations))
+    #     contributions = np.diff(cumulative_xG, prepend=0, axis=1)
+    #     #st.write(df_shots[self.model_params])
+    #     #st.write(self.xG_Model.params[self.model_params])
+    #     df_cum_xG = pd.DataFrame(cumulative_xG, columns=self.model_params, index=df_shots.index)
+    #     df_contributions = pd.DataFrame(contributions, columns=self.model_params, index=df_shots.index)
+    #     st.markdown("### Expected Goals (xG) Contributions")
+    #     st.write(df_contributions)
+    #     st.write(df_cum_xG)
+    #     return df_cum_xG, df_contributions
 
     @staticmethod
     def load_model():
+
         # Load model from data/...
         saved_model_path = "data/xG_model.sav"
         model = load(saved_model_path)
         st.markdown("### Model Summary")
         st.write(model.summary())   
+        #predictions = model.predict(df_shots)
         return model
 
         

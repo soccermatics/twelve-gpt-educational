@@ -28,6 +28,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import argparse
 import tiktoken
 import os
@@ -36,11 +37,25 @@ from utils.utils import normalize_text
 from classes.data_source import PlayerStats
 from classes.data_point import Player
 from classes.data_source import PlayerStats, Shots
+from classes.visual import ShotVisual
+from classes.chat import Chat
+from classes.description import ShotDescription
+
 
 
 from utils.page_components import (
     add_common_page_elements
 )
+
+
+from classes.chat import PlayerChat
+
+from utils.page_components import (
+    add_common_page_elements,
+    select_player,
+    create_chat,
+)
+
 
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
@@ -54,8 +69,49 @@ st.markdown("# This is the shots and xG explanation page")
 st.markdown("### Shots and xG")
 shots = Shots()
 shots_df= shots.df_shots
+df_contributions = shots.df_contributions
 
-st.write(shots_df.head(10))  # Display selected columns
+# Create a dropdown to select a shot ID from the available shot IDs in shots.df_shots['id']
+shot_id = st.sidebar.selectbox("Select Shot ID", shots_df['id'].unique())
+st.markdown("#### Selected Shot Data")
+st.write(shots_df[shots_df['id']== shot_id])  # Display selected columns
+st.markdown("#### Feature Contributions")
+st.write(df_contributions[df_contributions['shot_id']== shot_id])
+
+
+to_hash = tuple(shots.df_shots['id'].unique())
+# Now create the chat as type PlayerChat
+chat = create_chat(to_hash, Chat)
+
+# Now we want to add basic content to chat if it's empty
+if chat.state == "empty":
+    #descriptions = [PlayerShotDescription(filtered_player_shots_obj, player, competition)]
+    visuals = ShotVisual(metric=None)   
+    #visuals.add_shots(shots)
+    visuals.add_shot(shots, shot_id)
+    #st.plotly_chart(visuals.fig)  # Ensure to pass the figure to Streamlit's plotly_chart function
+
+
+    descriptions = ShotDescription(shots, shot_id)
+    with st.expander("Messages"):
+        st.write(descriptions.messages)
+    summaries = descriptions.stream_gpt()
+
+    if visuals:
+        chat.add_message(visuals)
+    if summaries:    
+        chat.add_message(summaries)
+
+    chat.state = "default"
+
+
+chat.display_messages()
+chat.save_state()
+
+#visual.add_title_from_match_player(match, selected_players)
+
+
+
 
 
 
