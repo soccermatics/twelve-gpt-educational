@@ -234,3 +234,90 @@ class Arguments(Data):
             argument_df = pd.concat([argument_df,argument_df2])
 
         return argument_df
+    #________________________________________________________________________________________________________
+
+class Lesson(Data):
+    
+    #Builds upon DataSource for data sources which have metrics and info
+    
+
+    def __init__(self):
+            # Dataframe specs:
+            # df_info: index = player, columns = basic info
+            # df_metrics: index = player/team_id, columns = multiindex (Raw, Z, Rank), (metrics)
+         self.df = self.get_processed_data()
+
+    def get_raw_data(self):
+        
+        df = pd.read_csv("data/CP programming agent/Cpprogramming.csv",encoding='unicode_escape')
+
+        return df
+
+    def process_data(self, df_raw):
+
+            # Assuming df is your DataFrame
+        df = df_raw.sort_values('step')
+        overall = []
+
+        for _, row in df.iterrows():
+            parts = row['step']
+            category = row['topic']
+
+                #opposite_dict={'Pro':'Con','Con':'Pro'}
+
+            current_view =''
+            for i in range(int(len(parts)/2)):
+                prefix = parts[:i*2+2]
+                prefix=prefix.rstrip('')
+                #df['step'] = df['step'].astype(str)
+                new_view=df[df['step']==prefix]['topic'].values[0]
+                if new_view == 'Get started with for loop':
+                    current_view = new_view
+                if current_view == 'Get started with for loop':
+                    current_view = new_view
+                elif current_view == 'Get started with for loop' and new_view == 'for loop':
+                    current_view = 'for loop'
+                elif current_view == 'for loop' and new_view == 'Loop defination':
+                    current_view = 'Loop defination'
+                elif current_view == 'for loop' and new_view == 'Loop function':
+                    current_view = 'Loop function'
+                elif current_view == 'for loop' and new_view == 'variable assignment':
+                    current_view = 'variable assignment'
+                    #elif current_view == 'Pro' and new_view == 'Pro':
+                       # current_view = 'Pro'
+
+
+            overall.append(current_view)  
+
+        df['overall'] = overall
+
+        return df
+
+            
+    def get_arguments(self, argument,stance):
+            
+        df = self.df
+            
+        # df['assistant'] contains the tree structure.
+        # df['category'] contains the stance.
+            
+        # Find all rows of dateframe where df['assistant'] starts with 'argument'
+        argument_df = df[df['step'].str.startswith(argument)]
+        # Find all rows of dateframe where df['assistant'] is longer but no more than two characters longer than 'argument'
+        argument_df = argument_df[argument_df['assistant'].str.len() <= len(argument)+2]
+        argument_df = argument_df[argument_df['assistant'].str.len() > len(argument)]
+        argument_df = argument_df[argument_df['topic']==stance]
+        # Unique list of all 'assistant' values
+        list_of_arguments = argument_df['step'].unique()
+
+        # For each argument in the list, find all rows of dateframe where df['assistant'] is within 2 and 4 and they are 'Pro
+        for subargument in list_of_arguments:
+            argument_df2 = df[df['assistant'].str.startswith(subargument)]
+            argument_df2 = argument_df2[argument_df2['assistant'].str.len() <= len(argument)+4]
+            argument_df2 = argument_df2[argument_df2['assistant'].str.len() > len(argument) + 2 ]
+            argument_df2 = argument_df2[argument_df2['topic']=='for loops']
+            # Add these to the arguments.
+            argument_df = pd.concat([argument_df,argument_df2])
+
+        return argument_df
+        

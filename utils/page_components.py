@@ -86,7 +86,8 @@ def add_page_selector():
     st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
     st.page_link("pages/trolley.py", label="Trolley Problem")
-    st.page_link("pages/own_page.py", label="Your Own Page")
+    st.page_link("pages/own_page.py", label="Your own page")
+    st.page_link("pages/interactive_education.py", label="CP teaching agent")
     
 
 def add_common_page_elements():

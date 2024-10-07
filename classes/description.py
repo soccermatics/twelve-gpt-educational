@@ -293,7 +293,7 @@ class TrolleyDescription(Description):
 
     @property
     def describe_paths(self):
-        return [f"{self.describe_base}/Trolley.csv"]
+        return [f"{self.describe_base}/TrolleyTree.xlsx"]
 
     def __init__(self, currentArguments,overallArgument,stance):
         self.currentArguments = currentArguments
@@ -355,5 +355,81 @@ class TrolleyDescription(Description):
             f"argument {self.stance} the thesis that {self.overallArgument}."
             f"The first sentence should layout the strongest argument out of all of those provided {self.stance} the thesis. Then the remaining one or two sentences should support"
             f"your main point using arguments provided. Be forceful but polite and only outline your own argument, not objections to that argument. Only argue {self.stance} the thesis. Address the user directly. Do not give a prelude to what you are going to do or respond to this request with words like 'certainly'."
+        )
+        return [{"role": "user", "content": prompt}]
+#_____________________________________________________________________________________________________________________________
+class LessonDescription(Description):
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/CProgramming.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/LessonTree.xlsx"]
+
+    def __init__(self, currentState,topic,studentResponse):
+        self.currentState = currentState
+        self.topic = topic
+        self.studentResponse = studentResponse
+        
+        super().__init__()
+
+
+    def get_intro_messages(self) -> List[Dict[str, str]]:
+        """
+        Constant introduction messages for the assistant.
+
+        Returns:
+        List of dicts with keys "role" and "content".
+        """
+        intro = [
+            {
+            "role": "system", "content": (
+                "You are an instructor bot teaching a human learner in a socratic way "
+                " You instruct on  " + self.topic + " topic."
+                "You use the information provided to you to guide the user on a learning part of understading the topic"
+                )
+            },
+            {
+                "role": "user",
+                "content": "Are you fun when instracting?",
+            },
+            {
+                "role": "assistant",
+                "content": (
+                    "I can be fun if you are fun to be thought, I don't expect to be giving you the answers, but I hope you learn the key concepts for loops in C "
+                ),
+            },
+        ]
+        if len(self.describe_paths) > 0:
+            intro += [
+                {
+                    "role": "user",
+                    "content": "First, could you answer some questions about the topic we will discuss for me?",
+                },
+                {"role": "assistant", "content": "Sure!"},
+            ]
+
+        return intro
+
+    def synthesize_text(self):
+
+        description = f"Here are some topics {self.topic} to be thought: {self.currentState}. \n\n "
+
+        for i,argument in self.currentState.iterrows():
+            
+            description += argument['user'] + ". "
+
+        return description
+
+    def get_prompt_messages(self):
+        prompt = (
+            f"Please use the information enclosed with ``` to give a concise, 2 sentence response to the user. "
+            #f"instructions {self.topic} the the topic is {self.currentState}."
+            f"The first sentence should be an appreciation of what the user has answered on {self.topic} topic. The next statement should be a question asking the user on concepts that build up to the current topic"
+            f"your main response should be one question asking the user on knowledge based on the previous responce"
+            #f"but prompt them to provide yo with the solutions. If they got the wrong answer or do not know about the topic prompt them on pre-requisite knowledge on the  {self.topic} topic."
+            #"For example if the learner says they do not know anything about loops, ask them what they know about variables. Address the user directly. "
+            #f"Do not give a prelude to what you are going to do or respond to this request with words like 'certainly'."
         )
         return [{"role": "user", "content": prompt}]

@@ -112,3 +112,66 @@ class TrolleyEmbeddings(Embeddings):
             df_embeddings = pd.concat([df_embeddings, df_temp], ignore_index=True)
 
         return df_embeddings
+    
+#____________________________________________________________________________________________________________________________________
+class LessonEmbeddings(Embeddings):
+    def __init__(self):
+        self.df_dict = LessonEmbeddings.get_embeddings()
+
+    def get_embeddings():
+        # Gets all embeddings 
+        df_embeddings_dict = dict()
+
+        files = [
+            "LessonTree",
+
+        ]
+
+        df_embeddings = pd.DataFrame()
+        for file in files:
+            # Read in
+            df_temp = pd.read_parquet(f"data/embeddings/{file}.parquet")
+            if "category" not in df_temp:
+                df_temp["category"] = None
+            if "format" not in df_temp:
+                df_temp["format"] = None
+            df_temp = df_temp[["user", "assistant","step","topic","Next","category", "user_embedded", "format"]]
+            #df_temp['user_embedded'] = df_temp['user_embedded'].apply(lambda x: x.replace('\x00', ''))
+            df_temp["user_embedded"] = df_temp.user_embedded.apply(eval).to_list()
+            df_embeddings = pd.concat([df_embeddings, df_temp], ignore_index=True)
+
+        return df_embeddings
+    
+
+
+#______________________________________________________________________________________________________________________________________
+'''class LessonEmbeddings(Embeddings):
+    def __init__(self):
+        self.df_dict = LessonEmbeddings.get_embeddings()
+
+    def get_embeddings():
+        # Gets all embeddings 
+        df_embeddings_dict = dict()
+
+        files = [
+            "Lesson",
+        ]
+
+        df_embeddings = pd.DataFrame()
+        for file in files:
+            # Read in
+            
+            df_temp = pd.read_parquet(f"data/embeddings/{file}.parquet")
+            if "category" not in df_temp:
+                df_temp["category"] = None
+            if "format" not in df_temp:
+                df_temp["format"] = None
+            df_temp = df_temp[["User", "Assistant", "step", "topic", "Next","category","user_embedded", "format"]]
+            #df_temp["user_embedded"] = df_temp.user_embedded.apply(eval).to_list()
+            df_temp["user_embedded"] = df_temp.user_embedded.apply(eval).to_list()
+
+            #df_embeddings = pd.read_parquet(f"data/embeddings/{file}.parquet")
+            df_embeddings = pd.concat([df_embeddings, df_temp], ignore_index=True)
+            #df_embeddings["user_embedded"] = df_embeddings.user_embedded.apply(eval).to_list()
+
+        return df_embeddings'''

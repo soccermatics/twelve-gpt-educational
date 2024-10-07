@@ -1,0 +1,34 @@
+user,assistant,step,topic,Next,Next
+I can write a loop in C,I am glad you know how to write a loop. Can you write a loop to displays numbers 1 to 10 [1.3.],1.,Get started with for loop,1.3.,1.1.
+I don't know anything about loops,"OK let’s lets start by learning about variables, one of the building blocks of loops. Can you define a variable that will store number 5 [1.2.]",1.,Get started with for loop,1.2.,1.2.
+I know what loops do,"Great, can you tell me what loops do?[1.1.1.]",1.,Get started with for loop,1.1.1.,1.1.2.
+loops help in repeating things in your code,"That is correct, thats exactly what they are. Write for me the syntax of a for loop. [1.1.2.]",1.1.1.,for loop,1.1.2.,1.1.1.1.
+I think they help in reducing the amount of code I write,"That is correct, thats exactly what they are. Write for me the syntax of a for loop. [1.1.2.]",1.1.,Loop function,1.1.1.1.,1.1.1.2.
+int a =5,"Good attempt, You missed a semi colon at the end of the statement, all statements in C have to end with a semi colon. Correct your code and submit again",1.2.,variable defination,1.1.,1.1.
+"The syntax for the for loop is
+for(intialization;condition;increment)
+{
+      //what is to be reapeted
+}","That is correct,how do you write the initialization part of the loop if the loop was to start from 1?",1.1.2.,Loop defination,1.1.1.2.,1.3.
+"#include<stdio.h>
+int main()
+{
+    int i;
+    for(i=1;i<=10;i++)
+    {
+        printf(""%d "",i);
+
+    }
+}","Your code is correct, can you now write a loop that only displays number even numbers",1.3.,printing 1 to 10,1.4.,1.4.
+"#include<stdio.h>
+int main()
+{
+    int i;
+    for(i=1,i<=10,i++)
+    {
+        printf(""%d "",i);
+
+    }
+}","Your code seems to have a problem at the loop defination, can you check to see if you can spot the error",1.1.,for loop,1.2.1,1.2.1.
+i=1,"That is correct, now write the condition part of the loop for a loop that will have to display numbers from 1 to 10",1.1.2.,Loop defination,1.1.2.,
+I cannot see the error,"Okay, what sybols do you use to separate statements in the loop",1.1.2.,,,

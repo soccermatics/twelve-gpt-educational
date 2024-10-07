@@ -1,0 +1,32 @@
+Unnamed: 0,user,assistant,step,topic,Next
+0,I can write a loop in C,Tell the user you are really happy they know so much. Then ask them to write a loop which prints out the numbers 1 to 10.,1.0,Get started with for loop,1.1
+1,I don't know anything about loops,OK letÂs help the user learn about variables first. Ask the user if they can define a variable to store number 5 for you?,1.0,variables,1.2
+2,loops help in repeating things in your code,"Tell the user that they are right, thats exactly what they are. Now ask if they know why loops are important",1.0,for loop,1.1.2
+3,I think they help in reducing the amount of code I write,"Tell the user they are right, that is one of the things loops help with. Now ask the user if they know the syntax of a for loop in C",1.1,Loop function,1.1.1.1
+4,"The syntax for the for loop is
+for(intialization;condition;increment)
+{
+      //what is to be reapeted
+}","Check whether the user has written the right syntax, if it is right, congragulate the user and ask them to write a for loop to display the numbers 1 to 10",1.1,Loop defination,1.1.1.2
+5,"#include<stdio.h>
+int main()
+{
+    int i;
+    for(i=1;i<=10;i++)
+    {
+        printf(""%d "",i);
+
+    }
+}",Check the code to see if it does write out the numbers 1 to 10. If you think it does then congratulate them on their great coding. Now ask them to copy the code into code runner and check it. Otherwise tell them where you think the error is in their code and ask them to try again.,1.1,printing 1 to 10,1.1
+6,int number =5;,"Check if the user has defined he variable correctily. If they have defined the variable correctily, ask if they can explain how variables are related to loops. If they have not defined the variable correctily show the user their mistake and ask the user to re write the variable.",1.2,variables,1.3
+7,Variables are used to keep tab of the number of iteration,"Check if the users answer is correct in relations to the relationship between variables and loops. If it is correct ask the user if they know about conditions. If they are wrong, clarify to them the relationship between variables and loops and ask them if they know about conditions",1.3,variables and loops,1.4
+8,"#include<stdio.h>
+int main()
+{
+    int i;
+    for(i=1,i<=10,i++)
+    {
+        printf(""%d "",i);
+
+    }
+}","Check the code to see if it does write out the numbers 1 to 10. It looks like the user has used , instead of ; to separate the variables. Tell them to check that they have got it right and try again.",1.1,for loop,1.2.1

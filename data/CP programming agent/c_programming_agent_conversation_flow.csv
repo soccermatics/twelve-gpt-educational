@@ -1,0 +1,27 @@
+Step	Prompt	Response	Next step	
+1	Write a code that implements for loop in C to dispay the numbers between 1 and 10	"for (int i = 1; i <= 10; i++) {
+    printf(""%d"", i);
+}"	2	
+1		(int i = 1; i <= 10; i++) {	1.1	You don't seem to have written the for loop properly
+1		"for (int i = 1; i <= 10; i++); {
+    printf(""%d"", i);
+}"	1.3	You seem to have a little problem in your code
+1.1		"for (int i = 1; i <= 10; i++) {
+}"	1.2	Your solution seems to be incomplete
+1.2	Can you indetiy the part of the code that is missing	I did not include the printf() statement to display the output	1.2.1	
+		I think my code is right	1.2.2	Your seem to be missing something that the question requires
+1.2.1	Can you read the question again and indetify which aspect of the question you did not implement	"Okay, I think I missed the part for displaying the output"	1.2.1.1	
+1.2.1.1	Now complete the code	"for (int i = 1; i <= 10; i++) {
+    printf(""%d"", i);
+}"	2	
+				
+1.3	Can you indetify where the error is	I can't seem to find the error	1.4	
+		I placed a semicolon at the end of the defination of the loop	1.5	
+1.4				
+1.5	Can you re write the code correcting the previous mistake	"for (int i = 1; i <= 10; i++) {
+    printf(""%d"", i);
+}"		
+				
+2	Use the for loop to display a sequence of numbers between 1 and 10 with a step of two between the numbers			
+				
+				
