@@ -74,37 +74,27 @@ df_contributions = shots.df_contributions
 # Create a dropdown to select a shot ID from the available shot IDs in shots.df_shots['id']
 shot_id = st.sidebar.selectbox("Select Shot ID", shots_df['id'].unique())
 st.markdown("#### Selected Shot Data")
-st.write(shots_df[shots_df['id']== shot_id])  # Display selected columns
+st.write(shots_df[shots_df['id']== shot_id]) 
 st.markdown("#### Feature Contributions")
 st.write(df_contributions[df_contributions['shot_id']== shot_id])
 
+visuals = ShotVisual(metric=None)
+visuals.add_shot(shots, shot_id)
+descriptions = ShotDescription(shots, shot_id)
+with st.expander("Messages"):
+    st.write(descriptions.messages)
 
-to_hash = tuple(shots.df_shots['id'].unique())
-# Now create the chat as type PlayerChat
-chat = create_chat(to_hash, Chat)
+summaries = descriptions.stream_gpt()
 
-# Now we want to add basic content to chat if it's empty
-if chat.state == "empty":
-    #descriptions = [PlayerShotDescription(filtered_player_shots_obj, player, competition)]
-    visuals = ShotVisual(metric=None)   
-    #visuals.add_shots(shots)
-    visuals.add_shot(shots, shot_id)
-    #st.plotly_chart(visuals.fig)  # Ensure to pass the figure to Streamlit's plotly_chart function
+chat = create_chat(tuple(shots_df['id'].unique()), Chat)
 
-
-    descriptions = ShotDescription(shots, shot_id)
-    with st.expander("Messages"):
-        st.write(descriptions.messages)
-    summaries = descriptions.stream_gpt()
-
-    if visuals:
-        chat.add_message(visuals)
-    if summaries:    
-        chat.add_message(summaries)
-
-    chat.state = "default"
+chat.add_message(visuals)
+if summaries:
+    chat.add_message(summaries)
 
 
+
+chat.state = "default"
 chat.display_messages()
 chat.save_state()
 
