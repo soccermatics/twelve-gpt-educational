@@ -300,11 +300,11 @@ class CountryDescription(Description):
 
     @property
     def gpt_examples_path(self):
-        return f"{self.gpt_examples_base}/Core_values.xlsx"
+        return f"{self.gpt_examples_base}/WVS_examples.xlsx"
 
     @property
     def describe_paths(self):
-        return [f"{self.describe_base}/Core_values.xlsx"]
+        return [f"{self.describe_base}/WVS_qualities.xlsx"]
 
     def __init__(self, country: Player):
         self.country = country
@@ -321,10 +321,9 @@ class CountryDescription(Description):
             {
                 "role": "system",
                 "content": (
-                    "You are a data analyst. "
-                    "You provide succinct and to the point explanations about countries using data. "
-                    "You use the information given to you from the data and answers "
-                    "to earlier user/assistant pairs to give summaries of countries."
+                    "You are a data analyst and a social scientist. "
+                    "You provide succinct and to the point explanations about countries using metrics derived from data collected in the World Value Survey. "
+                    "You use the information given to you from the data and answers to earlier questions to give summaries of how countries score in various metrics that attempt to measure the social values held by the population of that country."
                 ),
             },
             # {
@@ -344,7 +343,7 @@ class CountryDescription(Description):
             intro += [
                 {
                     "role": "user",
-                    "content": "First, could you answer some questions about a country for me?",
+                    "content": "First, could you answer some questions about a the World Value Survey for me?",
                 },
                 {"role": "assistant", "content": "Sure!"},
             ]
@@ -389,7 +388,7 @@ class CountryDescription(Description):
 
     def get_prompt_messages(self):
         prompt = (
-            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the core values of the country. "
+            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the social values held by population of the country. "
             # f"The first sentence should use varied language to give an overview of the player. "
             # "The second sentence should describe the player's specific strengths based on the metrics. "
             # "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
