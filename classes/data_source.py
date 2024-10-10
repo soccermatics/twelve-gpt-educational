@@ -186,7 +186,7 @@ class Arguments(Data):
                 prefix = parts[:i*2+2]
 
                 
-                new_view=df[df['assistant']==prefix]['category'].values[0]
+                new_view=df[df['step']==prefix]['category'].values[0]
                 if new_view == 'Thesis':
                     current_view = new_view
                 if current_view == 'Thesis':
@@ -269,7 +269,7 @@ class Lesson(Data):
             for i in range(int(len(parts)/2)):
                 prefix = parts[:i*2+2]
                 prefix=prefix.rstrip('')
-                #df['step'] = df['step'].astype(str)
+                df['step'] = df['step'].astype(str)
                 new_view=df[df['step']==prefix]['topic'].values[0]
                 if new_view == 'Get started with for loop':
                     current_view = new_view

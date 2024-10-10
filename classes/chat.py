@@ -511,7 +511,7 @@ class LessonChat(Chat):
             ret_val += "Tell the user that they should stick to loops in C. "
             with sidebar_container:
                     st.write(f'Novelty: 0/{numberofarguments}')
-                    st.write(f'Total score: {int(np.ceil(self.totalscore))}')
+                    #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
             return ret_val
 
         # Keep a track of similarity to previous arguments made
