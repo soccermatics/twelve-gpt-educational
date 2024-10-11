@@ -31,3 +31,8 @@ def format_metric(metric):
 
 def write_out_metric(metric):
     return metric.replace("_"," ").replace("adjusted","adjusted for possession").replace("per90","per 90").replace("npxG","non-penalty expected goals") + " minutes"
+
+def describe_contributions(value):
+    thresholds = [10, 5, 2, -2,-5,-10]
+    words = ["implies a seriously increased risk", "implies an increased risk", "implies a small increase in risk", "does not significantly effect the risk", "implies slightly smaller risk", "implies a decreased risk", "implies a greatly decreased risk"]
+    return describe(thresholds, words, value)

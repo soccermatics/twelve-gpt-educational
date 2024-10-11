@@ -9,7 +9,8 @@ from utils.sentences import format_metric
 
 from classes.data_point import Player
 from classes.data_source import PlayerStats
-
+from classes.data_point import Individual
+from classes.data_source import Model
 
 def hex_to_rgb(hex_color: str) -> tuple:
     hex_color = hex_color.lstrip("#")
@@ -141,7 +142,7 @@ class DistributionPlot(Visual):
             )
             showlegend = False
 
-    def add_data_point(self, ser_plot, plots, name, hover='', hover_string="", text=None):
+    def add_data_point(self, ser_plot, plots, name, hover='', hover_string="", text=None,annotation=""):
         if text is None:
             text = [name]
         elif isinstance(text, str):
@@ -169,7 +170,7 @@ class DistributionPlot(Visual):
             legend = False
 
             self.fig.add_annotation(
-                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f} per 90</span>", showarrow=False,
+                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f} {annotation}</span>", showarrow=False,
                 font={"color": rgb_to_color(self.white), "family": "Gilroy-Light",
                         "size": 12 * self.font_size_multiplier},
             )
@@ -186,7 +187,8 @@ class DistributionPlot(Visual):
             plots = '_Z',
             name=player.name,
             hover='_Ranks',
-            hover_string="Rank: %{customdata}/" + str(n_group)
+            hover_string="Rank: %{customdata}/" + str(n_group),
+            annotation=" per 90"
         )
 
     def add_players(self, players: PlayerStats, metrics):
@@ -213,3 +215,35 @@ class DistributionPlot(Visual):
         self.add_title(title, subtitle)
 
 
+class DistributionModelPlot(DistributionPlot):
+
+    def _setup_axes(self):
+        self.fig.update_xaxes(range=[-20, 20], fixedrange=True, tickmode="array", tickvals=[-10, 0, 10], ticktext=["Lower Risk", "Average", "Greater Risk"])
+        self.fig.update_yaxes(showticklabels=False, fixedrange=True, gridcolor=rgb_to_color(self.medium_green), zerolinecolor=rgb_to_color(self.medium_green))
+
+    def add_individual(self, individual, n_group, metrics):
+        
+        # Make list of all metrics with _Z and _Rank added at end 
+        metrics_Z = [metric + "_contribution" for metric in metrics]
+        
+        self.add_data_point(
+            ser_plot=individual.ser_metrics,
+            plots = '_contribution',
+            name=str(individual.id),
+            hover='',
+            hover_string="Value: %{customdata:.2f}",
+        )
+
+    def add_individuals(self, individuals, metrics):
+
+        # Make list of all metrics with _Z and _Rank added at end 
+        metrics_Z = [metric + "_contribution" for metric in metrics]
+        
+        self.add_group_data(
+            df_plot=individuals.df,
+            plots = '_contribution',
+            names=individuals.df["ID"].astype(str),
+            hover='',
+            hover_string="Value: %{customdata:.2f}",
+            legend=f"Other individuals  ", #space at end is important
+        )

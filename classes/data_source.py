@@ -148,4 +148,68 @@ class PlayerStats(Stats):
         
         return self.data_point_class(id=id,name=name,minutes_played=minutes_played,gender=gender,position=position,ser_metrics=ser_metrics,relevant_metrics=self.metrics)
 
+class Model(Data):
+    data_point_class = data_point.Individual
+
+    def __init__(self):
+        self.df = self.get_processed_data()
+        self.parameters = self.read_model()
+        
+
+    def get_raw_data(self):
+        df = pd.read_excel("data/medical/Anuerysm data.xlsx")
+        return df
+
+    def process_data(self, df_raw):
+
+        st.write(df_raw)
+        # In column "Gender" use 1 if male and 0 if female
+        df_raw['Gender'] = df_raw['Gender'].replace({'Male': 1, 'Female': 0})
+        df_raw['Anuerysm'] = df_raw['Anuerysm'].replace({'Yes': 1, 'No': 0})
+        if not('ID' in df_raw.columns):
+            df_raw['ID'] = df_raw.index
+
+        return df_raw   
     
+    def read_model(self):
+        parameters = pd.read_excel("data/medical/Anuerysm model.xlsx")
+        
+        return parameters
+    
+    def weight_contributions(self):
+        
+        df = self.df
+
+        parameters = self.parameters
+        self.intercept = parameters[parameters['Parameter'] == 'Intercept']['Value'].values[0]
+        # Drop intercept
+        self.parameters = parameters[parameters['Parameter'] != 'Intercept']
+
+        for i,row in self.parameters.iterrows():
+            df[row['Parameter']+'_contribution'] = df[row['Parameter']] * row['Value']
+            #Remove the mean
+            df[row['Parameter']+'_contribution'] = df[row['Parameter']+'_contribution'] - df[row['Parameter']+'_contribution'].mean()
+        
+
+        self.parameter_explanation = parameters.set_index('Parameter')['Explanation'].to_dict()
+        st.write(self.parameter_explanation)
+
+        self.df = df
+
+    def to_data_point(self) -> data_point.Individual:
+        
+        id = self.df['ID'].iloc[0]
+
+        #Reindexing dataframe
+        
+        self.df.reset_index(drop=True, inplace=True)
+        self.df=self.df.drop(columns=["ID","Anuerysm"])
+
+
+        # Convert to series
+        ser_metrics = self.df.squeeze()
+
+        return self.data_point_class(id=id,ser_metrics=ser_metrics)
+
+    
+

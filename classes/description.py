@@ -9,7 +9,7 @@ import numpy as np
 
 import utils.sentences as sentences
 from utils.gemini import convert_messages_format
-from classes.data_point import Player
+from classes.data_point import Player,Individual
 
 
 from settings import USE_GEMINI
@@ -272,6 +272,92 @@ class PlayerDescription(Description):
             description += " compared to other players in the same playing position. "                            
 
         #st.write(description)
+
+        return description
+
+    def get_prompt_messages(self):
+        prompt = (
+            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the player's playing style, strengths and weaknesses. "
+            f"The first sentence should use varied language to give an overview of the player. "
+            "The second sentence should describe the player's specific strengths based on the metrics. "
+            "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
+            "Finally, summarise exactly how the player compares to others in the same position. "
+        )
+        return [{"role": "user", "content": prompt}]
+
+
+class IndividualDescription(Description):
+    output_token_limit = 150
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/Anuerysm.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/Anuerysm.xlsx"]
+
+    def __init__(self, individual: Individual,metrics,parameter_explanation):
+        self.metrics = metrics
+        self.individual = individual
+        self.parameter_explanation = parameter_explanation
+        super().__init__()
+
+
+    def get_intro_messages(self) -> List[Dict[str, str]]:
+        """
+        Constant introduction messages for the assistant.
+
+        Returns:
+        List of dicts with keys "role" and "content".
+        """
+        intro = [
+            {
+                "role": "system",
+                "content": (
+                    "You are doctor. "
+                    "You have been asked to provide a summary of a patient's risk of aneurysm. "
+                ),
+            },
+        ]
+        if len(self.describe_paths) > 0:
+            intro += [
+                {
+                    "role": "user",
+                    "content": "First, could you answer some questions about medical details for me?",
+                },
+                {"role": "assistant", "content": "Sure!"},
+            ]
+
+        return intro
+
+    def synthesize_text(self):
+
+        individual=self.individual
+        metrics = self.metrics
+        description = f"Here is a statistical description of the factors related to anuerysm for the patient patient. \n\n "
+
+        if individual.ser_metrics["Gender"] == 1:
+            gender='male'
+        else:
+            gender='female'
+
+        subject_p, object_p, possessive_p = sentences.pronouns(gender)
+        
+        st.write(individual.ser_metrics)
+
+        for metric in metrics:
+            if metric == "Gender":
+                if individual.ser_metrics["Gender"] == 1:
+                    description += f"Being male "
+                else:
+                    description += f"Being male "
+            else:   
+                description += f"A {self.parameter_explanation[metric]} of {individual.ser_metrics[metric]} "
+            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"]) 
+            description += " of anuerysm compared to other patients that come into the clinic. "                            
+
+        st.write(description)
 
         return description
 

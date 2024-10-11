@@ -21,7 +21,15 @@ class Player(Stat):
         self.gender = gender
         self.position = position
         
-
         self.relevant_metrics = relevant_metrics
         # Save metrics as a Series
         self.ser_metrics = ser_metrics
+
+class Individual(Stat):
+
+    def __init__(self,id,ser_metrics):
+
+        # Unpack ser_info
+        self.id=id
+        self.ser_metrics = ser_metrics  
+        

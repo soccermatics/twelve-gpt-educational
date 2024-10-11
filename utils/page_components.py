@@ -86,6 +86,7 @@ def add_page_selector():
     st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
     st.page_link("pages/own_page.py", label="Your Own Page")
+    st.page_link("pages/anuerysm.py", label="Anuerysm")
     
 
 def add_common_page_elements():
@@ -134,6 +135,27 @@ def select_player(container,players,gender,position):
         player=player.to_data_point(gender,position)
         
     return player
+
+
+def select_individual(container,individuals):
+
+    # Make a copy of Players object
+    individual=copy.deepcopy(individuals)
+
+    # Filter players by position and select a player with sidebar selectors
+    with container:
+
+        # Filter for player name
+        individual.select_and_filter(
+            column_name="ID",
+            label="Individual",
+        )
+
+        # Return data point
+
+        individual=individual.to_data_point()
+        
+    return individual
 
 def create_chat(to_hash, chat_class, *args, **kwargs):
     chat_hash_state = hash(to_hash)

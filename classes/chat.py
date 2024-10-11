@@ -229,3 +229,55 @@ class PlayerChat(Chat):
         
         return ret_val
         
+class ModelChat(Chat):
+    def __init__(self, chat_state_hash, individual, individuals, state="empty"):
+        self.embeddings = PlayerEmbeddings()
+        self.individual = individual
+        self.individuals = individuals
+        super().__init__(chat_state_hash, state=state)
+
+    def get_input(self):
+        """
+        Get input from streamlit."""
+  
+        if x := st.chat_input(placeholder=f"What else would you like to know?"):
+            if len(x) > 500:
+                st.error(f"Your message is too long ({len(x)} characters). Please keep it under 500 characters.")
+
+            self.handle_input(x)
+
+    def instruction_messages(self):
+        """
+        Instruction for the agent.
+        """
+        first_messages = [
+            {"role": "system", "content": "You are a doctor."},
+            {"role": "user", "content": (
+                "You should say something")
+            },
+        ]
+        return first_messages
+
+
+    def get_relevant_info(self, query):
+ 
+        #If there is no query then use the last message from the user
+        if query=='':
+            query = self.visible_messages[-1]["content"]
+        
+        ret_val = "Here is a description of the individual in terms of data: \n\n"   
+        description = IndividualDescription(self.individual)
+        ret_val += description.synthesize_text()
+
+        # This finds some relevant information
+        results = self.embeddings.search(query, top_n=5)
+        ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"   
+        ret_val +="\n".join(results["assistant"].to_list())
+        
+        ret_val += f"\n\nIf none of this information is relevent to the users's query then use the information below to remind the user about the chat functionality: \n"
+        ret_val += "This chat can answer questions about a individual's statistics and what they mean for how they play football."
+        ret_val += "The user can select the individual they are interested in using the menu to the left."
+
+        
+        return ret_val
+        
