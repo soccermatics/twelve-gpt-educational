@@ -213,17 +213,18 @@ class DistributionPlot(Visual):
 
 
 
+
 class DistributionPlotPersonality(Visual):
     def __init__(self, columns, *args, **kwargs):
         self.empty = True
-        self.columns = columns
         self.marker_color = (c for c in [Visual.white, Visual.bright_yellow, Visual.bright_blue])
         self.marker_shape = (s for s in ["square", "hexagon", "diamond"])
-        self.data_processed = PersonStat().data_zscore.sample(frac=0.1)
+        self.data_processed = PersonStat().data_zscore.sample(frac=0.01)
         self.metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
-
         super().__init__(*args, **kwargs)
+        self.fig = go.Figure()
         self._setup_axes()
+
 
     def point_to_serie(self, person: Person):
         person_data = {
@@ -237,82 +238,93 @@ class DistributionPlotPersonality(Visual):
         return ser_metrics
 
     def _setup_axes(self):
-        self.fig.update_xaxes(range=[-4, 4], fixedrange=True, tickmode="array")
+        self.fig.update_xaxes(range=[-4, 4], fixedrange=True, tickmode="array", tickvals=[-3, 0, 3])
         self.fig.update_yaxes(showticklabels=False, fixedrange=True, gridcolor=rgb_to_color(self.medium_green), zerolinecolor=rgb_to_color(self.medium_green))
 
-    def add_group_data(self, df_plot, names, legend, hover_string=""):
+    '''def add_group_data(self, df_plot, legend, hover_string=""):
         showlegend = True
         
         for col in self.metrics:
             temp_df = pd.DataFrame(self.data_processed[col])
             metric_name = format_metric(col)
-            temp_df['name'] = metric_name
-            
+           
             self.fig.add_trace(
-                go.Scatter(
+                go.Violin(
                     x=temp_df[col],
-                    y=[col],
+                    name=metric_name,
+                    box_visible=True,
+                    meanline_visible=True,
                     mode="markers",
                     marker={"color": rgb_to_color(self.bright_green, opacity=0.2), "size": 10},
                     hovertemplate='%{text}<br>' + '<extra></extra>',
-                    text=names,
+                    orientation='h', 
                     customdata=temp_df[col],
-                    name=legend,
                     showlegend=showlegend,
                 )
+            )'''
+    
+    def add_group_data(self, df_plot, metric, legend):
+        showlegend = True
+
+        for label in self.metrics:
+            self.fig.add_trace(
+                go.Violin(
+                x=df_plot[label],  # Use x for the data
+                name=label,      # Label each violin plot correctly
+                box_visible=True,
+                meanline_visible=True,
+                line_color='black',  # Color of the violin outline
+                fillcolor='rgba(0,100,200,0.3)',  # Color of the violin fill
+                opacity=0.6,
+                orientation='h'  # Set orientation to horizontal
             )
-            showlegend = False
+        )
+
+            
 
     def add_data_point(self, ser_plot, name, hover_string="", text=None):
         if text is None:
             text = [name]
         elif isinstance(text, str):
             text = [text]
+            
         legend = True
         color = next(self.marker_color)
         marker = next(self.marker_shape)
         
-        for i, col in enumerate(self.metrics):  # Added enumerate to keep track of index `i`
+        for i, col in enumerate(self.metrics): 
             metric_name = format_metric(col)
 
-            # Correct annotation with valid index `i`
             self.fig.add_annotation(
-                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f} per 90</span>", showarrow=False,
+                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot.loc[col]:.2f} per 90</span>", showarrow=False,
                 font={"color": rgb_to_color(self.white), "family": "Gilroy-Light", "size": 12 * self.font_size_multiplier},
             )
             
-            # Corrected `Violin` trace: Removed `mode` and set appropriate properties
             self.fig.add_trace(
-                go.Violin(
-                    x=[ser_plot.loc[col]], name=col, 
-                    points="all",  # Display all points inside the violin
+                go.Scatter(
+                    x=[ser_plot.loc[col]], y = [col], name= name, 
                     marker={"color": rgb_to_color(color, opacity=0.5), "size": 10, "symbol": marker, "line_width": 1.5, "line_color": rgb_to_color(color)},
-                    hovertemplate='%{text}<br>' + '<extra></extra>',
-                    text=text,
-                    customdata=[ser_plot[col]],
+                    hovertemplate='%{text}<br>' + 'candidate point'+ '<extra></extra>',
                     showlegend=legend
                 )
             )
-            legend = False
+            
 
     def add_person(self, person: Person):
         ser_metrics = self.point_to_serie(person)
-        self.add_data_point(ser_plot=ser_metrics, name=person.name)
+        self.add_data_point(ser_plot=ser_metrics, name=person.name, hover_string="", text=None)
+    
+    def add_persons(self, person: Person, metrics):
+            df = self.data_processed
+            self.add_group_data(
+                df_plot= df,
+                metric = self.metrics,
+                legend=f"Other persons  ", #space at end is important
+            )
 
-    def add_persons(self, metrics):
-        df = self.data_processed
-        self.add_group_data(
-            df_plot=df,
-            names=df["name"],
-            hover_string="Rank: %{customdata}/" + str(len(df)),
-            legend=f"Other persons  ",  # Space at end is important
-        )
-
+    
     def add_title_from_person(self, person: Person):            
         self.person = person
         title = f"Evaluation of {person.name}?"
         subtitle = f"Based on Big Five scores"
         self.add_title(title, subtitle)
-
-
-
