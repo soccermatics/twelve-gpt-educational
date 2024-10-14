@@ -8,7 +8,8 @@ import openai
 import numpy as np
 
 import utils.sentences as sentences
-from classes.data_point import Player
+from classes.data_point import Player, Person
+from classes.data_source import PersonStat, StatPersonality, DataPersonality
 
 from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE, GPT_DEFAULT
 
