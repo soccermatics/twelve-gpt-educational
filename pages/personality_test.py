@@ -23,7 +23,7 @@ import traceback
 import copy
 
 
-from utils.page_components import (add_common_page_elements,select_player,create_chat,)
+from utils.page_components import (add_common_page_elements,select_person,create_chat,)
 
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
@@ -33,8 +33,12 @@ st.divider()
 
 #data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
 person_stat = PersonStat()
-person = person_stat.to_data_point(3)
 
+with st.expander("Dataframe"):
+    st.write(person_stat.df)
+
+
+person = select_person(sidebar_container, person_stat)
 
 #st.write(description.get_description(person))
 metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']

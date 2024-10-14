@@ -135,6 +135,27 @@ def select_player(container,players,gender,position):
         
     return player
 
+def select_person(container, person_stat):
+
+    # Make a copy of Players object
+    person=copy.deepcopy(person_stat)
+
+    # Filter players by position and select a player with sidebar selectors
+    with container:
+
+        # Filter for player name
+        person.select_and_filter(
+            column_name="name",
+            label="Person",
+        )
+
+        # Return data point
+
+        person=person.to_data_point()
+        
+    return person
+
+
 def create_chat(to_hash, chat_class, *args, **kwargs):
     chat_hash_state = hash(to_hash)
     chat = chat_class(chat_hash_state, *args, **kwargs)

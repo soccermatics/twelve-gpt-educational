@@ -151,6 +151,7 @@ class PlayerStats(Stats):
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
 
+#THIS IS UNNECESSARY
 class DataPersonality():
     """
     Get, process, and manage various forms of data.
@@ -158,7 +159,7 @@ class DataPersonality():
     data_point_class = None
 
     def __init__(self):
-        self.data = self.get_raw_data()
+        self.df = self.get_raw_data()
 
     def get_raw_data(self):
         dataset = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
@@ -166,11 +167,13 @@ class DataPersonality():
 
 
 
+
+#THIS SHOULD INHERIT FROM Stats class
 class StatPersonality(DataPersonality):
     data_point_class = data_point.Person
     
     def __init__(self):
-        self.data = self.get_raw_data()
+        self.df = self.get_raw_data()
         self.questions = self.get_question()
 
 
@@ -311,14 +314,13 @@ class PersonStat(StatPersonality):
     
     data_point_class = data_point.Person
 
-    
 
     def __init__(self):
-        self.data = self.get_raw_data()
+        self.df = self.get_raw_data()
         questions = StatPersonality().get_question() # to get the questions
-        self.data_processed, self.matching = self.prepare_dataset(self.data)
-        self.stats = self.get_stat(self.data_processed)
-        self.data_zscore = self.dataset_z_score(self.data_processed, self.stats)
+        self.df_processed, self.matching = self.prepare_dataset(self.df)
+        self.stats = self.get_stat(self.df_processed)
+        self.df_zscore = self.dataset_z_score(self.df_processed, self.stats)
         
         super().__init__()
 
@@ -326,10 +328,10 @@ class PersonStat(StatPersonality):
         ''' This fonction get the person or candidate data with a number id or a list, and return a dataframe of the person '''
         #questions = self.questions
         #questions = StatPersonality().get_question() # to get the questions
-        #dataset = self.data # here is the general dataset
+        #dataset = self.df # here is the general dataset
         #data, matching = self.prepare_dataset(dataset) # Here we prepare the dataset with the general transformation
         #stats = self.get_stat(data) # here we get the mean and std. It is use for the z-score
-        data = self.data_zscore # we calcul the z-score for the 5 traits and apply it on the general dataset
+        data = self.df_zscore # we calcul the z-score for the 5 traits and apply it on the general dataset
 
         # First we want to check if the user want a certain candidate from the dataset 
         # or if the user did the test so it return a list
@@ -347,18 +349,15 @@ class PersonStat(StatPersonality):
         return data_c
     
     def to_data_point(self, person_data) -> data_point.Person:
-        ''' This fonction get the person or candidate data with a number id or a list, and return the id, name, and the 5 traits '''
         
-        data_c = self.process_data(person_data)
+        id = self.df.index[0]
 
-        id = data_c.index[0]
-        name = data_c['name'].values[0]
-        extraversion = data_c['extraversion'].values[0]
-        neuroticism = data_c['neuroticism'].values[0]
-        agreeableness = data_c['agreeableness'].values[0]
-        conscientiousness = data_c['conscientiousness'].values[0]
-        openness = data_c['openness'].values[0]
+        #Reindexing dataframe
+        self.df.reset_index(drop=True, inplace=True)
 
+        self.df=self.df.drop(columns=["name"])
+
+        # Convert to series
+        ser_metrics = self.df.squeeze()
         
-        return self.data_point_class(id=id,name=name, extraversion=extraversion,neuroticism=neuroticism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
-
+        return self.data_point_class(id=id,name=name,ser_metrics=ser_metrics)
