@@ -15,6 +15,7 @@ import sys
 import pyarrow.parquet as pq
 
 
+
 import classes.data_point as data_point
 #from classes.wyscout_api import WyNot
 
@@ -115,9 +116,7 @@ class PlayerStats(Stats):
 
 
     def get_raw_data(self):
-
         df = pd.read_csv("data/events/Forwards.csv",encoding='unicode_escape')
-
         return df
 
     def process_data(self, df_raw):
@@ -141,19 +140,12 @@ class PlayerStats(Stats):
 
         name=self.df['player_name'][0]
         minutes_played=self.df['Minutes'][0]
-
-        # Drops the names from the dataframe.
         self.df=self.df.drop(columns=["player_name", "Minutes"])
 
         # Convert to series
-        # keeps all the metrics.
         ser_metrics = self.df.squeeze()
         
         return self.data_point_class(id=id,name=name,minutes_played=minutes_played,gender=gender,position=position,ser_metrics=ser_metrics,relevant_metrics=self.metrics)
-
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -169,8 +161,8 @@ class DataPersonality():
         self.data = self.get_raw_data()
 
     def get_raw_data(self):
-        data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
-        return data
+        dataset = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
+        return dataset
 
 
 
@@ -180,7 +172,6 @@ class StatPersonality(DataPersonality):
     def __init__(self):
         self.data = self.get_raw_data()
         self.questions = self.get_question()
-
 
 
     def get_stat(self,dataset):
@@ -316,10 +307,11 @@ class StatPersonality(DataPersonality):
         return questions
 
     
-    
 class PersonStat(StatPersonality):   
     
     data_point_class = data_point.Person
+
+    
 
     def __init__(self):
         self.data = self.get_raw_data()
@@ -366,3 +358,7 @@ class PersonStat(StatPersonality):
         agreeableness = data_c['agreeableness'].values[0]
         conscientiousness = data_c['conscientiousness'].values[0]
         openness = data_c['openness'].values[0]
+
+        
+        return self.data_point_class(id=id,name=name, extraversion=extraversion,neuroticism=neuroticism,agreeableness=agreeableness,conscientiousness=conscientiousness,openness=openness)
+
