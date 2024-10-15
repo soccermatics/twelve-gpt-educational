@@ -29,8 +29,9 @@ class Player(Stat):
 
 class Person(Stat):
     
-    def __init__(self,name):
+    def __init__(self, id, name, ser_metrics):
 
         # Unpack ser_info
+        self.id = id
         self.name = name
         self.ser_metrics = ser_metrics
