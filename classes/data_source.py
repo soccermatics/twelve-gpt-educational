@@ -28,6 +28,7 @@ class Data():
 
     def __init__(self):
         self.df = self.get_processed_data()
+    
 
     def get_raw_data(self) -> pd.DataFrame:
         raise NotImplementedError("Child class must implement get_raw_data(self)")
@@ -277,6 +278,7 @@ class PersonStat(Stats):
     def to_data_point(self) -> data_point.Person:
         
         id = self.df.index[0]
+        name = self.df['name'].values[0]
 
         #Reindexing dataframe
         self.df.reset_index(drop=True, inplace=True)
