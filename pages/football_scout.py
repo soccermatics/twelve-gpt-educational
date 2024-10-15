@@ -61,6 +61,14 @@ st.write(
     "This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key."
 )
 
+# Read in model card text
+with open("model cards/model-card-football-scout.md", 'r') as file:
+    # Read the contents of the file
+    model_card_text = file.read()
+
+
+st.expander("Model card for Football Scout", expanded=False).markdown(model_card_text)
+
 st.expander("Dataframe used", expanded=False).write(players.df)
 
 # Chat state hash determines whether or not we should load a new chat or continue an old one
