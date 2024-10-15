@@ -158,6 +158,7 @@ class PersonStat(Stats):
     
     def get_raw_data(self):
         df = pd.read_csv('data/data-final.csv',sep='\t',encoding='unicode_escape').sample(frac=0.0001)
+        return df
       
 
     def get_questions(self):
@@ -243,8 +244,8 @@ class PersonStat(Stats):
             
             
         else:
-            df_raw.drop(data.columns[50:107], axis=1, inplace=True)
-            df_raw.drop(data.columns[50:], axis=1, inplace=True) # here 50 to remove the country
+            df_raw.drop(df_raw.columns[50:107], axis=1, inplace=True)
+            df_raw.drop(df_raw.columns[50:], axis=1, inplace=True) # here 50 to remove the country
             df_raw.dropna(inplace=True)
 
            
@@ -273,15 +274,19 @@ class PersonStat(Stats):
         return df_raw
         
     
-    def to_data_point(self, df) -> data_point.Person:
+    def to_data_point(self) -> data_point.Person:
         
         id = self.df.index[0]
-        name = seld.df['name'][0]
 
         #Reindexing dataframe
         self.df.reset_index(drop=True, inplace=True)
 
         self.df=self.df.drop(columns=["name"])
+
+        # Convert to series
+        ser_metrics = self.df.squeeze()
+        
+        return self.data_point_class(id=id,name=name,ser_metrics=ser_metrics)
 
         # Convert to series
         ser_metrics = self.df.squeeze()
