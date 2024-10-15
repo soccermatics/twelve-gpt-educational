@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 
-from classes.data_source import PersonStat,  StatPersonality
+from classes.data_source import PersonStat
 from classes.data_point import Person
 from classes.description import PersonDescription
 from classes.visual import DistributionPlot,DistributionPlotPersonality
@@ -39,16 +39,9 @@ with st.expander("Dataframe"):
 
 
 person = select_person(sidebar_container, person_stat)
-
-#st.write(description.get_description(person))
+description =  PersonDescription(person)
+st.write( description.get_description(person))
 metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
-
-visual = DistributionPlotPersonality(metrics)
-visual.add_title_from_person(person)
-visual.add_persons(person, metrics)
-visual.add_person(person)
-
-
 '''
 # Now select the candidate
 player = select_player(sidebar_container, person) # TO CHANGE
