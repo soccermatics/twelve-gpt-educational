@@ -9,7 +9,7 @@ import numpy as np
 
 import utils.sentences as sentences
 from utils.gemini import convert_messages_format
-from classes.data_point import Player
+from classes.data_point import Player, Country
 
 
 from settings import USE_GEMINI
@@ -176,7 +176,7 @@ class Description(ABC):
             str
         """
 
-        st.expander("Description messages", expanded=False).write(self.messages)
+        st.expander("Chat transcript", expanded=False).write(self.messages)
 
         if USE_GEMINI:
             import google.generativeai as genai
@@ -306,8 +306,11 @@ class CountryDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/WVS_qualities.xlsx"]
 
-    def __init__(self, country: Player):
+    def __init__(self, country: Country, description_dict, thresholds_dict):
         self.country = country
+        self.description_dict = description_dict
+        self.thresholds_dict = thresholds_dict
+
         super().__init__()
 
     def get_intro_messages(self) -> List[Dict[str, str]]:
@@ -363,21 +366,8 @@ class CountryDescription(Description):
             description += f"{country.name.capitalize()} scored "
             description += sentences.describe_level(
                 country.ser_metrics[metric + "_Z"],
-                thresholds=[
-                    1.5,
-                    1,
-                    0.5,
-                    -0.5,
-                    -1,
-                ],
-                words=[
-                    "extremely high",
-                    "very high",
-                    "above average",
-                    "average",
-                    "below average",
-                    "very low",
-                ],
+                thresholds=self.thresholds_dict[metric],
+                words=self.description_dict[metric],
             )
             description += " in " + metric.lower()  # .replace("_", " ")
             description += " compared to other countries in the same survey. "

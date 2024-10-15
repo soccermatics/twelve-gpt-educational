@@ -157,7 +157,7 @@ class Visual:
 
 
 class DistributionPlot(Visual):
-    def __init__(self, columns, *args, **kwargs):
+    def __init__(self, columns, labels=None, *args, **kwargs):
         self.empty = True
         self.columns = columns
         self.marker_color = (
@@ -165,15 +165,18 @@ class DistributionPlot(Visual):
         )
         self.marker_shape = (s for s in ["square", "hexagon", "diamond"])
         super().__init__(*args, **kwargs)
-        self._setup_axes()
+        if labels is not None:
+            self._setup_axes(labels)
+        else:
+            self._setup_axes()
 
-    def _setup_axes(self):
+    def _setup_axes(self, labels=["Worse", "Average", "Better"]):
         self.fig.update_xaxes(
             range=[-4, 4],
             fixedrange=True,
             tickmode="array",
             tickvals=[-3, 0, 3],
-            ticktext=["Worse", "Average", "Better"],
+            ticktext=labels,
         )
         self.fig.update_yaxes(
             showticklabels=False,
