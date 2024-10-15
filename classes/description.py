@@ -9,12 +9,12 @@ import numpy as np
 
 import utils.sentences as sentences
 from classes.data_point import Player, Person
-from classes.data_source import PersonStat, StatPersonality, DataPersonality
+from classes.data_source import PersonStat
 
 from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE, GPT_DEFAULT
 
 import streamlit as st
-
+import random
 openai.api_type = "azure"
 
 
@@ -86,9 +86,7 @@ class Description(ABC):
         return intro
 
 
-    def get_messages_from_excel(self,
-        paths: Union[str, List[str]],
-    ) -> List[Dict[str, str]]:
+    def get_messages_from_excel(self, paths: Union[str, List[str]],) -> List[Dict[str, str]]:
         """
         Turn an excel file containing user and assistant columns with str values into a list of dicts.
 
@@ -264,13 +262,11 @@ class PlayerDescription(Description):
         return [{"role": "user", "content": prompt}]
 
 
-
-
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
 
 
-class PersonDescription(Description):
+class PersonDescription():
     output_token_limit = 150
 
     @property
@@ -283,8 +279,6 @@ class PersonDescription(Description):
 
     def __init__(self, person: Person):
         self.person = person
-        self.data = DataPersonality()
-        self.statpersonality = StatPersonality()
         super().__init__()
 
 
@@ -327,6 +321,7 @@ class PersonDescription(Description):
 
 
     def categorie_description(self, value):
+        text = ''
         if value <= -2:
             text = 'The candidate is extremely '
         elif (value < -2) & (value <= -1):
@@ -340,30 +335,38 @@ class PersonDescription(Description):
         elif (value > 1) & (value <= 2):
             text = 'The candidate is very '
         elif value > 2:
-            text = 'The candidate is extremely '
-        
+            text = 'The candidate is extremely '    
         return text
+
+    def all_max_indices(self, row):
+        max_value = row.max()
+        return list(row[row == max_value].index)
+
+    def all_min_indices(self, row):
+        min_value = row.min()
+        return list(row[row == min_value].index)
+
 
 
     def get_description(self, person):
         # here we need the dataset to check the min and max score of the person
         
-        self.person = person # here it should be the person point
-
-        dataset = self.data.get_raw_data()
-        questions = self.statpersonality.get_question()
-
-        
-        name = str(person.name)
-        extraversion = person.extraversion
-        neuroticism = person.neuroticism
-        agreeableness = person.agreeableness
-        conscientiousness = person.conscientiousness
-        openness = person.openness
-
+        person_metrics = person.ser_metrics
+        person_stat = PersonStat()
+        questions = person_stat.get_questions()
 
         
-        data_c = dataset.loc[dataset['name'] == name]
+        name = person.name
+        extraversion = person_metrics['extraversion']
+        neuroticism = person_metrics['neuroticism']
+        agreeableness = person_metrics['agreeableness']
+        conscientiousness = person_metrics['conscientiousness']
+        openness = person_metrics['openness']
+
+
+   
+
+      
         
         text = []
 
@@ -375,13 +378,13 @@ class PersonDescription(Description):
         if extraversion > 0:
             text_t = self.categorie_description(extraversion) + cat_1
             if extraversion > 1:
-                index_max = data_c.iloc[:,0:10].idxmax(axis = 'columns').values[0]
+                index_max = person_metrics[0:10].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
                 text_t +=  text_2
         else:
             text_t = self.categorie_description(extraversion) + cat_0
             if extraversion < -1:
-                index_min = data_c.iloc[:,0:10].idxmin(axis = 'columns').values[0]
+                index_min = person_metrics[0:10].idxmin()
                 text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
                 text_t += text_2
         text.append(text_t)
@@ -394,7 +397,7 @@ class PersonDescription(Description):
             text_t = self.categorie_description(neuroticism) + cat_1  \
                     + 'The candidate tends to feel more negative emotions, anxiety. '
             if neuroticism > 1:
-                index_max = data_c.iloc[:,10:20].idxmax(axis = 'columns').values[0]
+                index_max = person_metrics[10:20].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
                 text_t += text_2
                 
@@ -402,7 +405,7 @@ class PersonDescription(Description):
             text_t = self.categorie_description(neuroticism) + cat_0  \
                     + 'The candidate tends to feel less negative emotions, anxiety. '
             if neuroticism < -1:
-                index_min = data_c.iloc[:,10:20].idxmin(axis = 'columns').values[0]
+                index_min = person_metrics[10:20].idxmin()
                 text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
                 text_t += text_2
         text.append(text_t)
@@ -415,7 +418,7 @@ class PersonDescription(Description):
             text_t = self.categorie_description(agreeableness) + cat_1  \
                     + 'The candidate tends to be more cooperative, polite, kind and friendly. '
             if agreeableness > 1:
-                index_max = data_c.iloc[:,20:30].idxmax(axis = 'columns').values[0]
+                index_max = person_metrics[20:30].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                 text_t += text_2
 
@@ -423,7 +426,7 @@ class PersonDescription(Description):
             text_t = self.categorie_description(agreeableness) + cat_0  \
                     + 'The candidate tends to be less cooperative, polite, kind and friendly. '
             if agreeableness < -1:
-                index_min = data_c.iloc[:,20:30].idxmin(axis = 'columns').values[0]
+                index_min = person_metrics[20:30].idxmin()
                 text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
                 text_t += text_2
         text.append(text_t)
@@ -436,14 +439,14 @@ class PersonDescription(Description):
             text_t = self.categorie_description(conscientiousness) + cat_1  \
                     + 'The candidate tends to be more careful or diligent. '
             if conscientiousness > 1:
-                index_max = data_c.iloc[:,30:40].idxmax(axis = 'columns').values[0]
+                index_max = person_metrics[30:40].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                 text_t += text_2
         else:
             text_t = self.categorie_description(conscientiousness) + cat_0  \
                     + 'The candidate tends to be less careful or diligent. '
             if conscientiousness < -1:
-                index_min = data_c.iloc[:,30:40].idxmin(axis = 'columns').values[0]
+                index_min = person_metrics[30:40].idxmin()
                 text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
                 text_t += text_2
         text.append(text_t)
@@ -456,14 +459,14 @@ class PersonDescription(Description):
             text_t = self.categorie_description(openness) + cat_1  \
                     + 'The candidate tends to be more open. '
             if openness > 1:
-                index_max = data_c.iloc[:,40:50].idxmax(axis = 'columns').values[0]
+                index_max = person_metrics[40:50].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                 text_t += text_2
         else:
             text_t = self.categorie_description(openness) + cat_0  \
                     + 'The candidate tends to be less open. '
             if openness < -1:
-                index_min = data_c.iloc[:,40:50].idxmin(axis = 'columns').values[0]
+                index_min = person_metrics[40:50].idxmin()
                 text_2 = 'In particular they said that ' + questions[index_min][0] +'. '
                 text_t += text_2
         text.append(text_t)
@@ -482,7 +485,3 @@ class PersonDescription(Description):
             "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
-
-
-
-
