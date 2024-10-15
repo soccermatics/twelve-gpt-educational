@@ -62,7 +62,7 @@ st.write(
 )
 
 # Read in model card text
-with open("model cards/model-card-football-scout.md", 'r') as file:
+with open("model cards/model-card-football-scout.md", "r", encoding="utf8") as file:
     # Read the contents of the file
     model_card_text = file.read()
 
