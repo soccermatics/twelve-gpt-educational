@@ -42,6 +42,14 @@ person = select_person(sidebar_container, person_stat)
 description =  PersonDescription(person)
 st.write( description.get_description(person))
 metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+
+
+visual = DistributionPlotPersonality(metrics)
+visual.add_title_from_person(person)
+visual.add_persons(metrics=metrics)
+visual.add_person(person)
+
+
 '''
 # Now select the candidate
 player = select_player(sidebar_container, person) # TO CHANGE
