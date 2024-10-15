@@ -1,8 +1,9 @@
-# TODO: Update!
-# Model card for Football Scout Wordalisation
+# Model card for World Value Survey metric Wordalisation
 
-The football scout is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and
-is intended as an illustration of the methods. Here we detail the specific application to football scouting. It is thus intended as an example to help others building wordalisations. The wordalisations describe players playing as strikers, for at least 300 minutes, in the Premier League 2017-18 season. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens. 
+
+
+The WVS chatbot is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and
+is intended as an illustration of the methods. It is thus intended as an example to help others building wordalisations. The wordalisations are constructed using various social metrics derived from data collected in the [World Value Survey](www.worldvaluessurvey.org) (WVS). These social metrics as well as the WVS are discussed in the [Datasets] section. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The original design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, with modification made by Beimnet Girma and Amy Rouillard to adapt it to the WVS use-case.
 
 This model card is based on the [model cards paper](https://arxiv.org/abs/1810.03993) and is adapted specifically to Wordalisation applications as detailed in [Representing data in words](publication here). We also provide this model card as an example of 
 good practice for describing wordalisations.
@@ -19,7 +20,7 @@ Jump to section:
 
 ## Intended use
 
-The *primary use case* of this wordalisation is eductional. It shows how to convert a dataframe of football statistics about a player into a text about that player, which might be used by a scout or be of interest to a football fan. A *secondary use case* might be for users to understand more about the skills of male atheletes playing in the Premier League during 2017-18. However, this version cannot be used for professional purposes, i.e. professional football scouting, partly because the data is out of date, but mainly because the functionality is limited. Professional use is thus *out of scope*. Use of the chat for queires not relating to the data at hand is also *out of scope*. 
+The *primary use case* of this wordalisation is eductional. It shows how to convert a dataframe of statistics about a countries into a text about a chosen country. This version cannot be used for insight generation purposes, i.e. data analysis, firstly because we do not guarantee the quality of the data and because the functionality is limited. Data analysis is thus *out of scope*. Use of the chat for queries not relating to the data at hand is also *out of scope*. 
 
 ## Factors
 
@@ -27,7 +28,8 @@ The Football Scout Wordalisation is applied to a very specific demographic group
 
 ## Datasets
 
-The dataframe used in this project was constructed from a dataset of actions taken by [Premier League players](https://figshare.com/collections/Soccer_match_event_dataset/4415000/2) during the 2017-18 season. A *preprocessing* step, largely based on this [tutotrial](https://soccermatics.readthedocs.io/en/latest/lesson3/ScoutingPlayers.html), converted player actions to a dataframe of counts per ninety and corrected for possession of the ball. Only those players who play as forwards (an attacking role) are included in the dataset.
+The dataframe used in this project was constructed from a dataset ... 
+A *preprocessing* step, largely based on ...
 
 ## Model
 
