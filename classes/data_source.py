@@ -17,7 +17,6 @@ import pyarrow.parquet as pq
 
 
 import classes.data_point as data_point
-#from classes.wyscout_api import WyNot
 
 
 # Base class for all data 
@@ -148,105 +147,20 @@ class PlayerStats(Stats):
         return self.data_point_class(id=id,name=name,minutes_played=minutes_played,gender=gender,position=position,ser_metrics=ser_metrics,relevant_metrics=self.metrics)
 
 
-# -------------------------------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------------------------------
-
-#THIS IS UNNECESSARY
-class DataPersonality():
-    """
-    Get, process, and manage various forms of data.
-    """
-    data_point_class = None
-
-    def __init__(self):
-        self.df = self.get_raw_data()
-
-    def get_raw_data(self):
-        dataset = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
-        return dataset
 
 
-
-
-#THIS SHOULD INHERIT FROM Stats class
-class StatPersonality(DataPersonality):
+class PersonStat(Stats):   
     data_point_class = data_point.Person
-    
+    negative_metrics = []
+
     def __init__(self):
-        self.df = self.get_raw_data()
-        self.questions = self.get_question()
-
-
-    def get_stat(self,dataset):
-        ''' This function is used to obtain the mean and standard deviation for each trait. It is used to calculate the z score'''
-        
-        columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
-
-        stats = {}
+        super().__init__()
     
-        for column in columns:
-            stats[column] = {'mean': dataset[column].mean(),'std': dataset[column].std(ddof=0)}
-    
-        return stats
+    def get_raw_data(self):
+        df = pd.read_csv('data/data-final.csv',sep='\t',encoding='unicode_escape').sample(frac=0.0001)
+      
 
-    def dataset_z_score(self,dataset, stats):
-        columns = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
-    
-        for column in columns:
-            mean = stats[column]['mean']
-            std = stats[column]['std']
-            dataset[f'{column}'] = (dataset[column] - mean) / std
-    
-        return dataset
-
-    def convert_list_to_dataset(self,person_list, matching, questions):
-        data_temp =pd.DataFrame([person_list], columns= [column for column in matching])   
-        for column in data_temp.columns:
-            data_temp[column] = data_temp[column] * questions[column][1]
-        data_temp['extraversion'] = data_temp.iloc[:,0:10].sum(axis=1) + 20
-        data_temp['neuroticism'] = data_temp.iloc[:,10:20].sum(axis=1) +38
-        data_temp['agreeableness'] = data_temp.iloc[:,20:30].sum(axis=1) +14 
-        data_temp['conscientiousness'] = data_temp.iloc[:,30:40].sum(axis=1) + 14
-        data_temp['openness'] = data_temp.iloc[:,40:50].sum(axis=1) + 8
-    
-        return data_temp
-
-
-    def prepare_dataset(self, question):
-        ''' This function get the dataset, the questions, then get the dataset ready'''
-        
-        data = self.get_raw_data()
-        data = data.copy()
-        data.drop(data.columns[50:107], axis=1, inplace=True)
-        data.drop(data.columns[50:], axis=1, inplace=True) # here 50 to remove the country
-        data.dropna(inplace=True)
-
-        questions = question
-
-        # Group Names and Columns
-        EXT = [column for column in data if column.startswith('EXT')]
-        EST = [column for column in data if column.startswith('EST')]
-        AGR = [column for column in data if column.startswith('AGR')]
-        CSN = [column for column in data if column.startswith('CSN')]
-        OPN = [column for column in data if column.startswith('OPN')]
-
-        matching = EXT+EST+AGR+CSN+OPN
-
-        # Here we update the dataframe by applying the new coefficient
-        for column in data.columns:
-            data[column] = data[column] * questions[column][1]
-
-        # reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf 
-        data['extraversion'] = data.iloc[:, 0:10].sum(axis=1) + 20
-        data['neuroticism'] = data.iloc[:, 10:20].sum(axis=1) +38
-        data['agreeableness'] = data.iloc[:, 20:30].sum(axis=1) +14 
-        data['conscientiousness'] = data.iloc[:, 30:40].sum(axis=1) + 14
-        data['openness'] = data.iloc[:, 40:50].sum(axis=1) + 8
-        data['name'] = data.index.to_series().apply(lambda idx: 'C_' + str(idx))
-
-        return data, matching
-
-    def get_question(self):
+    def get_questions(self):
         ''' This function is to have access to the questions'''
         
         # Groups and Questions modify version
@@ -309,48 +223,60 @@ class StatPersonality(DataPersonality):
         questions = ext_questions | est_questions | agr_questions | csn_questions  | opn_questions
         return questions
 
-    
-class PersonStat(StatPersonality):   
-    
-    data_point_class = data_point.Person
 
-
-    def __init__(self):
-        self.df = self.get_raw_data()
-        questions = StatPersonality().get_question() # to get the questions
-        self.df_processed, self.matching = self.prepare_dataset(self.df)
-        self.stats = self.get_stat(self.df_processed)
-        self.df_zscore = self.dataset_z_score(self.df_processed, self.stats)
+    
         
-        super().__init__()
-
-    def process_data(self, person_data):
+    def process_data(self, df_raw):
         ''' This fonction get the person or candidate data with a number id or a list, and return a dataframe of the person '''
-        #questions = self.questions
-        #questions = StatPersonality().get_question() # to get the questions
-        #dataset = self.df # here is the general dataset
-        #data, matching = self.prepare_dataset(dataset) # Here we prepare the dataset with the general transformation
-        #stats = self.get_stat(data) # here we get the mean and std. It is use for the z-score
-        data = self.df_zscore # we calcul the z-score for the 5 traits and apply it on the general dataset
-
+        questions = self.get_questions()
+        
         # First we want to check if the user want a certain candidate from the dataset 
         # or if the user did the test so it return a list
-        if isinstance(person_data, list):
-            data_c = self.convert_list_to_dataset(person_data, self.matching, self.questions)
-            data_c = self.dataset_z_score(data_c, self.stats) 
+        if isinstance(df_raw, list):
+            matching = ['EXT1', 'EXT2', 'EXT3', 'EXT4', 'EXT5', 'EXT6', 'EXT7', 'EXT8', 'EXT9',
+           'EXT10', 'EST1', 'EST2', 'EST3', 'EST4', 'EST5', 'EST6', 'EST7', 'EST8',
+           'EST9', 'EST10', 'AGR1', 'AGR2', 'AGR3', 'AGR4', 'AGR5', 'AGR6', 'AGR7',
+           'AGR8', 'AGR9', 'AGR10', 'CSN1', 'CSN2', 'CSN3', 'CSN4', 'CSN5', 'CSN6',
+           'CSN7', 'CSN8', 'CSN9', 'CSN10', 'OPN1', 'OPN2', 'OPN3', 'OPN4', 'OPN5',
+           'OPN6', 'OPN7', 'OPN8', 'OPN9', 'OPN10']
+            df_raw =pd.DataFrame([df_raw], columns= [column for column in matching])
+            
+            
+        else:
+            df_raw.drop(data.columns[50:107], axis=1, inplace=True)
+            df_raw.drop(data.columns[50:], axis=1, inplace=True) # here 50 to remove the country
+            df_raw.dropna(inplace=True)
+
+           
+
+            # Group Names and Columns
+            #EXT = [column for column in df_raw if column.startswith('EXT')]
+            #EST = [column for column in df_raw if column.startswith('EST')]
+            #AGR = [column for column in df_raw if column.startswith('AGR')]
+            #CSN = [column for column in df_raw if column.startswith('CSN')]
+            #OPN = [column for column in df_raw if column.startswith('OPN')]
+
+            #matching = EXT+EST+AGR+CSN+OPN
+
+            # Here we update the dataframe by applying the new coefficient
+        for column in df_raw.columns:
+            df_raw[column] = df_raw[column] * questions[column][1]
+
+        # reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf 
+        df_raw['extraversion'] = df_raw.iloc[:, 0:10].sum(axis=1) + 20
+        df_raw['neuroticism'] = df_raw.iloc[:, 10:20].sum(axis=1) +38
+        df_raw['agreeableness'] = df_raw.iloc[:, 20:30].sum(axis=1) +14 
+        df_raw['conscientiousness'] = df_raw.iloc[:, 30:40].sum(axis=1) + 14
+        df_raw['openness'] = df_raw.iloc[:, 40:50].sum(axis=1) + 8
+        df_raw['name'] = df_raw.index.to_series().apply(lambda idx: 'C_' + str(idx))
+             
+        return df_raw
         
     
-        elif isinstance(person_data,(int, float)):
-            if person_data < 0:
-                print('The number should be greater or equal to 0')
-            else:
-                data_c = pd.DataFrame([data.iloc[person_data]])
-                
-        return data_c
-    
-    def to_data_point(self, person_data) -> data_point.Person:
+    def to_data_point(self, df) -> data_point.Person:
         
         id = self.df.index[0]
+        name = seld.df['name'][0]
 
         #Reindexing dataframe
         self.df.reset_index(drop=True, inplace=True)
