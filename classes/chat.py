@@ -16,7 +16,7 @@ from classes.description import (
     PlayerDescription,
     CountryDescription,
 )
-from classes.embeddings import PlayerEmbeddings
+from classes.embeddings import PlayerEmbeddings, CountryEmbeddings
 
 
 from classes.visual import Visual, DistributionPlot
@@ -103,7 +103,7 @@ class Chat:
         ]
 
         # Show the messages in an expander
-        st.expander("GPT Messages", expanded=False).write(messages)
+        st.expander("Chat transcript", expanded=False).write(messages)
 
         # Check if use gemini is set to true
         if USE_GEMINI:
@@ -263,7 +263,7 @@ class PlayerChat(Chat):
 class WVSChat(Chat):
     def __init__(self, chat_state_hash, country, countries, state="empty"):
         # TODO:
-        # self.embeddings = PlayerEmbeddings()
+        self.embeddings = CountryEmbeddings()
         self.country = country
         self.countries = countries
         super().__init__(chat_state_hash, state=state)
@@ -314,11 +314,10 @@ class WVSChat(Chat):
         description = CountryDescription(self.country)
         ret_val += description.synthesize_text()
 
-        # TODO:
-        # # This finds some relevant information
-        # results = self.embeddings.search(query, top_n=5)
-        # ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"
-        # ret_val += "\n".join(results["assistant"].to_list())
+        # This finds some relevant information
+        results = self.embeddings.search(query, top_n=5)
+        ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"
+        ret_val += "\n".join(results["assistant"].to_list())
 
         ret_val += f"\n\nIf none of this information is relevant to the users's query then use the information below to remind the user about the chat functionality: \n"
         ret_val += "This chat can answer questions about a country's core values."
