@@ -4,7 +4,7 @@ import openai
 from utils.embeddings_utils import get_embedding, cosine_similarity
 import os
 
-from settings import ENGINE_ADA, GPT3_BASE, GPT3_VERSION, GPT3_KEY
+from settings import ENGINE_ADA, GPT3_BASE, GPT3_VERSION, GPT3_KEY, USE_GEMINI, GEMINI_EMBEDDING_MODEL, GEMINI_API_KEY
 
 class Embeddings:
     def __init__(self):
@@ -15,11 +15,17 @@ class Embeddings:
         # if type is not specified, it will search all dataframes
         # otherwise it will search those listed
 
-        openai.api_base = GPT3_BASE
-        openai.api_version = GPT3_VERSION
-        openai.api_key = GPT3_KEY
-        # text-embedding-ada-002 (Version 2) model
-        embedding = get_embedding(query, engine=ENGINE_ADA)
+        if USE_GEMINI:
+            import google.generativeai as genai
+            genai.configure(api_key=GEMINI_API_KEY)
+            ENGINE = GEMINI_EMBEDDING_MODEL
+        else:
+            openai.api_base = GPT3_BASE
+            openai.api_version = GPT3_VERSION
+            openai.api_key = GPT3_KEY
+            # text-embedding-ada-002 (Version 2) model
+            ENGINE = ENGINE_ADA
+        embedding = get_embedding(query, engine=ENGINE, use_gemini=USE_GEMINI)
 
         # An option for the future is to take the top from each dataframe, so we get a mixture of responses.
         df = self.df_dict
@@ -32,17 +38,24 @@ class Embeddings:
     def compare_strings(self,string1,string2):
         # Use this function to compare two strings or words embeddings
         # Returns co-sine similarilty between the two strings
-        embedding1 = get_embedding(string1, engine=ENGINE_ADA)
-        embedding2 = get_embedding(string2, engine=ENGINE_ADA)
+        ENGINE = GEMINI_EMBEDDING_MODEL if USE_GEMINI else ENGINE_ADA
+        embedding1 = get_embedding(string1, engine=ENGINE, use_gemini=USE_GEMINI)
+        embedding2 = get_embedding(string2, engine=ENGINE, use_gemini=USE_GEMINI)
 
         return cosine_similarity(embedding1, embedding2)
     
     def return_embedding(self,query):
-        openai.api_base = GPT3_BASE
-        openai.api_version = GPT3_VERSION
-        openai.api_key = GPT3_KEY
-        # text-embedding-ada-002 (Version 2) model
-        embedding = get_embedding(query, engine=ENGINE_ADA)
+        if USE_GEMINI:
+            import google.generativeai as genai
+            genai.configure(api_key=GEMINI_API_KEY)
+            ENGINE = GEMINI_EMBEDDING_MODEL
+        else:
+            openai.api_base = GPT3_BASE
+            openai.api_version = GPT3_VERSION
+            openai.api_key = GPT3_KEY
+            # text-embedding-ada-002 (Version 2) model
+            ENGINE = ENGINE_ADA
+        embedding = get_embedding(query, engine=ENGINE, use_gemini=USE_GEMINI)
         
         return embedding    
         

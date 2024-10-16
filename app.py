@@ -9,18 +9,9 @@ import copy
 
 import streamlit as st
 
-from classes.data_source import PlayerStats
-from classes.data_point import Player
-from classes.visual import DistributionPlot
-from classes.description import (
-    PlayerDescription,
-)
-from classes.chat import PlayerChat
 
 from utils.page_components import (
     add_common_page_elements,
-    select_player,
-    create_chat,
 )
 
 sidebar_container = add_common_page_elements()
@@ -29,64 +20,17 @@ sidebar_container = st.sidebar.container()
 
 st.divider()
 
+displaytext= ('''## About Twelve GPT Educational ''')
 
-# minimal_minutes is the minimum number of minutes a player must have played to be included in the analysis
-minimal_minutes = 300
-players = PlayerStats(minimal_minutes=minimal_minutes)
+st.markdown(displaytext)
 
+displaytext= (
+    '''TwelveGPT Educational is a framework for creating data-driven chatbots. The design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens. \n\n'''
+    '''The code is set up in a general way, to allow users to build bots which talk about data. '''
+    '''The football scout bot displays a distribution plot of a football player's performance in various metrics. It then starts a chat giving an AI generated summary of the player's performance and asks a variety of questions about the player. \n\n'''
+    '''This is **not** the [Twelve GPT product](https://twelve.football/), but rather a (very) stripped down version of our code '''
+    '''to help people who would like to learn how to build bots to talk about football data. There are lots of things which [Twelve GPT](https://twelve.football/) can do, which TwelveGPT Educational cannot do. But we want more people to learn about the methods we use and to do this **TwelveGPT Educational** is an excellent alternative. We have thus used the the GNU GPL license which requires that all the released improved versions are also be free software. This will allow us to learn from each other in developing better. \n\n '''
+    '''If you work for a footballing organisation and would like to see a demo of the full Twelve GPT product then please email us at hello@twelve.football. '''
+ )
 
-# Define the metrics we are interested in and calculates them
-metrics = [
-    "npxG_adjusted_per90",
-    "goals_adjusted_per90",
-    "assists_adjusted_per90",
-    "key_passes_adjusted_per90",
-    "smart_passes_adjusted_per90",
-    "final_third_passes_adjusted_per90",
-    "final_third_receptions_adjusted_per90",
-    "ground_duels_won_adjusted_per90",
-    "air_duels_won_adjusted_per90",
-]
-players.calculate_statistics(metrics=metrics)
-
-# Now select the focal player
-player = select_player(sidebar_container, players, gender="male", position="Forward")
-
-st.write(players.df)
-
-# Chat state hash determines whether or not we should load a new chat or continue an old one
-# We can add or remove variables to this hash to change conditions for loading a new chat
-to_hash = (player.id,)
-# Now create the chat as type PlayerChat
-chat = create_chat(to_hash, PlayerChat, player, players)
-
-# Now we want to add basic content to chat if it's empty
-if chat.state == "empty":
-
-    # Make a plot of the distribution of the metrics for all players
-    # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-    visual = DistributionPlot(metrics[::-1])
-    visual.add_title_from_player(player)
-    visual.add_players(players, metrics=metrics)
-    visual.add_player(player, len(players.df), metrics=metrics)
-
-    # Now call the description class to get the summary of the player
-    description = PlayerDescription(player)
-    summary = description.stream_gpt()
-
-    # Add the visual and summary to the chat
-    chat.add_message(
-        "Please can you summarise " + player.name + " for me?",
-        role="user",
-        user_only=False,
-        visible=False,
-    )
-    chat.add_message(visual)
-    chat.add_message(summary)
-
-    chat.state = "default"
-
-# Now we want to get the user input, display the messages and save the state
-chat.get_input()
-chat.display_messages()
-chat.save_state()
+st.markdown(displaytext)

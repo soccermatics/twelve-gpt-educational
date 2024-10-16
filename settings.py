@@ -12,6 +12,11 @@ GPT4_VERSION = st.secrets.get('GPT4o_VERSION')
 GPT4_KEY = st.secrets.get('GPT4o_KEY')
 GPT4_ENGINE = st.secrets.get("GPT4o_ENGINE")
 
+# Gemini secrets
+USE_GEMINI = st.secrets.get("USE_GEMINI", False)
+GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", "")
+GEMINI_CHAT_MODEL = st.secrets.get("GEMINI_CHAT_MODEL", "")
+GEMINI_EMBEDDING_MODEL = st.secrets.get("GEMINI_EMBEDDING_MODEL", "")
 
 if GPT_DEFAULT == "4":
     GPT_BASE = GPT4_BASE
