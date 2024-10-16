@@ -31,18 +31,19 @@ sidebar_container = st.sidebar.container()
 
 st.divider()
 
-#data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
-person_stat = PersonStat()
+persons = PersonStat()
+# Define the metrics we are interested in and calculates them
+metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+persons.calculate_statistics(metrics=metrics)
 
 with st.expander("Dataframe"):
-    st.write(person_stat.df)
+    st.write(persons.df)
 
 
-person = select_person(sidebar_container, person_stat)
+person = select_person(sidebar_container, persons)
+
 description =  PersonDescription(person)
 st.write( description.get_description(person))
-metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
-
 
 visual = DistributionPlotPersonality(metrics)
 visual.add_title_from_person(person)
