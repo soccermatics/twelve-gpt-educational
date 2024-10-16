@@ -483,9 +483,9 @@ class PersonDescription():
     def get_prompt_messages(self):
         prompt = (
             f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the person's personality, strengths and weaknesses. "
-            f"The first sentence should use varied language to give an overview of the player. "
-            "The second sentence should describe the player's specific strengths based on the metrics. "
-            "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
-            "Finally, summarise exactly how the player compares to others in the same position. "
+            f"The first sentence should use varied language to give an overview of the person. "
+            "The second sentence should describe the person's specific strengths based on the metrics. "
+            "The third sentence should describe aspects in which the person is average and/or weak based on the statistics. "
+            "Finally, summarise exactly how the person compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
