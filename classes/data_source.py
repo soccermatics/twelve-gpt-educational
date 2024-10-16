@@ -186,7 +186,7 @@ class Arguments(Data):
                 prefix = parts[:i*2+2]
 
                 
-                new_view=df[df['step']==prefix]['category'].values[0]
+                new_view=df[df['assistant']==prefix]['category'].values[0]
                 if new_view == 'Thesis':
                     current_view = new_view
                 if current_view == 'Thesis':
@@ -301,15 +301,15 @@ class Lesson(Data):
         # df['assistant'] contains the tree structure.
         # df['category'] contains the stance.
             
-        # Find all rows of dateframe where df['assistant'] starts with 'argument'
+        # Find all rows of dateframe where df['assistant'] starts with 'topic'
         argument_df = df[df['step'].str.startswith(argument)]
         # Find all rows of dateframe where df['assistant'] is longer but no more than two characters longer than 'argument'
-        argument_df = argument_df[argument_df['assistant'].str.len() <= len(argument)+2]
+        #argument_df = argument_df[argument_df['assistant'].str.len() <= len(argument)+2]
         argument_df = argument_df[argument_df['assistant'].str.len() > len(argument)]
-        argument_df = argument_df[argument_df['topic']==stance]
+        argument_df = argument_df[argument_df['assistant']==stance]
         # Unique list of all 'assistant' values
         list_of_arguments = argument_df['step'].unique()
-
+        #st.write(list_of_arguments)
         # For each argument in the list, find all rows of dateframe where df['assistant'] is within 2 and 4 and they are 'Pro
         for subargument in list_of_arguments:
             argument_df2 = df[df['assistant'].str.startswith(subargument)]
@@ -318,6 +318,7 @@ class Lesson(Data):
             argument_df2 = argument_df2[argument_df2['topic']=='for loops']
             # Add these to the arguments.
             argument_df = pd.concat([argument_df,argument_df2])
+            #st.write(argument_df)
 
         return argument_df
         

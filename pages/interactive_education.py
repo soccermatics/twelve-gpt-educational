@@ -43,14 +43,15 @@ overall='1.'
 if 'argumentsMade' not in st.session_state:
     st.session_state.userStance = np.random.choice(['for loop', 'Loop defination','Get started with for loop','variable defination','printing 1 to 10',])
 userStance = st.session_state.userStance
-
 # make a dictionary to give opposite Pro and Con arguments
  #stanceSwap = {'Pro': 'Con', 'Con': 'Pro'}
 stanceFullName = {'for loop':'loop defination'}
 
 # Get the overall thesis
-overallThesis = lesson.df[lesson.df['step']==overall].iloc[0]['topic']
+overallThesis = lesson.df[lesson.df['step']==overall].iloc[0]['assistant']
+#st.write(overallThesis)
 currentState=lesson.df[lesson.df['step']==overall].iloc[0]['user']
+#st.write(currentState)
 displaytext= (
     "## The programming lesson chat\n\n"
     "Do you want to learn about programming concepts in an interactive manner! "
@@ -80,24 +81,28 @@ if 'gameOver' not in st.session_state:
 to_hash = (overall)
 
 chat = create_chat(to_hash, LessonChat, overallThesis, lesson, gameOver=st.session_state.gameOver)
-
+#st.write(currentState)
 # Now we want to add basic content to chat if it's empty
 if chat.state == "empty":
 
     #Gets the arguments at current level and supporting arguments one below.
-    ##currentArguments= lesson.get_arguments(overall,stanceFullName )
-    #description = LessonDescription(currentState, overallThesis,stanceFullName)
-    #summary = description.stream_gpt()
+    currentArguments= lesson.get_arguments(overall,overallThesis )
+    #st.write(overallThesis)
+    #st.write(currentArguments)
+    description = LessonDescription(chat.state, currentArguments,overallThesis)
+    summary = description.stream_gpt()
 
-    chat.add_message("how much do you know about loops?")
+    chat.add_message("how much do you know about for loops?")
+    #chat.add_message(summary)
 
     chat.state = "default"
 
 # Now we want to get the user input, display the messages and save the state
+#st.write(chat.state)
 chat.get_input()
 chat.display_messages()
 #st.session_state.totalscore =  chat.totalscore
-#st.session_state.argumentsMade = chat.argumentsMade
-#st.session_state.gameOver = chat.gameOver
+st.session_state.arguments = chat.arguments
+st.session_state.gameOver = chat.gameOver
 chat.save_state()
 

@@ -1,4 +1,5 @@
 user,assistant,step,topic,Next,Next
+get started,Welcome to the programming chatbot,1.,Get started with for loop,1.3.,1.3.
 I can write a loop in C,I am glad you know how to write a loop. Can you write a loop to displays numbers 1 to 10 [1.3.],1.,Get started with for loop,1.3.,1.1.
 I don't know anything about loops,"OK let’s lets start by learning about variables, one of the building blocks of loops. Can you define a variable that will store number 5 [1.2.]",1.,Get started with for loop,1.2.,1.2.
 I know what loops do,"Great, can you tell me what loops do?[1.1.1.]",1.,Get started with for loop,1.1.1.,1.1.2.

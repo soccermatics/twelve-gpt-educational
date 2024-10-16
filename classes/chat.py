@@ -14,7 +14,7 @@ else:
     from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
     
 from classes.description import (
-    PlayerDescription
+    PlayerDescription, LessonDescription
 )
 
 from classes.data_source import Arguments
@@ -447,19 +447,21 @@ class LessonChat(Chat):
         first_messages = [
             {"role": "system", "content": (
                 #"You are talking to a learner about the following topic: " + self.overallThesis + ". "
-                "You are an instructor, you guiding the user to learn about loops in C" 
+                "You are an instructor, you guiding the user to learn about  for loops in C" 
                 
                 )
             },
             {"role": "user", "content": (
-                "After these messages you will be interacting with the user who will tell you what they know about loops"
-                "Your task is to gauge the user understading of the loops and ask them a question that will help fill the knowledge gaps they have"
+                "After these messages you will be interacting with the user who will tell you what they know about for loops"
+                "Your task is to gauge the understading of the use on the topic of the {for loops} and ask them a question that will help fill the knowledge gaps they have"
                 "You will receive relevant information to answer a user's questions and then be asked to provide a response in form of a question. "
                 "All user messages will be prefixed with 'user:' and enclosed with ```. "
                 "When responding to the user, speak directly to them. "
-                "If the user has knowledge on loops, ask them to write code that demonstrate the use of loops, like displaying a range of numbers"
+                "If the user has understading of the for loops, ask them to write code that demonstrate the use of for loops, like displaying a range of numbers"
                 "Evaluate the response"
-                "If the user says they do not know about loops, ask them a question on topics that preceed loops"
+                "If the user says they do not know about loops, ask them a question on topics that preceed for loops"
+                "If the user is able to write the basic loops, give the user a complex task to solve with the for loop"
+                "At the end of the conversation give the user a programming task to practice their knowledge of the for loop"
                 " Do not deviate from this information or provide additional information that is not in the text returned by the functions."
                 )
             },
@@ -470,127 +472,45 @@ class LessonChat(Chat):
     def get_relevant_info(self, query):
  
         #If there is no query then use the last message from the user
+        #If there is no query then use the last message from the user
         if query=='':
             query = self.visible_messages[-1]["content"]
        
-        numberofarguments = 8
+        numberofarguments = 10
         sidebar_container = st.sidebar.container()
 
         similaritythreshold = 0.75
-        '''
-        if self.totalscore>=100:
-            ret_val = "The user has already won the game by getting the maximum score of 100. "
-            ret_val += "They are the winners!!!You will not respond more to arguments"
-            ret_val += "Tell the user to share the game with a friend or play again. "
-            with sidebar_container:
-            
-                st.write(f'You have won!')
-                st.write(f'Total score: 100')
-        
-            return ret_val '''
-        
-        if self.gameOver==True:
-            ret_val = "Thank the user for using the system "
-            #ret_val = f"Tell them their final score of {int(np.ceil(self.totalscore))}. "
-            '''            
-            with sidebar_container:
-            
-                st.write(f'Your argument is over.')
-                st.write(f'Final score: {int(np.ceil(self.totalscore))}')
-            '''
-            return ret_val
 
-        # This finds the argument that is most similar to the user's query
-        results = self.embeddings.search(query, top_n=numberofarguments)
-
-        # All the arguments are not relevant, so tell the user and return
+        # This finds some relevant information
+        results = self.embeddings.search(query, top_n=3)
+        st.write(results)
+        if results.iloc[0]['similarities'] >= similaritythreshold:
+            ret_val = "Here is a description of the a learner in terms of their knowledge: \n\n"
+            #ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"   
+            ret_val +="\n".join(results["assistant"].to_list())
+            #st.write(ret_val)
         if results.iloc[0]['similarities'] < similaritythreshold:
             ret_val = "\n\nThe user said:  \n"   
             ret_val +="\n".join(results["user"].to_list())
-            ret_val = "but this is not a releavant topic. "
-            ret_val += "Tell the user that they should stick to loops in C. "
-            with sidebar_container:
-                    st.write(f'Novelty: 0/{numberofarguments}')
+            ret_val = "but this is not a releavant area. "
+            ret_val += "Tell the user that they should try respond with the relevant topic. "
+            #with sidebar_container:
+                    #st.write(f'Novelty: 0/{numberofarguments}')
                     #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
             return ret_val
-
-        # Keep a track of similarity to previous arguments made
-        # Set to similaritythreshold as minimum.
-        #if len(self.argumentsMade) > 0:
-         #   previousArguments = results['step'].isin(self.argumentsMade)
-            #Check if previousArgumnets contains at least one True value
-          #  if previousArguments.any():
-           #     similaritytoprevious = results[previousArguments]['similarities'].mean()
-            #else:
-             #   similaritytoprevious = similaritythreshold
-       # else:
-        #    similaritytoprevious = similaritythreshold
-
-
-        # Remove the results that are in the argumentsMade list
-        #for argumentCode in self.argumentsMade:
-           # results = results[results["step"] != argumentCode]
-
-        # Remove the results where the overall argument does not match the overall stance
-        for r in results.iterrows():
-            assistant=r[1]['assistant']
-            overall = self.arguments.df[self.arguments.df['step']=='1.'].iloc[0]['overall']
-            results.at[r[0],'overall'] = overall     
-        results = results[results["overall"] == self.overallThesis]
-        #st.write(results)
-
-        # The first part of the originality score are number of arguments remaining unused, which shows relevance to the question.
-        self.originalityscore = len(results)/2
-
         if len(results) == 0:
-            ret_val = " Tell the user that they are no longer providing sufficiently answers to the posted questions. "
-            ret_val += "Tell the user that topics they can explore related to the presented topic. "
-            ret_val += "Then let them know what they have lernt " 
+            ret_val = " Tell the user that they are no longer providing relevant answers."
+            ret_val += "Tell the user that you have no further answers to their questions, but maybe next time they interact they can provide relevant topics. "
+            ret_val += "Then let them know that their final what they have learnt"
             with sidebar_container:
-                st.write(f'Game over! Try again.')
+                st.write(f'Lesson over! Try again.')
                 #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
             self.gameOver=True
 
             return ret_val
-
-        # Get the 10 best arguments which oppose the current stance.
-        currentArguments= []
-        for _,r in results.iterrows():    
-            argumentCode = r["step"]
-            currentArgumentsdf=self.arguments.get_arguments(argumentCode,'for loop')
-            currentArguments = currentArguments + list(currentArgumentsdf['assistant'])
-            if len(currentArguments) > 20:
-                break
         
-        # Remove that argument from the list of arguments
-        #self.argumentsMade.append(argumentCode)
-        #st.write(self.argumentsMade)
+        #return ret_val
 
-        # Add a score based on how original is compared to arguments made so far.
-        #with sidebar_container:
-           # part2 = 10*numberofarguments*(results.iloc[0]["similarities"]-similaritytoprevious)
-           # self.originalityscore = min(10.0,self.originalityscore+max(part2,0.0))
-            #st.write(f'Novelty: {int(np.ceil(self.originalityscore))}/{numberofarguments}')
-            #self.totalscore = self.totalscore+np.ceil(self.originalityscore)
-            #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
-    
-        if len(currentArguments) == 0:
-            ret_val = "Write at most one sentences prompting the user to gauge on their knowledge on loops. "
-        else:
-            ret_val = f"Here is a description of the questions you can ask, which is: {query}: \n\n"   
-            for a in currentArguments:
-                ret_val += a + "\n"
-            ret_val += "\n\nWrite one (or at most two) sentences prompting the learners understading of the topic concepts based on their previous response. "
-        
-        ret_val += "In the first sentence, restate the user's response. In the second sentence, ask the user a question based on their knowledge in loops that will help them grasp the concept of loops."
-        ret_val += "Always address the user directly as 'you' in the first person and write natural sounding lanaguage, with no headers. Write as if you are having a socratic conversation with the user."
-
-        ''' if self.totalscore>=100:
-            ret_val += "In addition to the above, also congratulate the user for getting the right answer. "
-            ret_val += "They are the Lerning!!! "
-            
-
-        return ret_val*/'''
     
     def get_input(self):
         """
