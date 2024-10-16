@@ -14,7 +14,7 @@ from classes.visual import DistributionPlot,DistributionPlotPersonality
 
 from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
-
+from classes.chat import PlayerChat
 import utils.sentences as sentences
 
 from utils.page_components import (add_common_page_elements)
@@ -31,6 +31,8 @@ sidebar_container = st.sidebar.container()
 
 st.divider()
 
+#data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
+
 persons = PersonStat()
 # Define the metrics we are interested in and calculates them
 metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
@@ -42,49 +44,37 @@ with st.expander("Dataframe"):
 
 person = select_person(sidebar_container, persons)
 
-description =  PersonDescription(person)
-st.write( description.get_description(person))
-
-visual = DistributionPlotPersonality(metrics)
-visual.add_title_from_person(person)
-
-st.write(person_stat.df)
-visual.add_persons(persons=person_stat,metrics=metrics)
-visual.add_person(person)
+#description =  PersonDescription(person)
+#st.write( description.get_description(person))
 
 
-'''
-# Now select the candidate
-player = select_player(sidebar_container, person) # TO CHANGE
 
-st.write("This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key.")
 
-st.expander("Dataframe used", expanded=False).write(data)
 
 # Chat state hash determines whether or not we should load a new chat or continue an old one
 # We can add or remove variables to this hash to change conditions for loading a new chat
 to_hash = (person.id,)
-
 # Now create the chat as type PlayerChat
-chat = create_chat(to_hash, PlayerChat, person, person) # TO CHANGE
+chat = create_chat(to_hash, PlayerChat, person, persons)
 
 # Now we want to add basic content to chat if it's empty
 if chat.state == "empty":
 
     # Make a plot of the distribution of the metrics for all players
     # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-
-    visual =DistributionPlotPersonality(metrics)
+    visual = DistributionPlotPersonality(metrics[::-1])
     visual.add_title_from_person(person)
-    visual.add_persons(metrics=metrics)
-    visual.add_person(person)
+    visual.add_persons(persons,metrics=metrics)
+    visual.add_person(person, len(persons.df),metrics=metrics)
+
     # Now call the description class to get the summary of the player
-    description = PersonDescription(person)
+    description =  PersonDescription(person)
+    st.write( description.get_description(person))
     summary = description.stream_gpt()
 
     # Add the visual and summary to the chat
     chat.add_message(
-        "Please can you summarise " + player.name + " for me?",
+        "Please can you summarise " + person.name + " for me?",
         role="user",
         user_only=False,
         visible=False,
@@ -97,4 +87,4 @@ if chat.state == "empty":
 # Now we want to get the user input, display the messages and save the state
 chat.get_input()
 chat.display_messages()
-chat.save_state()'''
+chat.save_state()
