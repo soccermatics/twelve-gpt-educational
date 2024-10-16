@@ -261,11 +261,21 @@ class PlayerChat(Chat):
 
 
 class WVSChat(Chat):
-    def __init__(self, chat_state_hash, country, countries, state="empty"):
+    def __init__(
+        self,
+        chat_state_hash,
+        country,
+        countries,
+        description_dict,
+        thresholds_dict,
+        state="empty",
+    ):
         # TODO:
         self.embeddings = CountryEmbeddings()
         self.country = country
         self.countries = countries
+        self.description_dict = description_dict
+        self.thresholds_dict = thresholds_dict
         super().__init__(chat_state_hash, state=state)
 
     def get_input(self):
@@ -311,7 +321,9 @@ class WVSChat(Chat):
             query = self.visible_messages[-1]["content"]
 
         ret_val = "Here is a description of the country in terms of data: \n\n"
-        description = CountryDescription(self.country)
+        description = CountryDescription(
+            self.country, self.description_dict, self.thresholds_dict
+        )
         ret_val += description.synthesize_text()
 
         # This finds some relevant information

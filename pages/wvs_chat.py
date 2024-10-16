@@ -127,7 +127,9 @@ else:
 # We can add or remove variables to this hash to change conditions for loading a new chat
 to_hash = (country.id,)
 
-chat = create_chat(to_hash, WVSChat, country, countries)
+chat = create_chat(
+    to_hash, WVSChat, country, countries, description_dict, thresholds_dict
+)
 
 # Now we want to add basic content to chat if it's empty
 if chat.state == "empty":
