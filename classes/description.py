@@ -357,11 +357,11 @@ class PersonDescription():
 
         
         name = person.name
-        extraversion = person_metrics['extraversion']
-        neuroticism = person_metrics['neuroticism']
-        agreeableness = person_metrics['agreeableness']
-        conscientiousness = person_metrics['conscientiousness']
-        openness = person_metrics['openness']
+        extraversion = person_metrics['extraversion_Z']
+        neuroticism = person_metrics['neuroticism_Z']
+        agreeableness = person_metrics['agreeableness_Z']
+        conscientiousness = person_metrics['conscientiousness_Z']
+        openness = person_metrics['openness_Z']
 
 
    
