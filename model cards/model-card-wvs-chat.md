@@ -20,16 +20,33 @@ Jump to section:
 
 ## Intended use
 
-The *primary use case* of this wordalisation is eductional. It shows how to convert a dataframe of statistics about a countries into a text about a chosen country. This version cannot be used for insight generation purposes, i.e. data analysis, firstly because we do not guarantee the quality of the data and because the functionality is limited. Data analysis is thus *out of scope*. Use of the chat for queries not relating to the data at hand is also *out of scope*. 
+The *primary use case* of this wordalisation is eductional. 
+It shows how to convert a dataframe of statistics about a countries into a text about a chosen country.
+This version cannot be used for insight generation purposes, i.e. data analysis, firstly because we do not guarantee the quality of the data and because the functionality is limited. 
+Data analysis is thus *out of scope*. Use of the chat for queries not relating to the data at hand is also *out of scope*. 
 
 ## Factors
 
-The Football Scout Wordalisation is applied to a very specific demographic group, namely male professional football players. This version is only for use within that group and thus excludes female atheletes. The ethnicity and social background of the players is not documented, but can be (anecdotely) considered to be more diverse than that of the English population as a whole (the Premier League is played in England). Players come from all over the world to play in the Premier League. The dataset was chosen because of avialability of a public dataset and because of the fact that the players will be recognisable names for many users. 
+
 
 ## Datasets
 
-The dataframe used in this project was constructed from a dataset ... 
-A *preprocessing* step, largely based on ...
+The data used in this project was constructed from the [World Value Survey Wave 7 (2017-2022)](https://www.worldvaluessurvey.org/WVSDocumentationWV7.jsp).
+The data consists of coded answers to a questionnaire, which was taken by participants from 66 countries with sample sizes varying from 447 in Northern Ireland to 3200 in Indonesia.
+From this raw data we constructed 7 metrics or qualities:
+* "Traditional vs Secular Values"$^1$ 
+* "Survival vs Self-expression Values"$^1$
+* "Neutrality"$^2$
+* "Fairness"$^2$
+* "Skepticism"$^2$
+* "Societal Tranquility"$^2$
+
+These metrics were calculated according to []()$^1$ and [Allison (2021)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0245231)$^2$.
+We note that because of the coding of answers to the questionnaire some considerable *preprocessing* was necessary to construct these metrics. Our preprocessing pipeline is available as a [Github repository](https://github.com/BeimnetGirma/wvs-data). 
+
+The above metrics are intended to aggregate the answers to several questions in order to provide a more general insight into a country's values. For example, is a country more traditional or secular? 
+
+In addition to the metrics we also provide question and answer pairs for the chatbot. These are intended to provide insight into the data and the metrics which can be found in the [WVS_qualities](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx) spreadsheet.
 
 ## Model
 
@@ -64,11 +81,15 @@ The wordalisation supports both GPT4o and ChatGPT and related APIs, as well as G
 
 No systematic *quantitative analyses* have been carried out on this wordalisation. Ideally, this wordalisation should be subjected to a rigorous *qualitative test* of:
 - Reliability of information. Are there factual errors in the text?
-- Biases. Does the wordalisation use social or ethnic features of the players to create the texts?
+- Biases. Does the WVS chatbot make bias statements based on 'knowledge' not present in the wordalisation?
 
 ## Ethical considerations
 
-Severel ethical challenges have arisen in this project. As noted above, there in a gender disparity in the data used. Several datasets for women's football are available and could be easily adapted to the framework here. There is also the issue of the effect such applications can have on the people who this data is about. This application deals with data collected on football players and uses it to assess their performance. Players' performances in the Premier League are regularly scrutinised in the media and on social media platforms. Informal discussions by the wordalisations creators with professional football scouts have suggested that the resulting texts can be "too positive" for professional settings, where clubs have to make important financial decisions based on performance. Nevertheless, this does not take away from the fact that the players analysed here are living human beings, whose performance is being evaluated in words by an automated system that does not understand broader factors around their lives. Careful consideration should be made if applying these methods to data collected on atheletes in environments where this type of scruitiny isn't the norm.
+The World Value Survey is based on questionnaires filled out by individuals from different countries. The sets of individuals are relatively small compared to the populations of the countries. 
+Further, the questionnaires where given in a limited number of languages for each country, potentially excluding some groups of the population.
+Therefore, the data can only give a rough indication of the attitudes of a population. The summaries generated by no means reflect the beliefs and attitudes of any given individual.
+Furthermore, it is debatable whether the derived metrics give any accurate insight and we would urge users to consider them within the research context in which they were derived, see [Datasets](#datasets).
+
 
 ## Caveats and recommendations
 

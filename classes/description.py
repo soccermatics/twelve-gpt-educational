@@ -363,7 +363,8 @@ class CountryDescription(Description):
 
         for metric in metrics:
 
-            description += f"{country.name.capitalize()} scored "
+            # TODO: customize this text?
+            description += f"{country.name.capitalize()} was found to be "
             description += sentences.describe_level(
                 country.ser_metrics[metric + "_Z"],
                 thresholds=self.thresholds_dict[metric],

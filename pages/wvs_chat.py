@@ -51,6 +51,7 @@ description_dict = {
         "neither traditional nor secular",
         "above averagely traditional",
         "very traditional",
+        "extremely traditional",
     ],
     "Survival vs Self-expression Values": [
         "extremely self-expression orientated",
@@ -59,6 +60,7 @@ description_dict = {
         "neither survival nor self-expression orientated",
         "some what survival orientated",
         "very survival orientated",
+        "extremely survival orientated",
     ],
     "Neutrality": [
         "extremely high",
@@ -67,6 +69,7 @@ description_dict = {
         "average",
         "below average",
         "very low",
+        "extremely low",
     ],
     "Fairness": [
         "extremely high",
@@ -75,6 +78,7 @@ description_dict = {
         "average",
         "below average",
         "very low",
+        "extremely low",
     ],
     "Skeptisism": [
         "extremely high",
@@ -83,6 +87,7 @@ description_dict = {
         "average",
         "below average",
         "very low",
+        "extremely low",
     ],
     "Societal Tranquility": [
         "extremely high",
@@ -91,6 +96,7 @@ description_dict = {
         "average",
         "below average",
         "very low",
+        "extremely low",
     ],
 }
 
@@ -103,6 +109,7 @@ thresholds_dict = dict(
             0.5,
             -0.5,
             -1,
+            -1.5,
         ],
     )
     for metric in metrics
