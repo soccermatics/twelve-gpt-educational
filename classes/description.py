@@ -386,7 +386,7 @@ class LessonDescription(Description):
             {
             "role": "system", "content": (
                 "You are an instructor bot teaching a human learner in a socratic way "
-                " You instruct on  " + self.topic + " topic."
+                " You instruct on  for loop topic."
                 "Instead of providing a direct answer, guide the user into thinking and explaining the concepts about the topic"
                 "Depeding on the user respose, generate questions to test if the user has understood the concept"
                 )
@@ -415,11 +415,13 @@ class LessonDescription(Description):
 
     def synthesize_text(self):
 
-        description = f"Here are some topics {self.topic} to be thought: {self.currentState}. \n\n "
+        message=pd.read_excel(self.gpt_examples_path)
 
-        for i,argument in self.topic.iterrows():
+        description = f"Here are some examples {message['user']} on how you can respond \n\n "
+
+        for i,argument in message.iterrows():
             
-            description += argument['user'] + ". "
+            description += argument['assistant'] + ". "
 
         return description
 
@@ -428,11 +430,8 @@ class LessonDescription(Description):
             f"Please use the information enclosed with ``` to give a concise, 2 sentence response to the user. "
             #f"instructions {self.topic} the the topic is {self.currentState}."
             f"The first sentence should be an appreciation of what the user has answered on {self.topic} topic. The next statement should be a question asking the user on concepts that build up to the current topic"
-            f"your main response should be one question asking the user on knowledge based on the previous responce"
-            "Assess the user understading of the topic based on the topic, if there is a gap ask the user a question that will help them understand the gap in knowledge "
-            #f"each response should end with a question that will prompt the user do something that will enhance their knowledge"
-            #f"but prompt them to provide yo with the solutions. If they got the wrong answer or do not know about the topic prompt them on pre-requisite knowledge on the  {self.topic} topic."
-            #"For example if the learner says they do not know anything about loops, ask them what they know about variables. Address the user directly. "
-            #f"Do not give a prelude to what you are going to do or respond to this request with words like 'certainly'."
+            f"your main response should be one question asking the user on knowledge based on the previous response"
+            f"Assess the user understading of the topic based on their response, if there is a gap ask the user a question that will help them understand the gap in knowledge "
+       
         )
         return [{"role": "user", "content": prompt}]

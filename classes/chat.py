@@ -426,10 +426,6 @@ class LessonChat(Chat):
     def __init__(self, chat_state_hash, overallThesis,arguments, state="empty",gameOver=False):
         self.embeddings = LessonEmbeddings()
         self.arguments =arguments
-        #stanceSwap = {'Pro': 'Con', 'Con': 'Pro'}
-        #self.stance = stanceSwap[userstance]
-        #self.userOverallStance = userstance
-        #self.argumentsMade = argumentsMade
         self.overallThesis =overallThesis
         self.gameOver=gameOver
 
@@ -452,17 +448,17 @@ class LessonChat(Chat):
                 )
             },
             {"role": "user", "content": (
-                "After these messages you will be interacting with the user who will tell you what they know about for loops"
-                "Your task is to gauge the understading of the use on the topic of the {for loops} and ask them a question that will help fill the knowledge gaps they have"
-                "You will receive relevant information to answer a user's questions and then be asked to provide a response in form of a question. "
-                "All user messages will be prefixed with 'user:' and enclosed with ```. "
-                "When responding to the user, speak directly to them. "
-                "If the user has understading of the for loops, ask them to write code that demonstrate the use of for loops, like displaying a range of numbers"
-                "Evaluate the response"
-                "If the user says they do not know about loops, ask them a question on topics that preceed for loops"
-                "If the user is able to write the basic loops, give the user a complex task to solve with the for loop"
-                "At the end of the conversation give the user a programming task to practice their knowledge of the for loop"
-                " Do not deviate from this information or provide additional information that is not in the text returned by the functions."
+                f"After these messages you will be interacting with the user who will tell you what they know about for loops"
+                f"Your task is to gauge the understading of the use on the topic of the for loops and ask them a question that will help fill the knowledge gaps they have"
+                f"You will receive relevant information to answer a user's questions and then be asked to provide a response in form of a question. "
+                f"All user messages will be prefixed with 'user:' and enclosed with ```. "
+                f"When responding to the user, speak directly to them. "
+                f"If the user has understading of the for loops, ask them to write code that demonstrate the use of for loops, like displaying a range of numbers"
+                f"Evaluate the response, and check for syntax and logical errors in the student submission"
+                f"If the user says they do not know about loops, ask them a question on topics that preceed for loops"
+                f"If the user is able to write the basic loops, give the user a complex task to solve with the for loop"
+                f"At the end of the conversation give the user a programming task to practice their knowledge of the for loop"
+                f"Do not deviate from this information or provide additional information that is not in the text returned by the functions."
                 )
             },
         ]

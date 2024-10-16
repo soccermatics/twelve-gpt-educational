@@ -88,7 +88,6 @@ if chat.state == "empty":
     #Gets the arguments at current level and supporting arguments one below.
     currentArguments= lesson.get_arguments(overall,overallThesis )
     #st.write(overallThesis)
-    #st.write(currentArguments)
     description = LessonDescription(chat.state, currentArguments,overallThesis)
     summary = description.stream_gpt()
 
