@@ -41,12 +41,13 @@ From this raw data we constructed 7 metrics or qualities:
 * "Skepticism"$^2$
 * "Societal Tranquility"$^2$
 
-These metrics were calculated according to []()$^1$ and [Allison (2021)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0245231)$^2$.
+These metrics were calculated according to Ingelhart (2005)[1] and Allison (2021)[2], for metrics indicated by $^1$ and $^2$ respectively.
 We note that because of the coding of answers to the questionnaire some considerable *preprocessing* was necessary to construct these metrics. Our preprocessing pipeline is available as a [Github repository](https://github.com/BeimnetGirma/wvs-data). 
 
 The above metrics are intended to aggregate the answers to several questions in order to provide a more general insight into a country's values. For example, is a country more traditional or secular? 
 
-In addition to the metrics we also provide question and answer pairs for the chatbot. These are intended to provide insight into the data and the metrics which can be found in the [WVS_qualities](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx) spreadsheet.
+In addition to the metrics we also provide question and answer pairs for the chatbot. These are intended to provide insight into the data and can be found in the [WVS_qualities](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx) spreadsheet.
+
 
 ## Model
 
@@ -95,3 +96,9 @@ Furthermore, it is debatable whether the derived metrics give any accurate insig
 
 We have no further caveats and recommendations.
 
+
+## References
+
+[1] Ingelhart, R. and Welzel, C., 2005. Modernization, cultural change, and democracy: The human development sequence.
+
+[2] Allison, L., Wang, C. and Kaminsky, J., 2021. Religiosity, neutrality, fairness, skepticism, and societal tranquility: A data science analysis of the World Values Survey. Plos one, 16(1), p.e0245231.
