@@ -158,7 +158,8 @@ class PersonStat(Stats):
         super().__init__()
     
     def get_raw_data(self):
-        df = pd.read_csv('data/data-final.csv',sep='\t',encoding='unicode_escape').sample(frac=0.0001)
+        #df = pd.read_csv('data/data-final.csv',sep='\t',encoding='unicode_escape').sample(frac=0.0001)
+        df = pd.read_csv('data/data_raw.csv',sep='\t',encoding='unicode_escape')
         return df
       
 
