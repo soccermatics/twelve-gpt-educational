@@ -271,11 +271,11 @@ class PersonDescription():
 
     @property
     def gpt_examples_path(self):
-        return f"{self.gpt_examples_base}/Forward.xlsx"
+        return f"{self.gpt_examples_base}/Forward_bigfive.xlsx"
 
     @property
     def describe_paths(self):
-        return [f"{self.describe_base}/Forward.xlsx"]
+        return [f"{self.describe_base}/Forward_bigfive.xlsx"]
 
     def __init__(self, person: Person):
         self.person = person
@@ -301,9 +301,7 @@ class PersonDescription():
             {
                 "role": "assistant",
                 "content": (
-                    "I refer to the game as football. "
-                    "When I say football, I don't mean American football, I mean what Americans call soccer. "
-                    "But I always talk about football, as people do in the United Kingdom."
+                    "I refer to the person as candidate. "
                 ),
             },
         ]
@@ -476,9 +474,15 @@ class PersonDescription():
         return text
 
     
+    def synthesize_text(self):
+        person=self.person
+        description = self.get_description(person)
+
+        return description
+    
     def get_prompt_messages(self):
         prompt = (
-            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the player's playing style, strengths and weaknesses. "
+            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the person's personality, strengths and weaknesses. "
             f"The first sentence should use varied language to give an overview of the player. "
             "The second sentence should describe the player's specific strengths based on the metrics. "
             "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
