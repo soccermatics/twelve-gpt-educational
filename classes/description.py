@@ -331,7 +331,7 @@ class PersonDescription():
         elif (value > -0.5) & (value <= 0.5):
             text = 'The candidate is relatively '
         elif (value > 0.5) & (value <= 1):
-            text = 'The candidate is quite'
+            text = 'The candidate is quite '
         elif (value > 1) & (value <= 2):
             text = 'The candidate is very '
         elif value > 2:
