@@ -46,6 +46,8 @@ metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 
 
 visual = DistributionPlotPersonality(metrics)
 visual.add_title_from_person(person)
+
+st.write(person_stat.df)
 visual.add_persons(persons=person_stat,metrics=metrics)
 visual.add_person(person)
 
