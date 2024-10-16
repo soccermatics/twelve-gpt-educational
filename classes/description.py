@@ -289,7 +289,7 @@ class PlayerDescription(Description):
 # -------------------------------------------------------------------------------------------------------------------------------
 
 
-class PersonDescription():
+class PersonDescription(Description):
     output_token_limit = 150
 
     @property
