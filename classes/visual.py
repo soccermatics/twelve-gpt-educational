@@ -8,7 +8,7 @@ import pandas as pd
 from utils.sentences import format_metric
 
 from classes.data_point import Player, Person
-from classes.data_source import PlayerStats, StatPersonality, DataPersonality, PersonStat
+from classes.data_source import PlayerStats, PersonStat
 
 
 
