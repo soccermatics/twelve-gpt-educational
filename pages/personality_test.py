@@ -31,8 +31,6 @@ sidebar_container = st.sidebar.container()
 
 st.divider()
 
-#data = pd.read_csv("data/events/dataset.csv",encoding='unicode_escape')
-
 persons = PersonStat()
 # Define the metrics we are interested in and calculates them
 metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
@@ -69,7 +67,6 @@ if chat.state == "empty":
 
     # Now call the description class to get the summary of the player
     description =  PersonDescription(person)
-    st.write( description.get_description(person))
     summary = description.stream_gpt()
 
     # Add the visual and summary to the chat
