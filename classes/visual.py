@@ -289,7 +289,7 @@ class DistributionPlotPersonality(Visual):
             legend = False
 
             self.fig.add_annotation(
-                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f} per 90</span>", showarrow=False,
+                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f}</span>", showarrow=False,
                 font={"color": rgb_to_color(self.white), "family": "Gilroy-Light",
                         "size": 12 * self.font_size_multiplier},
             )
