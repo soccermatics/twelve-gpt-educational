@@ -319,22 +319,20 @@ class PersonDescription():
 
 
     def categorie_description(self, value):
-        text = ''
         if value <= -2:
-            text = 'The candidate is extremely '
-        elif (value < -2) & (value <= -1):
-            text = 'The candidate is very '
-        elif (value > -1) & (value <= -0.5):
-            text = 'The candidate is quite '
-        elif (value > -0.5) & (value <= 0.5):
-            text = 'The candidate is relatively '
-        elif (value > 0.5) & (value <= 1):
-            text = 'The candidate is quite '
-        elif (value > 1) & (value <= 2):
-            text = 'The candidate is very '
-        elif value > 2:
-            text = 'The candidate is extremely '    
-        return text
+            return 'The candidate is extremely '
+        elif -2 < value <= -1:
+            return 'The candidate is very '
+        elif -1 < value <= -0.5:
+            return 'The candidate is quite '
+        elif -0.5 < value <= 0.5:
+            return 'The candidate is relatively '
+        elif 0.5 < value <= 1:
+            return 'The candidate is quite '
+        elif 1 < value <= 2:
+            return 'The candidate is very '
+        else: 
+            return 'The candidate is extremely '
 
     def all_max_indices(self, row):
         max_value = row.max()
