@@ -121,13 +121,9 @@ Furthermore, it is debatable whether the derived metrics give any accurate insig
 ## Caveats and recommendations
 
 We have no further caveats and recommendations.
-<<<<<<< HEAD
-=======
 
 ## References
 
 [1] Ingelhart, R. and Welzel, C., 2005. Modernization, cultural change, and democracy: The human development sequence.
 
 [2] Allison, L., Wang, C. and Kaminsky, J., 2021. Religiosity, neutrality, fairness, skepticism, and societal tranquility: A data science analysis of the World Values Survey. Plos one, 16(1), p.e0245231.
-
-> > > > > > > 8de9a07ed0cab9d434b940e3194c891d7f4659fa
