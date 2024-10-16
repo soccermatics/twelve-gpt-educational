@@ -25,6 +25,8 @@ Data analysis is thus _out of scope_. Use of the chat for queries not relating t
 
 ## Factors
 
+The World Value Survey Analysis Wordalisation to 66 countries that took part in the 2017-2022 survey. We would like to state that any conversations about countries not included in the survey are not guaranteed to hold any merit. We would also like note that the participants of these surveys are only a small sample of the population with the biggest sample from a given country being 4000. Therefore, the values presented here cannot be reprentative of a an entire population of a country.
+
 ## Datasets
 
 The data used in this project was constructed from the [World Value Survey Wave 7 (2017-2022)](https://www.worldvaluessurvey.org/WVSDocumentationWV7.jsp).
