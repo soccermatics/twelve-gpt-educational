@@ -1,7 +1,7 @@
 # Model card for Personality Test Wordalisation
 
 The Personality GPT is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and
-is intended as an illustration of the methods. Here we detail the specific application to the Personality Test interpretation. It is thus intended as an example to help others building wordalisations. The wordalisations describe a person based on their answers to a personality test. Here is an example about what could be done for a job position, when the recruiter gives the personality test to a candidate. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens. 
+is intended as an illustration of the methods. Here we detail the specific application to the Personality Test interpretation. It is thus intended as an example to help others building wordalisations. The wordalisations describe a person based on their answers to a personality test. Here is an example about what could be done for a job position, when the recruiter gives the personality test to a candidate. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, and was adapted for the Personality Test by Amandine Caut.
 
 This model card is based on the [model cards paper](https://arxiv.org/abs/1810.03993) and is adapted specifically to Wordalisation applications as detailed in [Representing data in words](publication here). We also provide this model card as an example of 
 good practice for describing wordalisations.
@@ -22,11 +22,12 @@ The *primary use case* of this wordalisation is eductional. It shows how to conv
 
 ## Factors
 
-The dataset was chosen because of avialability of a public dataset. 
+The dataset was chosen because of avialability of a public dataset.
 
 ## Datasets
 
-The dataframe used in this project was constructed from 1,015,342 questionnaire answers collected online by Open Psychometrics ([https://www.kaggle.com/datasets/tunguz/big-five-personality-test]). A *preprocessing* to clean the dataset is included in data_source.py
+The dataframe used in this project was constructed from 1,015,342 questionnaire answers collected online by Open Psychometrics ([https://www.kaggle.com/datasets/tunguz/big-five-personality-test]). A *preprocessing* to clean the dataset is included in data_source.py.
+There are 50 questions in 5 categories: Extraversion, Neuroticism, Agreeableness, Conscientiousness , Openness. The sum of the 10 questions in each category results in a score ranging from 0 to 40. Following professional guidelines, we apply a scoring adjustment at the end of each category, referencing the scoring table provided(reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf).Afterward, we calculate the z-score for each category's final score.
 
 ## Model
 
