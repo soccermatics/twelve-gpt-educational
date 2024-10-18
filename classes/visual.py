@@ -253,7 +253,7 @@ class DistributionPlotPersonality(Visual):
                     },
                     hovertemplate='%{text}<br>'+temp_hover_string+'<extra></extra>',
                     text=names,
-                    customdata=df_plot[col+hover],
+                    customdata=round(df_plot[col+hover]),
                     name=legend,
                     showlegend=showlegend,
                 )
@@ -271,6 +271,7 @@ class DistributionPlotPersonality(Visual):
 
         for i, col in enumerate(self.columns):
             temp_hover_string = hover_string
+         
 
             metric_name = format_metric(col)
 
@@ -281,7 +282,7 @@ class DistributionPlotPersonality(Visual):
                     marker={"color": rgb_to_color(color, opacity=0.5), "size": 10, "symbol": marker, "line_width": 1.5, "line_color": rgb_to_color(color)},
                     hovertemplate='%{text}<br>'+temp_hover_string+'<extra></extra>',
                     text=text,
-                    customdata=[ser_plot[col+hover]],
+                    customdata=[round(ser_plot[col+hover])],
                     name=name,
                     showlegend=legend
                 )
@@ -289,7 +290,7 @@ class DistributionPlotPersonality(Visual):
             legend = False
 
             self.fig.add_annotation(
-                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {ser_plot[col]:.2f}</span>", showarrow=False,
+                x=0, y=i + 0.4, text=f"<span style=''>{metric_name}: {int(ser_plot[col]):.0f}</span>", showarrow=False,
                 font={"color": rgb_to_color(self.white), "family": "Gilroy-Light",
                         "size": 12 * self.font_size_multiplier},
             )
@@ -324,9 +325,10 @@ class DistributionPlotPersonality(Visual):
     
     def add_title_from_person(self, person: Person):            
         self.person = person
-        title = f"Evaluation of {person.name}?"
+        title = f"Evaluation of {person.name}"
         subtitle = f"Based on Big Five scores"
         self.add_title(title, subtitle)
+
 
 
 
