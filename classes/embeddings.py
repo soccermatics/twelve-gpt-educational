@@ -95,7 +95,7 @@ class PersonEmbeddings(Embeddings):
         df_embeddings_dict = dict()
 
         files = [
-            "Forward",
+            "Forward_bigfive",
         ]
 
         df_embeddings = pd.DataFrame()
