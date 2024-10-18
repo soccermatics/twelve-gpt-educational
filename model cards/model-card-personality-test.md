@@ -45,7 +45,7 @@ The prompt to *tell it who it is* identifies a human role for the wordalisation 
 
 In the text which is generated at the stage of *tell it what data to use* we use the following function to translate z-scores to evaluation words:
 ```python
-    def categorie_description(self, value):
+    def category_description(self, value):
         if value <= -2:
             return 'The candidate is extremely '
         elif -2 < value <= -1:
