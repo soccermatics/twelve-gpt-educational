@@ -14,7 +14,7 @@ from classes.visual import DistributionPlot,DistributionPlotPersonality
 
 from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
-from classes.chat import PlayerChat
+from classes.chat import PersonChat
 import utils.sentences as sentences
 
 from utils.page_components import (add_common_page_elements)
@@ -52,8 +52,8 @@ person = select_person(sidebar_container, persons)
 # Chat state hash determines whether or not we should load a new chat or continue an old one
 # We can add or remove variables to this hash to change conditions for loading a new chat
 to_hash = (person.id,)
-# Now create the chat as type PlayerChat
-chat = create_chat(to_hash, PlayerChat, person, persons)
+# Now create the chat as type PersonChat
+chat = create_chat(to_hash, PersonChat, person, persons)
 
 # Now we want to add basic content to chat if it's empty
 if chat.state == "empty":
