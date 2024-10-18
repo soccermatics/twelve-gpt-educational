@@ -289,6 +289,7 @@ class PlayerDescription(Description):
 # -------------------------------------------------------------------------------------------------------------------------------
 
 
+
 class PersonDescription(Description):
     output_token_limit = 150
 
@@ -305,6 +306,7 @@ class PersonDescription(Description):
         super().__init__()
 
 
+
     def get_intro_messages(self) -> List[Dict[str, str]]:
         """
         Constant introduction messages for the assistant.
@@ -317,14 +319,21 @@ class PersonDescription(Description):
                 "role": "system",
                 "content": (
                     "You are a recruiter. "
-                    "You use the information given to you from the data and answers "
+                    "You provide succinct and to the point explanations about a candiate using data.  "
+                    "You use the information given to you from the data and answers"
                     "to earlier user/assistant pairs to give summaries of candidates."
                 ),
             },
             {
+                "role": "user",
+                "content": "Do you refer to the candidate as a candidate or a person?",
+            },
+            {
                 "role": "assistant",
                 "content": (
-                    "I refer to the person as candidate. "
+                    "I refer to the candidate as a person. "
+                    "When I say candidate, I mean person. "
+                    "But I always talk about the candidate, as a person."
                 ),
             },
         ]
@@ -381,11 +390,6 @@ class PersonDescription(Description):
         agreeableness = person_metrics['agreeableness_Z']
         conscientiousness = person_metrics['conscientiousness_Z']
         openness = person_metrics['openness_Z']
-
-
-   
-
-      
         
         text = []
 
@@ -497,6 +501,7 @@ class PersonDescription(Description):
     
     def synthesize_text(self):
         person=self.person
+        metrics = self.person.ser_metrics
         description = self.get_description(person)
 
         return description
