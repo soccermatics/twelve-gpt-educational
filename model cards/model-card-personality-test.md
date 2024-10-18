@@ -27,7 +27,7 @@ The dataset was chosen because of avialability of a public dataset.
 ## Datasets
 
 The dataframe used in this project was constructed from 1,015,342 questionnaire answers collected online by Open Psychometrics ([https://www.kaggle.com/datasets/tunguz/big-five-personality-test]). A *preprocessing* to clean the dataset is included in data_source.py.
-There are 50 questions in 5 categories: Extraversion, Neuroticism, Agreeableness, Conscientiousness , Openness. The sum of the 10 questions in each category results in a score ranging from 0 to 40. Following professional guidelines, we apply a scoring adjustment at the end of each category, referencing the scoring table provided(reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf).Afterward, we calculate the z-score for each category's final score.
+There are 50 questions in 5 categories: Extraversion, Neuroticism, Agreeableness, Conscientiousness , Openness. The sum of the 10 questions in each category results in a score ranging from 0 to 40. Following professional guidelines, we apply a scoring adjustment at the end of each category, referencing the scoring table provided(reference to scoring: [https://openpsychometrics.org/printable/big-five-personality-test.pdf].Afterward, we calculate the z-score for each category's final score.
 
 ## Model
 
