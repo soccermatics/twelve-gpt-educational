@@ -18,22 +18,25 @@ Jump to section:
 
 ## Intended use
 
-The *primary use case* of this wordalisation is eductional. It shows how to convert a dataframe of personality test statistics about a person into a text about that person, which might be used by a recruiter. A *secondary use case* might be for users to understand more about the Big Five personality test.However, this version is not suitable for professional use, such as by a recruiter, primarily because it lacks the expertise of a licensed psychologist and also because its functionality is limited. Professional use is thus *out of scope*. Use of the chat for queires not relating to the data at hand is also *out of scope*. 
+The *primary use case* of this wordalisation is eductional. It shows how to convert a dataframe of personality test statistics about a person into a text about that person, which might be used by a recruiter. A *secondary use case* might be for users to understand more about the Big Five personality test. However, this version is not suitable for professional use, such as by a recruiter, primarily because it lacks the expertise of a licensed psychologist and also because its functionality is limited. Professional use is thus *out of scope*. Use of the chat for queires not relating to the data at hand is also *out of scope*. 
 
 ## Factors
 
 The dataset was chosen because of avialability of a public dataset.
 
 ## Datasets
+The dataset used in this project was sourced from Kaggle's open dataset repository [www.kaggle.com/datasets/tunguz/big-five-personality-test]. It consists of 1,015,342 questionnaire responses, collected online by Open Psychometrics. Respondents answered questions on a scale from 1 to 5, where: 1 = Strongly Disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree.
 
-The dataframe used in this project was constructed from 1,015,342 questionnaire answers collected online by Open Psychometrics ([https://www.kaggle.com/datasets/tunguz/big-five-personality-test]). A *preprocessing* to clean the dataset is included in data_source.py.
-There are 50 questions in 5 categories: Extraversion, Neuroticism, Agreeableness, Conscientiousness , Openness. The sum of the 10 questions in each category results in a score ranging from 0 to 40. Following professional guidelines, we apply a scoring adjustment at the end of each category, referencing the scoring table provided(reference to scoring: [https://openpsychometrics.org/printable/big-five-personality-test.pdf].Afterward, we calculate the z-score for each category's final score.
+The dataset goes to a preprocessing cleaning which is handled in the data\_source.py script.
+There are 50 questions divided into five categories: Extraversion, Neuroticism, Agreeableness, Conscientiousness, and Openness. Each question is associated with a weight of either +1 or -1, as determined by Open Psychometrics [https://openpsychometrics.org/printable/big-five-personality-test.pdf]. The answers to each question are multiplied by its respective weight.
+
+For each personality category, the score is calculated by summing the responses to the 10 questions in that category. An additional scoring adjustment is applied, resulting in a final score that ranges from 0 to 40 for each category. Subsequently, we compute the z-score for each category's final score, normalizing the results to allow for comparisons across individuals and categories.
 
 ## Model
 
 ### Quantitative model
 
-The model applies a ranking on the persons in the dataset based on the z-scores. For each metric a z-scoure is calculated by 
+The model applies a ranking on the persons in the dataset based on the z-scores. For each metric a z-score is calculated by 
 subtracting the mean and dividing by the standard deviation over all persons in the dataset. The persons are then displayed in a distribution
 plot with the selected persons highlighted. 
 
