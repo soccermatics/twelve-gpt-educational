@@ -131,7 +131,7 @@ def select_country(container, countries):
     # Make a copy of Players object
     country = copy.deepcopy(countries)
 
-    rnd = int(country.select_random())
+    # rnd = int(country.select_random()) # does not work because of page refresh!
     # Filter country by position and select a player with sidebar selectors
     with container:
 
@@ -139,7 +139,7 @@ def select_country(container, countries):
         country.select_and_filter(
             column_name="country",
             label="Country",
-            default_index=rnd,  # randomly select a country for default
+            # default_index=rnd,  # randomly select a country for default
         )
 
         # Return data point
