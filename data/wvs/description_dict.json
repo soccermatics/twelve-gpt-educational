@@ -1,0 +1,56 @@
+{
+    "Traditional vs Secular Values": [
+        "have extremely secular values",
+        "have very secular values",
+        "have above averagely secular values",
+        "have neither strongly traditional nor strongly secular values",
+        "have above averagely traditional values",
+        "have very traditional values",
+        "have extremely traditional values"
+    ],
+    "Survival vs Self-expression Values": [
+        "value self-expression extremely highly",
+        "value self-expression very highly",
+        "have an above average value of self-expression",
+        "have neither survival orientated nor self-expression orientated values",
+        "have above average survival orientated values",
+        "be very survival orientated",
+        "be extremely survival orientated"
+    ],
+    "Neutrality": [
+        "be extremely neutral",
+        "be very neutral",
+        "be above averagely neutral",
+        "be averagely neutral",
+        "be below averagely neutral",
+        "score very low on neutrality",
+        "score extremely low on neutrality"
+    ],
+    "Fairness": [
+        "value fairness extremely highly",
+        "value fairness very highly",
+        "value fairness above averagely",
+        "value fairness averagely",
+        "have a bellow average value of fairness",
+        "have a very low value of fairness",
+        "have an extremely low value of fairness"
+    ],
+    "Skeptisism": [
+        "be extremely skeptical",
+        "be very skeptical",
+        "be above averagely skeptical",
+        "be neither skeptical nor trusting",
+        "have a below average score on skepticism",
+        "have a very low score on skepticism",
+        "have an extremely low score on skepticism"
+    ],
+    "Societal Tranquility": [
+        "be extremely tranquil",
+        "be very tranquil",
+        "be above averagely tranquil",
+        "be averagely tranquil",
+        "be bellow averagely tranquil",
+        "score very low on tranquility",
+        "score extremely low on tranquility"
+    ]
+}

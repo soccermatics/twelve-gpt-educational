@@ -17,6 +17,9 @@ def load_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+import json
+import pandas as pd
+
 # def show():
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
@@ -29,6 +32,9 @@ countries = CountryStats()
 metrics = [m for m in countries.df.columns if m not in ["country"]]
 
 countries.calculate_statistics(metrics=metrics)
+
+# save countries.df to csv
+# countries.df.to_csv("data/wvs/countries.csv", index=False)
 
 country = select_country(sidebar_container, countries)
 
@@ -50,73 +56,19 @@ st.expander("Model card", expanded=False).markdown(model_card_text)
 
 st.expander("Dataframe used", expanded=False).write(countries.df)
 
-description_dict = {
-    "Traditional vs Secular Values": [
-        "extremely secular",
-        "very secular",
-        "above averagely secular",
-        "neither traditional nor secular",
-        "above averagely traditional",
-        "very traditional",
-        "extremely traditional",
-    ],
-    "Survival vs Self-expression Values": [
-        "extremely self-expression orientated",
-        "very self-expression orientated",
-        "above averagely self-expression orientated",
-        "neither survival nor self-expression orientated",
-        "some what survival orientated",
-        "very survival orientated",
-        "extremely survival orientated",
-    ],
-    "Neutrality": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-    "Fairness": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-    "Skeptisism": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-    "Societal Tranquility": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-}
+with open("data/wvs/description_dict.json", "r") as f:
+    description_dict = json.load(f)
 
 thresholds_dict = dict(
     (
         metric,
         [
+            2.5,
             1.5,
-            1,
             0.5,
             -0.5,
-            -1,
             -1.5,
+            -2.5,
         ],
     )
     for metric in metrics
