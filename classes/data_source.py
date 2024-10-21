@@ -44,10 +44,10 @@ class Data:
         raw = self.get_raw_data()
         return self.process_data(raw)
 
-    def select_and_filter(self, column_name, label):
+    def select_and_filter(self, column_name, label, default_index=0):
 
         df = self.df
-        selected_id = st.selectbox(label, df[column_name].unique())
+        selected_id = st.selectbox(label, df[column_name].unique(), index=default_index)
         self.df = df[df[column_name] == selected_id]
 
 
@@ -172,6 +172,10 @@ class CountryStats(Stats):
         self.core_value_dict = self.core_value_dict.set_index("value")["name"].to_dict()
 
         super().__init__()
+
+    def select_random(self):
+        # return the index of the random sample
+        return self.df.sample(1).index[0]
 
     def get_raw_data(self):
 
@@ -399,9 +403,15 @@ class CountryStats(Stats):
         # Convert to series
         ser_metrics = self.df.squeeze()
 
+        # get the names of columns in ser_metrics than end in "_Z" with abs value greater than 1.5
+        drill_down_metrics = ser_metrics[
+            ser_metrics.index.str.endswith("_Z") & (ser_metrics.abs() > 1.0)
+        ].index.tolist()
+
         return self.data_point_class(
             id=id,
             name=name,
             ser_metrics=ser_metrics,
             relevant_metrics=self.metrics,
+            drill_down_metrics=drill_down_metrics,
         )

@@ -96,5 +96,13 @@ for col in df.columns:
 
 # %%
 
+threshold = 1.5
 
+# construct a new df that check if the abs of each value is greater than threshold
+df_abs = df.abs() > threshold
+# sum the number of True values for each column
+count = df_abs.sum(axis=1)
+
+# plot the count as a histogram
+plt.hist(count, bins=20)
 # %%

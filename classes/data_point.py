@@ -33,7 +33,7 @@ class Player(Stat):
 
 class Country(Stat):
 
-    def __init__(self, id, name, ser_metrics, relevant_metrics):
+    def __init__(self, id, name, ser_metrics, relevant_metrics, drill_down_metrics):
 
         # Unpack ser_info
         self.id = id
@@ -42,3 +42,5 @@ class Country(Stat):
         self.relevant_metrics = relevant_metrics
         # Save metrics as a Series
         self.ser_metrics = ser_metrics
+
+        self.drill_down_metrics = drill_down_metrics

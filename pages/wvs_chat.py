@@ -12,10 +12,13 @@ from utils.page_components import add_common_page_elements
 from classes.description import (
     CountryDescription,
 )
+
+
 # Function to load and inject custom CSS from an external file
 def load_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 
 import json
 import pandas as pd
@@ -38,6 +41,8 @@ countries.calculate_statistics(metrics=metrics)
 
 country = select_country(sidebar_container, countries)
 
+st.markdown("Drill down on:  \n" + "  \n".join([x for x in country.drill_down_metrics]))
+
 st.write(
     "This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key."
 )
@@ -52,7 +57,6 @@ with open("model cards/model-card-wvs-chat.md", "r", encoding="utf8") as file:
 
 load_css("model cards/style/python-code.css")
 st.expander("Model card", expanded=False).markdown(model_card_text)
-
 
 st.expander("Dataframe used", expanded=False).write(countries.df)
 
@@ -122,6 +126,7 @@ if chat.state == "empty":
 
 # Now we want to get the user input, display the messages and save the state
 chat.get_input()
+
 chat.display_messages()
 chat.save_state()
 
