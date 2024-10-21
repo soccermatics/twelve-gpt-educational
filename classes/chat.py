@@ -111,6 +111,10 @@ class Chat:
 
             converted_msgs = convert_messages_format(messages)
 
+            # # save converted messages to json
+            # with open("data/wvs/msgs_1.json", "w") as f:
+            #     json.dump(converted_msgs, f)
+
             genai.configure(api_key=GEMINI_API_KEY)
             model = genai.GenerativeModel(
                 model_name=GEMINI_CHAT_MODEL,
