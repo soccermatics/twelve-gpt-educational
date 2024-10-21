@@ -107,22 +107,6 @@ count = df_abs.sum(axis=1)
 plt.hist(count, bins=20)
 # %%
 
-import json
-
-prompt_dict = {}
-with open("data/wvs/prompt.json", "w") as f:
-    json.dump(prompt_dict, f)
-
-secrets_dict = {
-    "GEMINI_API_KEY": "AIzaSyAC7c_jmNWYuJbvhMmNs7j23ifWZwF1VqI",
-}
-prompt_dict = {}
-with open("data/wvs/secrets.json", "w") as f:
-    json.dump(secrets_dict, f)
-
-
-# %%
-
 from classes.data_source import CountryStats
 from classes.description import CountryDescription
 import copy
@@ -185,7 +169,7 @@ for country_name in country_names:
         )
 
         text = f"Now do the same thing with the following: ```{c_description.synthesize_text()}```"
-        text_empty = f"Here is a statistical description of the core values of {tmp_country.name.capitalize()}. \n\n"
+        text_empty = f"Here is a statistical description of the core values of {tmp_country.name.capitalize()}. \n\n ``` ```"
 
         texts.append(text)
         texts_empty.append(text_empty)
