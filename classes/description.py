@@ -289,7 +289,6 @@ class PlayerDescription(Description):
 # -------------------------------------------------------------------------------------------------------------------------------
 
 
-
 class PersonDescription(Description):
     output_token_limit = 150
 
@@ -350,7 +349,7 @@ class PersonDescription(Description):
 
 
 
-    def category_description(self, value):
+    def categorie_description(self, value):
         if value <= -2:
             return 'The candidate is extremely '
         elif -2 < value <= -1:
@@ -399,13 +398,13 @@ class PersonDescription(Description):
         cat_1 = 'outgoing and energetic. '
                 
         if extraversion > 0:
-            text_t = self.category_description(extraversion) + cat_1
+            text_t = self.categorie_description(extraversion) + cat_1
             if extraversion > 1:
                 index_max = person_metrics[0:10].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0]+'. '
                 text_t +=  text_2
         else:
-            text_t = self.category_description(extraversion) + cat_0
+            text_t = self.categorie_description(extraversion) + cat_0
             if extraversion < -1:
                 index_min = person_metrics[0:10].idxmin()
                 text_2 = 'In particular they said that ' + questions[index_min][0]+'. '
@@ -417,7 +416,7 @@ class PersonDescription(Description):
         cat_1 = 'sensitive and nervous. '
             
         if neuroticism > 0:
-            text_t = self.category_description(neuroticism) + cat_1  \
+            text_t = self.categorie_description(neuroticism) + cat_1  \
                     + 'The candidate tends to feel more negative emotions, anxiety. '
             if neuroticism > 1:
                 index_max = person_metrics[10:20].idxmax()
@@ -425,7 +424,7 @@ class PersonDescription(Description):
                 text_t += text_2
                 
         else:
-            text_t = self.category_description(neuroticism) + cat_0  \
+            text_t = self.categorie_description(neuroticism) + cat_0  \
                     + 'The candidate tends to feel less negative emotions, anxiety. '
             if neuroticism < -1:
                 index_min = person_metrics[10:20].idxmin()
@@ -438,7 +437,7 @@ class PersonDescription(Description):
         cat_1 = 'friendly and compassionate. '
             
         if agreeableness > 0:
-            text_t = self.category_description(agreeableness) + cat_1  \
+            text_t = self.categorie_description(agreeableness) + cat_1  \
                     + 'The candidate tends to be more cooperative, polite, kind and friendly. '
             if agreeableness > 1:
                 index_max = person_metrics[20:30].idxmax()
@@ -446,7 +445,7 @@ class PersonDescription(Description):
                 text_t += text_2
 
         else:
-            text_t = self.category_description(agreeableness) + cat_0  \
+            text_t = self.categorie_description(agreeableness) + cat_0  \
                     + 'The candidate tends to be less cooperative, polite, kind and friendly. '
             if agreeableness < -1:
                 index_min = person_metrics[20:30].idxmin()
@@ -459,14 +458,14 @@ class PersonDescription(Description):
         cat_1 = 'efficient and organized. '
             
         if conscientiousness > 0:
-            text_t = self.category_description(conscientiousness) + cat_1  \
+            text_t = self.categorie_description(conscientiousness) + cat_1  \
                     + 'The candidate tends to be more careful or diligent. '
             if conscientiousness > 1:
                 index_max = person_metrics[30:40].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                 text_t += text_2
         else:
-            text_t = self.category_description(conscientiousness) + cat_0  \
+            text_t = self.categorie_description(conscientiousness) + cat_0  \
                     + 'The candidate tends to be less careful or diligent. '
             if conscientiousness < -1:
                 index_min = person_metrics[30:40].idxmin()
@@ -479,14 +478,14 @@ class PersonDescription(Description):
         cat_1 = 'inventive and curious. '
 
         if openness > 0:
-            text_t = self.category_description(openness) + cat_1  \
+            text_t = self.categorie_description(openness) + cat_1  \
                     + 'The candidate tends to be more open. '
             if openness > 1:
                 index_max = person_metrics[40:50].idxmax()
                 text_2 = 'In particular they said that ' + questions[index_max][0] +'. '
                 text_t += text_2
         else:
-            text_t = self.category_description(openness) + cat_0  \
+            text_t = self.categorie_description(openness) + cat_0  \
                     + 'The candidate tends to be less open. '
             if openness < -1:
                 index_min = person_metrics[40:50].idxmin()
@@ -515,3 +514,6 @@ class PersonDescription(Description):
             "Finally, summarise exactly how the person compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
+
+
+
