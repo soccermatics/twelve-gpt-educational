@@ -432,6 +432,7 @@ class LessonChat(Chat):
         # Initialize the total score as an int and originality score as float
         #self.totalscore = totalscore
         self.originalityscore = np.float64(0.0)
+        #st.write
         super().__init__(chat_state_hash, state=state)
 
     def instruction_messages(self):
@@ -480,21 +481,12 @@ class LessonChat(Chat):
         results = results.sort_values('similarities', ascending=False)
         sorted_results =results.reset_index(drop=True)
         st.write(sorted_results)
-       
-        if len(results)>0:
+        if len(sorted_results)>0:
             if sorted_results.iloc[0]['similarities'] >= similaritythreshold:
                 ret_val = "\n\nHere is the most preffered relevant information for answering the user question:  \n"   
                 ret_val +="\n".join(sorted_results.loc[[0]]["assistant"].to_list())
                 return ret_val
-            if sorted_results.iloc[1]['similarities'] >= similaritythreshold:
-                ret_val = "\n\nHere is the second preffered relevant information for answering the user question:  \n"   
-                ret_val +="\n".join(sorted_results.loc[[1]]["assistant"].to_list())
-                return ret_val
-            if sorted_results.iloc[2]['similarities'] >= similaritythreshold:
-                ret_val = "\n\nHere is the third preffered relevant information for answering the user question:  \n"   
-                ret_val +="\n".join(sorted_results.loc[[2]]["assistant"].to_list())
-                return ret_val
-                    
+
                 #st.write(ret_val)
             if sorted_results.iloc[0]['similarities'] < similaritythreshold:
                 ret_val = "\n\nThe user said:  \n"   
