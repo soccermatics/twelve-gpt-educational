@@ -357,7 +357,7 @@ class CountryDescription(Description):
 
         country = self.country
         metrics = self.country.relevant_metrics
-        description = f"Here is a statistical description of the core values of {country.name.capitalize()}. \n\n "
+        description = f"Here is a statistical description of the core values of {country.name.capitalize()}. \n\n"
 
         # subject_p, object_p, possessive_p = sentences.pronouns(country.gender)
 
@@ -373,13 +373,13 @@ class CountryDescription(Description):
             # description += " in " + metric.lower()  # .replace("_", " ")
             # description += " compared to other countries in the same survey. "
 
-            description += f"{country.name.capitalize()} was found to"
+            description += f"{country.name.capitalize()} was found to "
             description += sentences.describe_level(
                 country.ser_metrics[metric + "_Z"],
                 thresholds=self.thresholds_dict[metric],
                 words=self.description_dict[metric],
             )
-            description += "compared to other countries in the same survey. "
+            description += " compared to other countries in the same survey. "
 
         # st.write(description)
 
