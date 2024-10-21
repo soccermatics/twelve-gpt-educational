@@ -346,6 +346,7 @@ class TrolleyDescription(Description):
         for i,argument in self.currentArguments.iterrows():
             
             description += argument['user'] + ". "
+        st.write(description)
 
         return description
 
@@ -393,7 +394,7 @@ class LessonDescription(Description):
             },
             {
                 "role": "user",
-                "content": "Are you fun when instracting?",
+                "content": "Are you a fun instructor?",
             },
             {
                 "role": "assistant",
@@ -417,11 +418,11 @@ class LessonDescription(Description):
 
         message=pd.read_excel(self.gpt_examples_path)
 
-        description = f"Here are some examples {message['user']} on how you can respond \n\n "
+        description = f"Here are user questions {self.studentResponse} {message['user']} and reponses {message['assistant']}  \n\n "
 
         for i,argument in message.iterrows():
             
-            description += argument['assistant'] + ". "
+            description += message['user'] + ". "
 
         return description
 
@@ -429,7 +430,7 @@ class LessonDescription(Description):
         prompt = (
             f"Please use the information enclosed with ``` to give a concise, 2 sentence response to the user. "
             #f"instructions {self.topic} the the topic is {self.currentState}."
-            f"The first sentence should be an appreciation of what the user has answered on {self.topic} topic. The next statement should be a question asking the user on concepts that build up to the current topic"
+            f"The first sentence should be an appreciation of what the user has responded {self.studentResponse}. The next statement should be a question asking the user on concepts that build up to the current topic"
             f"your main response should be one question asking the user on knowledge based on the previous response"
             f"Assess the user understading of the topic based on their response, if there is a gap ask the user a question that will help them understand the gap in knowledge "
        

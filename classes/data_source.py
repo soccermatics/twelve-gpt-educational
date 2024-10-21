@@ -256,7 +256,7 @@ class Lesson(Data):
     def process_data(self, df_raw):
 
             # Assuming df is your DataFrame
-        df = df_raw.sort_values('step')
+        df = df_raw.sort_values('step', ascending=False)
         overall = []
 
         for _, row in df.iterrows():

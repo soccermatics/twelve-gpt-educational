@@ -79,7 +79,6 @@ if 'gameOver' not in st.session_state:
     st.session_state.gameOver = False
 
 to_hash = (overall)
-
 chat = create_chat(to_hash, LessonChat, overallThesis, lesson, gameOver=st.session_state.gameOver)
 #st.write(currentState)
 # Now we want to add basic content to chat if it's empty

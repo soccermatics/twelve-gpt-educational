@@ -432,8 +432,6 @@ class LessonChat(Chat):
         # Initialize the total score as an int and originality score as float
         #self.totalscore = totalscore
         self.originalityscore = np.float64(0.0)
-        
-
         super().__init__(chat_state_hash, state=state)
 
     def instruction_messages(self):
@@ -479,33 +477,45 @@ class LessonChat(Chat):
 
         # This finds some relevant information
         results = self.embeddings.search(query, top_n=3)
-        st.write(results)
-        if results.iloc[0]['similarities'] >= similaritythreshold:
-            ret_val = "Here is a description of the a learner in terms of their knowledge: \n\n"
-            #ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"   
-            ret_val +="\n".join(results["assistant"].to_list())
-            #st.write(ret_val)
-        if results.iloc[0]['similarities'] < similaritythreshold:
-            ret_val = "\n\nThe user said:  \n"   
-            ret_val +="\n".join(results["user"].to_list())
-            ret_val = "but this is not a releavant area. "
-            ret_val += "Tell the user that they should try respond with the relevant topic. "
-            #with sidebar_container:
-                    #st.write(f'Novelty: 0/{numberofarguments}')
-                    #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
-            return ret_val
+        results = results.sort_values('similarities', ascending=False)
+        sorted_results =results.reset_index(drop=True)
+        st.write(sorted_results)
+       
+        if len(results)>0:
+            if sorted_results.iloc[0]['similarities'] >= similaritythreshold:
+                ret_val = "\n\nHere is the most preffered relevant information for answering the user question:  \n"   
+                ret_val +="\n".join(sorted_results.loc[[0]]["assistant"].to_list())
+                return ret_val
+            if sorted_results.iloc[1]['similarities'] >= similaritythreshold:
+                ret_val = "\n\nHere is the second preffered relevant information for answering the user question:  \n"   
+                ret_val +="\n".join(sorted_results.loc[[1]]["assistant"].to_list())
+                return ret_val
+            if sorted_results.iloc[2]['similarities'] >= similaritythreshold:
+                ret_val = "\n\nHere is the third preffered relevant information for answering the user question:  \n"   
+                ret_val +="\n".join(sorted_results.loc[[2]]["assistant"].to_list())
+                return ret_val
+                    
+                #st.write(ret_val)
+            if sorted_results.iloc[0]['similarities'] < similaritythreshold:
+                ret_val = "\n\nThe user said:  \n"   
+                ret_val +="\n".join(sorted_results["assistant"].to_list())
+                ret_val = "Look at the learner response, if it is around for loops, ask a question that will enhance their undestading of for loops. "
+                ret_val += "If it not in the for loop tell the user that they should try respond with the relevant topic. "
+                #with sidebar_container:
+                        #st.write(f'Novelty: 0/{numberofarguments}')
+                        #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
+                return ret_val
         if len(results) == 0:
-            ret_val = " Tell the user that they are no longer providing relevant answers."
-            ret_val += "Tell the user that you have no further answers to their questions, but maybe next time they interact they can provide relevant topics. "
-            ret_val += "Then let them know that their final what they have learnt"
+            ret_val="\n\n check the user response, if it is related to for loops in general ask the user a question to assess their knowledge on for loops:\n" 
+            ret_val+="If response is not related to for loop and programming in general, tell the user to ask relevant questions"
             with sidebar_container:
                 st.write(f'Lesson over! Try again.')
                 #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
-            self.gameOver=True
+                self.gameOver=True
 
+                return ret_val
+            
             return ret_val
-        
-        #return ret_val
 
     
     def get_input(self):
