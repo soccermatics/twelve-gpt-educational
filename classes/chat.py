@@ -11,7 +11,7 @@ if USE_GEMINI:
     from settings import USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
 else:
     from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
-    
+
 from classes.description import (
     PlayerDescription, PersonDescription,
 )
@@ -36,12 +36,11 @@ class Chat:
             st.session_state.chat_state_hash = chat_state_hash
             st.session_state.messages_to_display = []
             st.session_state.chat_state = state
-            
         if isinstance(self, PlayerChat):
             self.name = self.player.name
         else:
             self.name = self.person.name
-            
+
         # Set session states as attributes for easier access
         self.messages_to_display = st.session_state.messages_to_display
         self.state = st.session_state.chat_state
@@ -62,8 +61,8 @@ class Chat:
     def get_input(self):
         """
         Get input from streamlit."""
-  
-        if x := st.chat_input(placeholder=f"What else would you like to know about {self.player.name}?"):
+        
+        if x := st.chat_input(placeholder=f"What else would you like to know about {self.name}?"):
             if len(x) > 500:
                 st.error(f"Your message is too long ({len(x)} characters). Please keep it under 500 characters.")
 
@@ -234,6 +233,7 @@ class PlayerChat(Chat):
         
         return ret_val
         
+
 class PersonChat(Chat):
     def __init__(self, chat_state_hash, person, persons, state="empty"):
         self.embeddings = PersonEmbeddings()
