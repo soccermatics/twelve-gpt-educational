@@ -331,7 +331,6 @@ class DistributionPlotPersonality(Visual):
 
 
 
-
 '''class ViolinPlot(Visual):
     def violin(data, point_data):
         # Create a figure object
@@ -382,7 +381,4 @@ class DistributionPlotPersonality(Visual):
         fig.update_traces(fill='toself', marker=dict(size=5))
         # Display the plot in Streamlit
         st.plotly_chart(fig)'''
-
-
-    
 
