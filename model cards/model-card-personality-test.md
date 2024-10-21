@@ -22,7 +22,7 @@ The *primary use case* of this wordalisation is eductional. It shows how to conv
 
 ## Factors
 
-The dataset was chosen because of avialability of a public dataset.
+The dataset was chosen because of avialability of a public dataset. The questionnaire is anonymous, and we did not use any information about the participants' country of origin in the development of the chat.
 
 ## Datasets
 The dataset used in this project was sourced from Kaggle's open dataset repository [www.kaggle.com/datasets/tunguz/big-five-personality-test]. It consists of 1,015,342 questionnaire responses, collected online by Open Psychometrics. Respondents answered questions on a scale from 1 to 5, where: 1 = Strongly Disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree.
