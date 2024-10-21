@@ -290,3 +290,4 @@ class PersonStat(Stats):
         ser_metrics = self.df.squeeze()
         
         return self.data_point_class(id=id,name=name,ser_metrics=ser_metrics)
+
