@@ -12,6 +12,10 @@ from utils.page_components import add_common_page_elements
 from classes.description import (
     CountryDescription,
 )
+# Function to load and inject custom CSS from an external file
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 import json
 import pandas as pd
@@ -42,8 +46,11 @@ st.write(
 with open("model cards/model-card-wvs-chat.md", "r", encoding="utf8") as file:
     # Read the contents of the file
     model_card_text = file.read()
+# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\model cards\style\python-code.css
+# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\pages\wvs_chat.py
+# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\pages\python-code.css
 
-
+load_css("model cards/style/python-code.css")
 st.expander("Model card", expanded=False).markdown(model_card_text)
 
 
