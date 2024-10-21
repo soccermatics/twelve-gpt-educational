@@ -1,7 +1,7 @@
 # Model card for World Value Survey metric Wordalisation
 
 The WVS chatbot is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and
-is intended as an illustration of the *wordalisation* method. It is thus intended as an example to help others build similar tools. The wordalisations are constructed using various social metrics derived from data collected in the [World Value Survey](www.worldvaluessurvey.org) (WVS). These social metrics as well as the WVS are discussed in the [Datasets](#datasets) section. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The original design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, with modification made by Beimnet Zenebe and Amy Rouillard to adapt it to the WVS use-case.
+is intended as an illustration of the _wordalisation_ method. It is thus intended as an example to help others build similar tools. The wordalisations are constructed using various social metrics derived from data collected in the [World Value Survey](www.worldvaluessurvey.org) (WVS). These social metrics as well as the WVS are discussed in the [Datasets](#datasets) section. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The original design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, with modification made by Beimnet Zenebe and Amy Rouillard to adapt it to the WVS use-case.
 
 This model card is based on the [model cards paper](https://arxiv.org/abs/1810.03993) and is adapted specifically to Wordalisation applications as detailed in [Representing data in words](publication here). We also provide this model card as an example of good practice for describing wordalisations.
 
@@ -18,14 +18,16 @@ Jump to section:
 ## Intended use
 
 The _primary use case_ of this wordalisation is eductional.
-It shows how to convert a dataframe of statistics about countries into a text that discusses a chosen country. The statistics relate to various social and political values, however we note that the results should be understood in the context of the WVS and the research in which the metrics were derived. The purpose of the wordalisation and chat functionality is to use the capacities of an LLM to make the statistics more digestible for a human reader, rather than to investigate the validity of the WVS study. 
+It shows how to convert a dataframe of statistics about countries into a text that discusses a chosen country. The statistics relate to various social and political values, however we note that the results should be understood in the context of the WVS and the research in which the metrics were derived. The purpose of the wordalisation and chat functionality is to use the capacities of an LLM to make the statistics more digestible for a human reader, rather than to investigate the validity of the WVS study.
 
-This version cannot be used for insight generation purposes, i.e. data analysis, firstly because we do not guarantee the quality of the data and because functionality is limited.
+This chatbot cannot be used for insight generation purposes, i.e. data analysis, firstly because we do not guarantee the quality of the data and because functionality is limited.
 Data analysis is thus _out of scope_. Use of the chat for queries not relating to the data at hand is also _out of scope_.
+
+We would also strongly oppose the generalization or stereotyping of any group of people and emphasize that this chatbot cannot and should not be used to represent the values any country or its population.
 
 ## Factors
 
-The World Value Survey metric Wordalisation relates to 66 countries that took part in the 2017-2022 survey. We would like to state that any conversations about countries not included in the survey are not guaranteed to hold any merit. We would also like note that the participants of these surveys are only a small sample of the population with the biggest sample from a given country being 4000. Therefore, the values presented here cannot be representative of a an entire population of a country.
+The World Value Survey metric Wordalisation relates to 66 countries that took part in the 2017-2022 survey. We would like to state that any conversations about countries not included in the survey are not guaranteed to hold any merit. We would also like note that the participants of these surveys are only a small sample of the population with the biggest sample from a given country being 4000. Therefore, the values presented here cannot be representative of an entire population of a country.
 
 ## Datasets
 
@@ -41,11 +43,12 @@ From this raw data we constructed 7 metrics or qualities:
 - "Societal Tranquility"$^2$
 
 These metrics were calculated according to Ingelhart (2005)[1] and Allison (2021)[2], for metrics indicated by $^1$ and $^2$ respectively.
+
 We note that because of the coding of answers to the questionnaire some considerable _preprocessing_ was necessary to construct these metrics. Our preprocessing pipeline is available as a [Github repository](https://github.com/BeimnetGirma/wvs-data).
 
 The above metrics are intended to aggregate the answers to several questions in order to provide a more general insight into a country's values. For example, is a country more traditional or secular?
 
-In addition to the wordalisation of these metrics we provide question and answer pairs as to the chatbot. These are intended to contextualize the data and can be found in the [WVS_qualities](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx) spreadsheet. Further, we provide question and answer pairs that are intend to be good examples of how that chat bot should discuss the given country. These are intended as in-context-learning examples and can be found [here](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/gpt_examples/WVS_examples.xlsx). The use of these question-answer pairs is detailed in the [Normative model](#normative-model) section.
+In addition to the wordalisation of these metrics we provide question and answer pairs to the chatbot. These are intended to contextualize the data and can be found in the [WVS Qualities](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx) spreadsheet. Further, we provide question and answer pairs that are intend to be good examples of how that chat bot should discuss the given country. These are intended as in-context-learning examples and can be found [here](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/gpt_examples/WVS_examples.xlsx). The use of these question-answer pairs is detailed in the [Normative model](#normative-model) section.
 
 ## Model
 
@@ -55,11 +58,11 @@ The model applies a mapping on the countries in the dataset along different valu
 
 ### Normative model
 
+A prompt is constructed in several parts (_tell it who it is_, _tell it what it know_, _tell it how to answer_, _tell it what data to use_) in order to provide relevant context to the LLM. The prompt to _tell it who it is_ identifies a human role for the chat bot as a "Data Analyst". The user-assistant pairs in the stage of _tell it what it knows_ describe the general context of the chat domain and how the selected values can be [interpretted in the social sciences](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx). These descriptions outline the meaning of the values. And the penultimate prompt to _tell it how to answer_ provides [examples of expected outputs](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/gpt_examples/WVS_examples.xlsx) given data about a certain country. The final prompt is to _tell it what data to use_ for the selected country.
 
-A prompt is constructed in several parts in order to provide relevant context to the LLM. The prompt to _tell it who it is_ identifies a human role for the chat bot as a "Data Analyst". The user-assistant pairs in the stage of _tell it what it knows_ describe how the selected values can be [interpretted in the social sciences](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx). These descriptions outline the meaning of the values. And penultimate prompt to _tell it how to answer_ provides [examples of outputs](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/gpt_examples/WVS_examples.xlsx). The final prompt is to _tell it what data to use_ for the selected country.
+At the stage of _tell it what data to use_, we apply a model that maps the values of a country onto different value scales based on the z-scores. The distribution of countries along the value scale represents the leaning of values towards one value or the other. For example, a country with a z-score of more than 3 on the traditional vs secular values metric would be considered to "have extremely secular values". We would like to note that z-score values are devoid of any notion of ranking of country values as better or worse.
 
-
-At the stage of _tell it what data to use_, we apply a model that maps the values of a country onto different value scales based on the z-scores. The distribution of countries along the value scale represents the leaning of values towards one value or the other. For example, a country with a z-score of more than 3 would be considered to "have extremely secular values". The distribution (or the values associated with it) are devoid of any notion of ranking based on the value scores of countries. We use the following function to translate z-scores into evaluation words:
+We use the following function to translate z-scores into evaluation words:
 
 ```python
 def describe(thresholds, words, value):
@@ -85,7 +88,9 @@ words = [
         "have extremely traditional values"
     ]
 ```
-which fits into the template: 
+
+which fits into the template:
+
 ```python
 text = f"{country.name.capitalize()} was found to {words} compared to other countries in the same survey. "
 
@@ -95,11 +100,12 @@ text = f"{country.name.capitalize()} was found to {words} compared to other coun
 
 Our implementation supports both GPT4o and ChatGPT and related APIs, as well as Gemini API. Since these language model's training data included text about these countries, this knowledge will likely effect both the initial response and subsequent queries within the same chat. This means that some aspects of the answers may come from data external to that in the provided dataframe.
 
-## Evaluation 
+## Evaluation
 
 **Under construction**
 
-Some systematic _quantitative analyses_ has been carried out on this wordalisation. 
+Some systematic _quantitative analyses_ has been carried out on this wordalisation.
+
 - Sentiment analysis. How does the prompt and wordalisation affect the sentiment of the chatbot when discussing a country?
 
 Ideally, this wordalisation should be subjected to further rigorous _qualitative test_ of:
@@ -112,7 +118,8 @@ Ideally, this wordalisation should be subjected to further rigorous _qualitative
 
 ## Ethical considerations
 
-The World Value Survey is based on questionnaires filled out by individuals from different countries. In particular was use data generate during wave 7 which took place from 2017 to 2022. Samples are relatively small compared to the populations of the countries.
+The World Value Survey is based on questionnaires filled out by individuals from different countries. In particular, we use data from the 7th wave of the survey which took place from 2017-2022. Samples are relatively small compared to the populations of the countries.
+
 Further, the questionnaires where given in a limited number of languages for each country, possibly preventing some groups of the population from participation. The data is also based on self-reported answers to the questionnaires, which may be influenced by the social context in which the questionnaire was given.
 
 In the context of the factors mentioned the above, the data can only give a rough indication of the attitudes of a population, during the period 2017-2022. Therefore, the summaries generated by the [Normative model](#normative-model) may contain out of date information and should not be considered a reflection of the beliefs or attitudes of any given individual.
