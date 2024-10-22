@@ -482,21 +482,22 @@ class LessonChat(Chat):
         sorted_results =results.reset_index(drop=True)
         st.write(sorted_results)
         if len(sorted_results)>0:
-            if sorted_results.iloc[0]['similarities'] >= similaritythreshold:
-                ret_val = "\n\nHere is the most preffered relevant information for answering the user question:  \n"   
-                ret_val +="\n".join(sorted_results.loc[[0]]["assistant"].to_list())
-                return ret_val
+            for i in range(len(sorted_results)):
+                if sorted_results.iloc[0]['similarities'] >= similaritythreshold:
+                    ret_val = "\n\nHere is the most preffered relevant information for answering the user question:  \n"   
+                    ret_val +="\n".join(sorted_results.loc[[0]]["assistant"].to_list())
+                    return ret_val
 
-                #st.write(ret_val)
-            if sorted_results.iloc[0]['similarities'] < similaritythreshold:
-                ret_val = "\n\nThe user said:  \n"   
-                ret_val +="\n".join(sorted_results["assistant"].to_list())
-                ret_val = "Look at the learner response, if it is around for loops, ask a question that will enhance their undestading of for loops. "
-                ret_val += "If it not in the for loop tell the user that they should try respond with the relevant topic. "
-                #with sidebar_container:
-                        #st.write(f'Novelty: 0/{numberofarguments}')
-                        #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
-                return ret_val
+                    #st.write(ret_val)
+                if sorted_results.iloc[0]['similarities'] < similaritythreshold:
+                    ret_val = "\n\nThe user said:  \n"   
+                    ret_val +="\n".join(sorted_results["assistant"].to_list())
+                    ret_val = "Look at the learner response, if it is around for loops, ask a question that will enhance their undestading of for loops. "
+                    ret_val += "If it not in the for loop tell the user that they should try respond with the relevant topic. "
+                    #with sidebar_container:
+                            #st.write(f'Novelty: 0/{numberofarguments}')
+                            #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
+                    return ret_val
         if len(results) == 0:
             ret_val="\n\n check the user response, if it is related to for loops in general ask the user a question to assess their knowledge on for loops:\n" 
             ret_val+="If response is not related to for loop and programming in general, tell the user to ask relevant questions"

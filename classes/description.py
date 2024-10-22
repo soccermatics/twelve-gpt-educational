@@ -415,23 +415,21 @@ class LessonDescription(Description):
         return intro
 
     def synthesize_text(self):
+        
+        description = f"Here are some arguments the thesis:. \n\n "
 
-        message=pd.read_excel(self.gpt_examples_path)
-
-        description = f"Here are user questions {self.studentResponse} {message['user']} and reponses {message['assistant']}  \n\n "
-
-        for i,argument in message.iterrows():
+        for i,argument in self.topic.iterrows():
             
-            description += message['user'] + ". "
+            description += argument['user'] + ". "
+        #st.write(description)
 
         return description
 
     def get_prompt_messages(self):
         prompt = (
             f"Please use the information enclosed with ``` to give a concise, 2 sentence response to the user. "
-            #f"instructions {self.topic} the the topic is {self.currentState}."
-            f"The first sentence should be an appreciation of what the user has responded {self.studentResponse}. The next statement should be a question asking the user on concepts that build up to the current topic"
-            f"your main response should be one question asking the user on knowledge based on the previous response"
+            f"The first sentence should be an appreciation of what the user has responded. The next statement should be a question asking the user on concepts that build up to the current topic. "
+            f"your main response should be one question asking the user on knowledge based on the previous response "
             f"Assess the user understading of the topic based on their response, if there is a gap ask the user a question that will help them understand the gap in knowledge "
        
         )

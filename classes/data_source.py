@@ -318,7 +318,7 @@ class Lesson(Data):
             argument_df2 = argument_df2[argument_df2['topic']=='for loops']
             # Add these to the arguments.
             argument_df = pd.concat([argument_df,argument_df2])
-            #st.write(argument_df)
+        #st.write(argument_df)
 
         return argument_df
         
