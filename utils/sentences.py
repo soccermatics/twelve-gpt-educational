@@ -41,10 +41,21 @@ def format_metric(metric):
 
 
 def write_out_metric(metric):
-    return (
-        metric.replace("_", " ")
-        .replace("adjusted", "adjusted for possession")
-        .replace("per90", "per 90")
-        .replace("npxG", "non-penalty expected goals")
-        + " minutes"
-    )
+    return metric.replace("_"," ").replace("adjusted","adjusted for possession").replace("per90","per 90").replace("npxG","non-penalty expected goals") + " minutes"
+
+def categorie_description(data_pz):
+    if data_pz <= -2:
+        text = 'The candidate is extremely '
+    elif (data_pz < -2) & (data_pz <= -1):
+        text = 'The candidate is very '
+    elif (data_pz > -1) & (data_pz <= -0.5):
+        text = 'The candidate is quite '
+    elif (data_pz > -0.5) & (data_pz <= 0.5):
+        text = 'The candidate is relatively '
+    elif (data_pz > 0.5) & (data_pz <= 1):
+        text = 'The candidate is quite'
+    elif (data_pz > 1) & (data_pz <= 2):
+        text = 'The candidate is very '
+    elif data_pz > 2:
+        text = 'The candidate is extremely '
+    return text

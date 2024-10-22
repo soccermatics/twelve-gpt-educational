@@ -13,13 +13,12 @@ else:
     from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 from classes.description import (
-    PlayerDescription,
+    PlayerDescription, PersonDescription,
     CountryDescription,
 )
-from classes.embeddings import PlayerEmbeddings, CountryEmbeddings
+from classes.embeddings import PlayerEmbeddings, PersonEmbeddings, CountryEmbeddings
 
-
-from classes.visual import Visual, DistributionPlot
+from classes.visual import Visual, DistributionPlot, DistributionPlotPersonality
 
 import utils.sentences as sentences
 from utils.gemini import convert_messages_format
@@ -40,6 +39,10 @@ class Chat:
             st.session_state.chat_state_hash = chat_state_hash
             st.session_state.messages_to_display = []
             st.session_state.chat_state = state
+        if isinstance(self, PlayerChat):
+            self.name = self.player.name
+        else:
+            self.name = self.person.name
 
         # Set session states as attributes for easier access
         self.messages_to_display = st.session_state.messages_to_display
@@ -57,20 +60,20 @@ class Chat:
         """
         message = {"role": role, "content": content}
         self.messages_to_display.append(message)
+    
+    def get_input(self):
+        """
+        Get input from streamlit."""
+      
+        if x := st.chat_input(
+            placeholder=f"What else would you like to know?"
+        ):
+            if len(x) > 500:
+                st.error(
+                    f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
+                )
 
-    # def get_input(self):
-    #     """
-    #     Get input from streamlit."""
-
-    #     if x := st.chat_input(
-    #         placeholder=f"What else would you like to know about {self.player.name}?"
-    #     ):
-    #         if len(x) > 500:
-    #             st.error(
-    #                 f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
-    #             )
-
-    #         self.handle_input(x)
+            self.handle_input(x)
 
     def handle_input(self, input):
         """
@@ -339,4 +342,67 @@ class WVSChat(Chat):
         ret_val += "This chat can answer questions about a country's core values."
         ret_val += "The user can select the country they are interested in using the menu to the left."
 
+        return ret_val
+
+class PersonChat(Chat):
+    def __init__(self, chat_state_hash, person, persons, state="empty"):
+        self.embeddings = PersonEmbeddings()
+        self.person = person
+        self.persons = persons
+        super().__init__(chat_state_hash, state=state)
+
+    def instruction_messages(self):
+        """
+        Instruction for the agent.
+        """
+        first_messages = [
+            {"role": "system", "content": "You are a recruiter."},
+            {"role": "user", "content": (
+                "After these messages you will be interacting with a user of personality test platform. "
+                f"The user has selected the person {self.person.name}, and the conversation will be about them. "
+                "You will receive relevant information to answer a user's questions and then be asked to provide a response. "
+                "All user messages will be prefixed with 'User:' and enclosed with ```. "
+                "When responding to the user, speak directly to them. "
+                "Use the information provided before the query  to provide 2 sentence answers."
+                " Do not deviate from this information or provide additional information that is not in the text returned by the functions."
+                )
+            },
+        ]
+        return first_messages
+
+        def get_input(self):
+            """
+            Get input from streamlit."""
+        
+            if x := st.chat_input(
+                placeholder=f"What else would you like to know about the person?"
+            ):
+                if len(x) > 500:
+                    st.error(
+                        f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
+                    )
+
+                self.handle_input(x)
+
+
+    def get_relevant_info(self, query):
+ 
+        #If there is no query then use the last message from the user
+        if query=='':
+            query = self.visible_messages[-1]["content"]
+        
+        ret_val = "Here is a description of the person in terms of data: \n\n"   
+        description = PersonDescription(self.person)
+        ret_val += description.synthesize_text()
+
+        # This finds some relevant information
+        results = self.embeddings.search(query, top_n=5)
+        ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"   
+        ret_val +="\n".join(results["assistant"].to_list())
+        
+        ret_val += f"\n\nIf none of this information is relevent to the users's query then use the information below to remind the user about the chat functionality: \n"
+        ret_val += "This chat can answer questions about person's statistics and what they mean about their personality."
+        ret_val += "The user can select the persons they are interested in using the menu to the left."
+
+        
         return ret_val

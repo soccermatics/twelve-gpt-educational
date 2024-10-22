@@ -43,4 +43,14 @@ class Country(Stat):
         # Save metrics as a Series
         self.ser_metrics = ser_metrics
 
+
+class Person(Stat):
+    
+    def __init__(self, id, name, ser_metrics):
+
+        # Unpack ser_info
+        self.id = id
+        self.name = name
+        self.ser_metrics = ser_metrics
+
         self.drill_down_metrics = drill_down_metrics
