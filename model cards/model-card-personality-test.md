@@ -66,7 +66,7 @@ In the text which is generated at the stage of *tell it what data to use* we use
 ```
 There are four positive terms and three negative terms in the words used. 
 
-In the *tell it how to answer* step, four examples. This somewhat compromises how the texts for these four candidates are constructed. These examples and the prompt used emphasise highlighting positive and negative aspects of the person personality, and ignoring aspects which are average or typical.
+In the *tell it how to answer* step, we create four examples of candidate's profile. This somewhat compromises how the texts for these four candidates are constructed. These examples and the prompt used emphasise highlighting positive and negative aspects of the person personality, and ignoring aspects which are average or typical.
 
 ### Language model
 
