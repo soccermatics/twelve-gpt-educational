@@ -56,7 +56,9 @@ with open("model cards/model-card-wvs-chat.md", "r", encoding="utf8") as file:
 # C:\Users\beimn\Documents\workdir\wvs\wvs-chat\pages\python-code.css
 
 load_css("model cards/style/python-code.css")
-st.expander("Model card", expanded=False).markdown(model_card_text)
+st.expander("Model card", expanded=False).markdown(
+    model_card_text, unsafe_allow_html=True
+)
 
 st.expander("Dataframe used", expanded=False).write(countries.df)
 

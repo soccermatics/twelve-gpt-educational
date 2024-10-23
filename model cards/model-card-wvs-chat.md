@@ -31,7 +31,9 @@ The World Value Survey data and derived metrics, discussed in [Datasets](#datase
 
 Figure 1: World Value Survey data collection distribution. The colorscale indicates the number of participants in the survey from each country.
 
-![WVS coverage](sample_size_map.png)
+<img src="model cards/sample_size_map.png" alt="WVS coverage" width="500"/>
+
+![](sample_size_map.png)
 
 ## Datasets
 
