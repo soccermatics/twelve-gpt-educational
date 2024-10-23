@@ -9,7 +9,9 @@ import numpy as np
 
 import utils.sentences as sentences
 from utils.gemini import convert_messages_format
-from classes.data_point import Player, Country
+
+from classes.data_point import Player, Country, Person
+from classes.data_source import PersonStat
 
 
 from settings import USE_GEMINI
@@ -20,6 +22,7 @@ else:
     from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 import streamlit as st
+import random
 
 openai.api_type = "azure"
 
@@ -397,5 +400,267 @@ class CountryDescription(Description):
             # "The second sentence should describe the player's specific strengths based on the metrics. "
             # "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
             # "Finally, summarise exactly how the player compares to others in the same position. "
+        )
+        return [{"role": "user", "content": prompt}]
+
+
+class PersonDescription(Description):
+    output_token_limit = 150
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/Forward_bigfive.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/Forward_bigfive.xlsx"]
+
+    def __init__(self, person: Person):
+        self.person = person
+        super().__init__()
+
+    def get_intro_messages(self) -> List[Dict[str, str]]:
+        """
+        Constant introduction messages for the assistant.
+
+        Returns:
+        List of dicts with keys "role" and "content".
+        """
+        intro = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a recruiter. "
+                    "You provide succinct and to the point explanations about a candiate using data.  "
+                    "You use the information given to you from the data and answers"
+                    "to earlier user/assistant pairs to give summaries of candidates."
+                ),
+            },
+            {
+                "role": "user",
+                "content": "Do you refer to the candidate as a candidate or a person?",
+            },
+            {
+                "role": "assistant",
+                "content": (
+                    "I refer to the candidate as a person. "
+                    "When I say candidate, I mean person. "
+                    "But I always talk about the candidate, as a person."
+                ),
+            },
+        ]
+        if len(self.describe_paths) > 0:
+            intro += [
+                {
+                    "role": "user",
+                    "content": "First, could you answer some questions about a candidate for me?",
+                },
+                {"role": "assistant", "content": "Sure!"},
+            ]
+
+        return intro
+
+    def categorie_description(self, value):
+        if value <= -2:
+            return "The candidate is extremely "
+        elif -2 < value <= -1:
+            return "The candidate is very "
+        elif -1 < value <= -0.5:
+            return "The candidate is quite "
+        elif -0.5 < value <= 0.5:
+            return "The candidate is relatively "
+        elif 0.5 < value <= 1:
+            return "The candidate is quite "
+        elif 1 < value <= 2:
+            return "The candidate is very "
+        else:
+            return "The candidate is extremely "
+
+    def all_max_indices(self, row):
+        max_value = row.max()
+        return list(row[row == max_value].index)
+
+    def all_min_indices(self, row):
+        min_value = row.min()
+        return list(row[row == min_value].index)
+
+    def get_description(self, person):
+        # here we need the dataset to check the min and max score of the person
+
+        person_metrics = person.ser_metrics
+        person_stat = PersonStat()
+        questions = person_stat.get_questions()
+
+        name = person.name
+        extraversion = person_metrics["extraversion_Z"]
+        neuroticism = person_metrics["neuroticism_Z"]
+        agreeableness = person_metrics["agreeableness_Z"]
+        conscientiousness = person_metrics["conscientiousness_Z"]
+        openness = person_metrics["openness_Z"]
+
+        text = []
+
+        # extraversion
+        cat_0 = "solitary and reserved. "
+        cat_1 = "outgoing and energetic. "
+
+        if extraversion > 0:
+            text_t = self.categorie_description(extraversion) + cat_1
+            if extraversion > 1:
+                index_max = person_metrics[0:10].idxmax()
+                text_2 = (
+                    "In particular they said that " + questions[index_max][0] + ". "
+                )
+                text_t += text_2
+        else:
+            text_t = self.categorie_description(extraversion) + cat_0
+            if extraversion < -1:
+                index_min = person_metrics[0:10].idxmin()
+                text_2 = (
+                    "In particular they said that " + questions[index_min][0] + ". "
+                )
+                text_t += text_2
+        text.append(text_t)
+
+        # neuroticism
+        cat_0 = "resilient and confident. "
+        cat_1 = "sensitive and nervous. "
+
+        if neuroticism > 0:
+            text_t = (
+                self.categorie_description(neuroticism)
+                + cat_1
+                + "The candidate tends to feel more negative emotions, anxiety. "
+            )
+            if neuroticism > 1:
+                index_max = person_metrics[10:20].idxmax()
+                text_2 = (
+                    "In particular they said that " + questions[index_max][0] + ". "
+                )
+                text_t += text_2
+
+        else:
+            text_t = (
+                self.categorie_description(neuroticism)
+                + cat_0
+                + "The candidate tends to feel less negative emotions, anxiety. "
+            )
+            if neuroticism < -1:
+                index_min = person_metrics[10:20].idxmin()
+                text_2 = (
+                    "In particular they said that " + questions[index_min][0] + ". "
+                )
+                text_t += text_2
+        text.append(text_t)
+
+        # agreeableness
+        cat_0 = "critical and rational. "
+        cat_1 = "friendly and compassionate. "
+
+        if agreeableness > 0:
+            text_t = (
+                self.categorie_description(agreeableness)
+                + cat_1
+                + "The candidate tends to be more cooperative, polite, kind and friendly. "
+            )
+            if agreeableness > 1:
+                index_max = person_metrics[20:30].idxmax()
+                text_2 = (
+                    "In particular they said that " + questions[index_max][0] + ". "
+                )
+                text_t += text_2
+
+        else:
+            text_t = (
+                self.categorie_description(agreeableness)
+                + cat_0
+                + "The candidate tends to be less cooperative, polite, kind and friendly. "
+            )
+            if agreeableness < -1:
+                index_min = person_metrics[20:30].idxmin()
+                text_2 = (
+                    "In particular they said that " + questions[index_min][0] + ". "
+                )
+                text_t += text_2
+        text.append(text_t)
+
+        # conscientiousness
+        cat_0 = "extravagant and careless. "
+        cat_1 = "efficient and organized. "
+
+        if conscientiousness > 0:
+            text_t = (
+                self.categorie_description(conscientiousness)
+                + cat_1
+                + "The candidate tends to be more careful or diligent. "
+            )
+            if conscientiousness > 1:
+                index_max = person_metrics[30:40].idxmax()
+                text_2 = (
+                    "In particular they said that " + questions[index_max][0] + ". "
+                )
+                text_t += text_2
+        else:
+            text_t = (
+                self.categorie_description(conscientiousness)
+                + cat_0
+                + "The candidate tends to be less careful or diligent. "
+            )
+            if conscientiousness < -1:
+                index_min = person_metrics[30:40].idxmin()
+                text_2 = (
+                    "In particular they said that " + questions[index_min][0] + ". "
+                )
+                text_t += text_2
+        text.append(text_t)
+
+        # openness
+        cat_0 = "consistent and cautious. "
+        cat_1 = "inventive and curious. "
+
+        if openness > 0:
+            text_t = (
+                self.categorie_description(openness)
+                + cat_1
+                + "The candidate tends to be more open. "
+            )
+            if openness > 1:
+                index_max = person_metrics[40:50].idxmax()
+                text_2 = (
+                    "In particular they said that " + questions[index_max][0] + ". "
+                )
+                text_t += text_2
+        else:
+            text_t = (
+                self.categorie_description(openness)
+                + cat_0
+                + "The candidate tends to be less open. "
+            )
+            if openness < -1:
+                index_min = person_metrics[40:50].idxmin()
+                text_2 = (
+                    "In particular they said that " + questions[index_min][0] + ". "
+                )
+                text_t += text_2
+        text.append(text_t)
+
+        text = "".join(text)
+        text = text.replace(",", "")
+        return text
+
+    def synthesize_text(self):
+        person = self.person
+        metrics = self.person.ser_metrics
+        description = self.get_description(person)
+
+        return description
+
+    def get_prompt_messages(self):
+        prompt = (
+            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the person's personality, strengths and weaknesses. "
+            f"The first sentence should use varied language to give an overview of the person. "
+            "The second sentence should describe the person's specific strengths based on the metrics. "
+            "The third sentence should describe aspects in which the person is average and/or weak based on the statistics. "
+            "Finally, summarise exactly how the person compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]

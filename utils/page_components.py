@@ -7,6 +7,7 @@ import base64
 from pathlib import Path
 
 import streamlit as st
+import copy
 
 # from pages import about, football_scout, embedder, wvs_chat, own_page
 
@@ -69,6 +70,7 @@ def add_page_selector():
     st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
     st.page_link("pages/wvs_chat.py", label="World Value Survey")
+    st.page_link("pages/personality_test.py", label="Personality page")
     st.page_link("pages/own_page.py", label="Your Own Page")
 
     # st.image("data/ressources/img/TwelveEdu.png")
@@ -120,3 +122,51 @@ def add_common_page_elements():
     sidebar_container.divider()
 
     return sidebar_container
+
+
+def select_player(container, players, gender, position):
+
+    # Make a copy of Players object
+    player = copy.deepcopy(players)
+
+    # Filter players by position and select a player with sidebar selectors
+    with container:
+
+        # Filter for player name
+        player.select_and_filter(
+            column_name="player_name",
+            label="Player",
+        )
+
+        # Return data point
+
+        player = player.to_data_point(gender, position)
+
+    return player
+
+
+def select_person(container, person_stat):
+
+    # Make a copy of Players object
+    person = copy.deepcopy(person_stat)
+
+    # Filter players by position and select a player with sidebar selectors
+    with container:
+
+        # Filter for player name
+        person.select_and_filter(
+            column_name="name",
+            label="Person",
+        )
+
+        # Return data point
+
+        person = person.to_data_point()
+
+    return person
+
+
+def create_chat(to_hash, chat_class, *args, **kwargs):
+    chat_hash_state = hash(to_hash)
+    chat = chat_class(chat_hash_state, *args, **kwargs)
+    return chat
