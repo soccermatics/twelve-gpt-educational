@@ -523,9 +523,13 @@ class CountryStats(Stats):
             "ZMB": "Zambia",
             "ZWE": "Zimbabwe",
             "HKG": "Hong Kong",
-            "MAC": "Macao",
+            "MAC": "Macau",
             "PRI": "Puerto Rico",
             "NIR": "Northern Ireland",
+            "GRL": "Greenland",
+            "CIV": "Ivory Coast",
+            "COD": "Congo, Democratic Republic of the",
+            "SWZ": "Eswatini",
         }
 
         country_names = df_raw["country"].values.tolist()
