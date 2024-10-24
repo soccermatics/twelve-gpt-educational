@@ -68,13 +68,14 @@ class Visual:
             self.font_size_multiplier = 1.0
         self.fig = go.Figure()
         self._setup_styles()
+        self.plot_type = plot_type
 
         if plot_type == "scout":
             self.annotation_text = (
                 "<span style=''>{metric_name}: {data:.2f} per 90</span>"
             )
         else:
-            self.annotation_text = "<span style=''>{metric_name}: {data:.2f}</span>"
+            self.annotation_text = "<span style=''>{metric_name}: {data:.0f}/66</span>"  # TODO: this text will not automatically update!
 
     def show(self):
         st.plotly_chart(
@@ -262,7 +263,12 @@ class DistributionPlot(Visual):
                 x=0,
                 y=i + 0.4,
                 text=self.annotation_text.format(
-                    metric_name=metric_name, data=ser_plot[col]
+                    metric_name=metric_name,
+                    data=(
+                        ser_plot[col]
+                        if self.plot_type == "scout"
+                        else ser_plot[col + hover]
+                    ),
                 ),
                 showarrow=False,
                 font={
