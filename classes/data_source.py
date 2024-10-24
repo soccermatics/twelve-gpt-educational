@@ -200,7 +200,6 @@ class Arguments(Data):
                 elif current_view == 'Pro' and new_view == 'Pro':
                     current_view = 'Pro'
 
-
             overall.append(current_view)  
 
         df['overall'] = overall

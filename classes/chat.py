@@ -432,7 +432,7 @@ class LessonChat(Chat):
         # Initialize the total score as an int and originality score as float
         #self.totalscore = totalscore
         self.originalityscore = np.float64(0.0)
-        #st.write
+        
         super().__init__(chat_state_hash, state=state)
 
     def instruction_messages(self):
@@ -447,16 +447,17 @@ class LessonChat(Chat):
                 )
             },
             {"role": "user", "content": (
-                f"After these messages you will be interacting with the user who will tell you what they know about for loops"
-                f"Your task is to gauge the understading of the use on the topic of the for loops and ask them a question that will help fill the knowledge gaps they have"
-                f"You will receive relevant information to answer a user's questions and then be asked to provide a response in form of a question. "
+                f"After these messages you will be interacting with the user who will tell you what they know about for loops. "
+                f"Your task is to gauge the understading of the use on the topic of for loops and ask them a question that will help fill the knowledge gaps they have. "
+                f"You will receive relevant information to answer a user's questions. The relevant information has different options for which is the preffered option. "
+                f"You can respond using the number 1 preffered ways but you can gauge based on the user response "
                 f"All user messages will be prefixed with 'user:' and enclosed with ```. "
                 f"When responding to the user, speak directly to them. "
                 f"If the user has understading of the for loops, ask them to write code that demonstrate the use of for loops, like displaying a range of numbers"
-                f"Evaluate the response, and check for syntax and logical errors in the student submission"
-                f"If the user says they do not know about loops, ask them a question on topics that preceed for loops"
-                f"If the user is able to write the basic loops, give the user a complex task to solve with the for loop"
-                f"At the end of the conversation give the user a programming task to practice their knowledge of the for loop"
+                f"Evaluate the response, and check for syntax and logical errors in the student submission. "
+                f"If the user says they do not know about loops, ask them a question on topics that preceed for loops. "
+                f"If the user is able to write the basic loops, give the user a complex task to solve with the for loop. "
+                f"At the end of the conversation give the user a programming task to practice their knowledge of the for loop. "
                 f"Do not deviate from this information or provide additional information that is not in the text returned by the functions."
                 )
             },
@@ -482,22 +483,32 @@ class LessonChat(Chat):
         sorted_results =results.reset_index(drop=True)
         st.write(sorted_results)
         if len(sorted_results)>0:
+            greator_similarities=sorted_results['similarities'] >= similaritythreshold
+            responce=[]
+            for i in range(len(greator_similarities)):
+                ret_val = f" This is the number {i+1} preffered way for answering the user question:  " 
+                ret_val +="\n".join(sorted_results.loc[[i]]["assistant"])
+                responce.append(ret_val)  
+                ret_val +="\n".join(sorted_results.loc[[i]]["assistant"].to_list())
+            result = " ".join(responce)
+            return result
+            '''
             for i in range(len(sorted_results)):
-                if sorted_results.iloc[0]['similarities'] >= similaritythreshold:
-                    ret_val = "\n\nHere is the most preffered relevant information for answering the user question:  \n"   
-                    ret_val +="\n".join(sorted_results.loc[[0]]["assistant"].to_list())
-                    return ret_val
+                if sorted_results.iloc[i]['similarities'] >= similaritythreshold:
+                    ret_val = f"\n\nHere is the {i+1} st preffered way for answering the user question:  \n"   
+                    ret_val +="\n".join(sorted_results.loc[[i]]["assistant"].to_list())
+                    return ret_val'''
 
                     #st.write(ret_val)
-                if sorted_results.iloc[0]['similarities'] < similaritythreshold:
-                    ret_val = "\n\nThe user said:  \n"   
-                    ret_val +="\n".join(sorted_results["assistant"].to_list())
-                    ret_val = "Look at the learner response, if it is around for loops, ask a question that will enhance their undestading of for loops. "
-                    ret_val += "If it not in the for loop tell the user that they should try respond with the relevant topic. "
+            if sorted_results.iloc[0]['similarities'] < similaritythreshold:
+                ret_val = "\n\nThe user said:  \n"   
+                ret_val +="\n".join(sorted_results["assistant"].to_list())
+                ret_val = "Look at the learner response, if it is around for loops, ask a question that will enhance their undestading of for loops. "
+                ret_val += "If it not in the for loop tell the user that they should try respond with the relevant topic. "
                     #with sidebar_container:
                             #st.write(f'Novelty: 0/{numberofarguments}')
                             #st.write(f'Total score: {int(np.ceil(self.totalscore))}')
-                    return ret_val
+                return ret_val
         if len(results) == 0:
             ret_val="\n\n check the user response, if it is related to for loops in general ask the user a question to assess their knowledge on for loops:\n" 
             ret_val+="If response is not related to for loop and programming in general, tell the user to ask relevant questions"
