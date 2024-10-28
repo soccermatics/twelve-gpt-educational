@@ -15,7 +15,6 @@ import sys
 import pyarrow.parquet as pq
 
 
-
 import classes.data_point as data_point
 
 # from classes.wyscout_api import WyNot
@@ -31,7 +30,6 @@ class Data:
 
     def __init__(self):
         self.df = self.get_processed_data()
-    
 
     def get_raw_data(self) -> pd.DataFrame:
         raise NotImplementedError("Child class must implement get_raw_data(self)")
@@ -173,7 +171,120 @@ class CountryStats(Stats):
         # convert to dictionary using the value and name columns
         self.core_value_dict = self.core_value_dict.set_index("value")["name"].to_dict()
 
+        self.drill_down = self.get_drill_down_dict()
+
         super().__init__()
+
+    def get_drill_down_data(self, file_path):
+        df = self.process_data(
+            self.get_z_scores(pd.read_csv(file_path).drop(columns=["score"]))
+        )
+
+        return dict(zip(df.country.values, df.drill_down_metric.values))
+
+    def get_drill_down_data_values(self, file_path, metric_name):
+
+        df = self.process_data(pd.read_csv(file_path).drop(columns=["score"]))
+
+        # create a value column that has the values from the columns is given by the dict self.drill_down_metric_country_question
+        # where the dict has format {country: question}
+        df["value"] = df.apply(
+            lambda x: x[
+                self.drill_down_metric_country_question[metric_name][x["country"]]
+            ],
+            axis=1,
+        )
+
+        return dict(zip(df.country.values, df.value.values))
+
+    def get_drill_down_dict(
+        self,
+    ):
+
+        # read all .csv files from path ending in _pre.csv
+        path = "data/wvs/intermediate_data/"
+        all_files = os.listdir(path)
+
+        self.drill_down_metric_country_question = dict(
+            (
+                "_".join(file.split("_")[:-1]),
+                self.get_drill_down_data(path + file),
+            )
+            for file in all_files
+            if file.endswith("_pre.csv")
+        )
+
+        drill_down_data_raw = dict(
+            (
+                "_".join(file.split("_")[:-1]),
+                self.get_drill_down_data_values(
+                    path + file, "_".join(file.split("_")[:-1])
+                ),
+            )
+            for file in all_files
+            if file.endswith("_raw.csv")
+        )
+
+        metrics = [m for m in self.drill_down_metric_country_question.keys()]
+        countries = [
+            k for k in self.drill_down_metric_country_question[metrics[0]].keys()
+        ]
+
+        drill_down = [
+            (
+                country,
+                dict(
+                    [
+                        (
+                            metric,
+                            (
+                                self.drill_down_metric_country_question[metric][
+                                    country
+                                ],
+                                drill_down_data_raw[metric][country],
+                            ),
+                        )
+                        for metric in metrics
+                    ]
+                ),
+            )
+            for country in countries
+        ]
+
+        return dict(drill_down)
+
+    def get_z_scores(self, df, metrics=None, negative_metrics=[]):
+
+        if metrics is None:
+            metrics = [m for m in df.columns if m not in ["country"]]
+
+        df_z = df[metrics].apply(zscore, nan_policy="omit")
+
+        # Rename every column to include "Z" at the end
+        df_z.columns = [f"{col}_Z" for col in df_z.columns]
+
+        # Here we get opposite value of metrics if their weight is negative
+        for metric in set(negative_metrics).intersection(metrics):
+            df_z[metric] = df_z[metric] * -1
+
+        # find the columns that end with "_Z" and has greatest magnitude
+        drill_down_metrics = (
+            df_z[df_z.columns[df_z.columns.str.endswith("_Z")]]
+            .abs()
+            .idxmax(axis=1)
+            .apply(lambda x: "_".join(x.split("_")[:-1]))
+        )
+        df_z["drill_down_metric"] = drill_down_metrics
+
+        # # Here we want to use df_metric_zscores to get the ranks and pct_ranks due to negative metrics
+        # df_ranks = df[metrics].rank(ascending=False)
+
+        # # Rename every column to include "Ranks" at the end
+        # df_ranks.columns = [f"{col}_Ranks" for col in df_ranks.columns]
+
+        # Add ranks and pct_ranks as new columns
+        # return pd.concat([df, df_z, df_ranks], axis=1)
+        return pd.concat([df, df_z], axis=1)
 
     def select_random(self):
         # return the index of the random sample
@@ -424,155 +535,218 @@ class CountryStats(Stats):
         drill_down_metrics = ser_metrics[
             ser_metrics.index.str.endswith("_Z") & (ser_metrics.abs() > 1.0)
         ].index.tolist()
+        drill_down_metrics = ["_".join(x.split("_")[:-1]) for x in drill_down_metrics]
+
+        drill_down_values = dict(
+            [
+                (key, value)
+                for key, value in self.drill_down[name].items()
+                if key in drill_down_metrics
+            ]
+        )
 
         return self.data_point_class(
             id=id,
             name=name,
             ser_metrics=ser_metrics,
             relevant_metrics=self.metrics,
-            drill_down_metrics=drill_down_metrics,
+            drill_down_metrics=drill_down_values,
         )
 
 
-
-class PersonStat(Stats):   
+class PersonStat(Stats):
     data_point_class = data_point.Person
     negative_metrics = []
 
     def __init__(self):
         super().__init__()
-    
+
     def get_raw_data(self):
-        #df = pd.read_csv('data/data-final.csv',sep='\t',encoding='unicode_escape').sample(frac=0.0001)
-        df = pd.read_csv('data/data_raw.csv',sep='\t',encoding='unicode_escape')
+        # df = pd.read_csv('data/data-final.csv',sep='\t',encoding='unicode_escape').sample(frac=0.0001)
+        df = pd.read_csv("data/data_raw.csv", sep="\t", encoding="unicode_escape")
         return df
-      
 
     def get_questions(self):
-        ''' This function is to have access to the questions'''
-        
+        """This function is to have access to the questions"""
+
         # Groups and Questions modify version
         # (1) extraversion, (2) neuroticism, (3) agreeableness, (4)conscientiousness , and (5) openness
-        ext_questions = {'EXT1' : ['they are the life of the party',1],
-                         'EXT2' : ['they dont talk a lot',-1],
-                         'EXT3' : ['they feel comfortable around people',1],
-                         'EXT4' : ['they keep in the background',-1],
-                         'EXT5' : ['they start conversations',1],
-                         'EXT6' : ['they have little to say',-1],
-                         'EXT7' : ['they talk to a lot of different people at parties',1],
-                         'EXT8' : ['they dont like to draw attention to themself',-1],
-                         'EXT9' : ['they dont mind being the center of attention',1],
-                         'EXT10': ['they are quiet around strangers',-1]}
-        
-        est_questions = {'EST1' : ['they get stressed out easily',-1],
-                         'EST2' : ['they are relaxed most of the time',1],
-                         'EST3' : ['they worry about things',-1],
-                         'EST4' : ['they seldom feel blue',1],
-                         'EST5' : ['they are easily disturbed',-1],
-                         'EST6' : ['they get upset easily',-1],
-                         'EST7' : ['they change their mood a lot',-1],
-                         'EST8' : ['they have frequent mood swings',-1],
-                         'EST9' : ['they get irritated easily',-1],
-                         'EST10': ['they often feel blue',-1]}
-        
-        agr_questions = {'AGR1' : ['they feel little concern for others',-1],
-                         'AGR2' : ['they interested in people',1],
-                         'AGR3' : ['they insult people',-1],
-                         'AGR4' : ['they sympathize with others feelings',1],
-                         'AGR5' : ['they are not interested in other peoples problems',-1],
-                         'AGR6' : ['they have a soft heart',1],
-                         'AGR7' : ['they not really interested in others',-1],
-                         'AGR8' : ['they take time out for others',1],
-                         'AGR9' : ['they feel others emotions',1],
-                         'AGR10': ['they make people feel at ease',1]}
-    
-        csn_questions = {'CSN1' : ['they are always prepared',1],
-                         'CSN2' : ['they leave their belongings around',-1],
-                         'CSN3' : ['they pay attention to details',1],
-                         'CSN4' : ['they make a mess of things',-1],
-                         'CSN5' : ['they get chores done right away',1],
-                         'CSN6' : ['they often forget to put things back in their proper place',-1],
-                         'CSN7' : ['they like order',1],
-                         'CSN8' : ['they shirk their duties',-1],
-                         'CSN9' : ['they follow a schedule',1],
-                         'CSN10' : ['they are exacting in their work',1]}
+        ext_questions = {
+            "EXT1": ["they are the life of the party", 1],
+            "EXT2": ["they dont talk a lot", -1],
+            "EXT3": ["they feel comfortable around people", 1],
+            "EXT4": ["they keep in the background", -1],
+            "EXT5": ["they start conversations", 1],
+            "EXT6": ["they have little to say", -1],
+            "EXT7": ["they talk to a lot of different people at parties", 1],
+            "EXT8": ["they dont like to draw attention to themself", -1],
+            "EXT9": ["they dont mind being the center of attention", 1],
+            "EXT10": ["they are quiet around strangers", -1],
+        }
 
-        opn_questions = {'OPN1' : ['they have a rich vocabulary',1],
-                         'OPN2' : ['they have difficulty understanding abstract ideas',-1],
-                         'OPN3' : ['they have a vivid imagination',1],
-                         'OPN4' : ['they are not interested in abstract ideas',-1],
-                         'OPN5' : ['they have excellent ideas',1],
-                         'OPN6' : ['they do not have a good imagination',-1],
-                         'OPN7' : ['they are quick to understand things',1],
-                         'OPN8' : ['they use difficult words',1],
-                         'OPN9' : ['they spend time reflecting on things',1],
-                         'OPN10': ['they are full of ideas',1]}
-    
-        questions = ext_questions | est_questions | agr_questions | csn_questions  | opn_questions
+        est_questions = {
+            "EST1": ["they get stressed out easily", -1],
+            "EST2": ["they are relaxed most of the time", 1],
+            "EST3": ["they worry about things", -1],
+            "EST4": ["they seldom feel blue", 1],
+            "EST5": ["they are easily disturbed", -1],
+            "EST6": ["they get upset easily", -1],
+            "EST7": ["they change their mood a lot", -1],
+            "EST8": ["they have frequent mood swings", -1],
+            "EST9": ["they get irritated easily", -1],
+            "EST10": ["they often feel blue", -1],
+        }
+
+        agr_questions = {
+            "AGR1": ["they feel little concern for others", -1],
+            "AGR2": ["they interested in people", 1],
+            "AGR3": ["they insult people", -1],
+            "AGR4": ["they sympathize with others feelings", 1],
+            "AGR5": ["they are not interested in other peoples problems", -1],
+            "AGR6": ["they have a soft heart", 1],
+            "AGR7": ["they not really interested in others", -1],
+            "AGR8": ["they take time out for others", 1],
+            "AGR9": ["they feel others emotions", 1],
+            "AGR10": ["they make people feel at ease", 1],
+        }
+
+        csn_questions = {
+            "CSN1": ["they are always prepared", 1],
+            "CSN2": ["they leave their belongings around", -1],
+            "CSN3": ["they pay attention to details", 1],
+            "CSN4": ["they make a mess of things", -1],
+            "CSN5": ["they get chores done right away", 1],
+            "CSN6": ["they often forget to put things back in their proper place", -1],
+            "CSN7": ["they like order", 1],
+            "CSN8": ["they shirk their duties", -1],
+            "CSN9": ["they follow a schedule", 1],
+            "CSN10": ["they are exacting in their work", 1],
+        }
+
+        opn_questions = {
+            "OPN1": ["they have a rich vocabulary", 1],
+            "OPN2": ["they have difficulty understanding abstract ideas", -1],
+            "OPN3": ["they have a vivid imagination", 1],
+            "OPN4": ["they are not interested in abstract ideas", -1],
+            "OPN5": ["they have excellent ideas", 1],
+            "OPN6": ["they do not have a good imagination", -1],
+            "OPN7": ["they are quick to understand things", 1],
+            "OPN8": ["they use difficult words", 1],
+            "OPN9": ["they spend time reflecting on things", 1],
+            "OPN10": ["they are full of ideas", 1],
+        }
+
+        questions = (
+            ext_questions
+            | est_questions
+            | agr_questions
+            | csn_questions
+            | opn_questions
+        )
         return questions
 
-
-    
-        
     def process_data(self, df_raw):
-        ''' This fonction get the person or candidate data with a number id or a list, and return a dataframe of the person '''
+        """This fonction get the person or candidate data with a number id or a list, and return a dataframe of the person"""
         questions = self.get_questions()
-        
-        # First we want to check if the user want a certain candidate from the dataset 
+
+        # First we want to check if the user want a certain candidate from the dataset
         # or if the user did the test so it return a list
         if isinstance(df_raw, list):
-            matching = ['EXT1', 'EXT2', 'EXT3', 'EXT4', 'EXT5', 'EXT6', 'EXT7', 'EXT8', 'EXT9',
-           'EXT10', 'EST1', 'EST2', 'EST3', 'EST4', 'EST5', 'EST6', 'EST7', 'EST8',
-           'EST9', 'EST10', 'AGR1', 'AGR2', 'AGR3', 'AGR4', 'AGR5', 'AGR6', 'AGR7',
-           'AGR8', 'AGR9', 'AGR10', 'CSN1', 'CSN2', 'CSN3', 'CSN4', 'CSN5', 'CSN6',
-           'CSN7', 'CSN8', 'CSN9', 'CSN10', 'OPN1', 'OPN2', 'OPN3', 'OPN4', 'OPN5',
-           'OPN6', 'OPN7', 'OPN8', 'OPN9', 'OPN10']
-            df_raw =pd.DataFrame([df_raw], columns= [column for column in matching])
-            
-            
+            matching = [
+                "EXT1",
+                "EXT2",
+                "EXT3",
+                "EXT4",
+                "EXT5",
+                "EXT6",
+                "EXT7",
+                "EXT8",
+                "EXT9",
+                "EXT10",
+                "EST1",
+                "EST2",
+                "EST3",
+                "EST4",
+                "EST5",
+                "EST6",
+                "EST7",
+                "EST8",
+                "EST9",
+                "EST10",
+                "AGR1",
+                "AGR2",
+                "AGR3",
+                "AGR4",
+                "AGR5",
+                "AGR6",
+                "AGR7",
+                "AGR8",
+                "AGR9",
+                "AGR10",
+                "CSN1",
+                "CSN2",
+                "CSN3",
+                "CSN4",
+                "CSN5",
+                "CSN6",
+                "CSN7",
+                "CSN8",
+                "CSN9",
+                "CSN10",
+                "OPN1",
+                "OPN2",
+                "OPN3",
+                "OPN4",
+                "OPN5",
+                "OPN6",
+                "OPN7",
+                "OPN8",
+                "OPN9",
+                "OPN10",
+            ]
+            df_raw = pd.DataFrame([df_raw], columns=[column for column in matching])
+
         else:
             df_raw.drop(df_raw.columns[50:107], axis=1, inplace=True)
-            df_raw.drop(df_raw.columns[50:], axis=1, inplace=True) # here 50 to remove the country
+            df_raw.drop(
+                df_raw.columns[50:], axis=1, inplace=True
+            )  # here 50 to remove the country
             df_raw.dropna(inplace=True)
 
-           
-
             # Group Names and Columns
-            #EXT = [column for column in df_raw if column.startswith('EXT')]
-            #EST = [column for column in df_raw if column.startswith('EST')]
-            #AGR = [column for column in df_raw if column.startswith('AGR')]
-            #CSN = [column for column in df_raw if column.startswith('CSN')]
-            #OPN = [column for column in df_raw if column.startswith('OPN')]
+            # EXT = [column for column in df_raw if column.startswith('EXT')]
+            # EST = [column for column in df_raw if column.startswith('EST')]
+            # AGR = [column for column in df_raw if column.startswith('AGR')]
+            # CSN = [column for column in df_raw if column.startswith('CSN')]
+            # OPN = [column for column in df_raw if column.startswith('OPN')]
 
-            #matching = EXT+EST+AGR+CSN+OPN
+            # matching = EXT+EST+AGR+CSN+OPN
 
             # Here we update the dataframe by applying the new coefficient
         for column in df_raw.columns:
             df_raw[column] = df_raw[column] * questions[column][1]
 
-        # reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf 
-        df_raw['extraversion'] = df_raw.iloc[:, 0:10].sum(axis=1) + 20
-        df_raw['neuroticism'] = df_raw.iloc[:, 10:20].sum(axis=1) +38
-        df_raw['agreeableness'] = df_raw.iloc[:, 20:30].sum(axis=1) +14 
-        df_raw['conscientiousness'] = df_raw.iloc[:, 30:40].sum(axis=1) + 14
-        df_raw['openness'] = df_raw.iloc[:, 40:50].sum(axis=1) + 8
-        df_raw['name'] = df_raw.index.to_series().apply(lambda idx: 'C_' + str(idx))
-             
-        return df_raw
-        
-    
-    def to_data_point(self) -> data_point.Person:
-        
-        id = self.df.index[0]
-        name = self.df['name'].values[0]
+        # reference to scoring: https://sites.temple.edu/rtassessment/files/2018/10/Table_BFPT.pdf
+        df_raw["extraversion"] = df_raw.iloc[:, 0:10].sum(axis=1) + 20
+        df_raw["neuroticism"] = df_raw.iloc[:, 10:20].sum(axis=1) + 38
+        df_raw["agreeableness"] = df_raw.iloc[:, 20:30].sum(axis=1) + 14
+        df_raw["conscientiousness"] = df_raw.iloc[:, 30:40].sum(axis=1) + 14
+        df_raw["openness"] = df_raw.iloc[:, 40:50].sum(axis=1) + 8
+        df_raw["name"] = df_raw.index.to_series().apply(lambda idx: "C_" + str(idx))
 
-        #Reindexing dataframe
+        return df_raw
+
+    def to_data_point(self) -> data_point.Person:
+
+        id = self.df.index[0]
+        name = self.df["name"].values[0]
+
+        # Reindexing dataframe
         self.df.reset_index(drop=True, inplace=True)
 
-        self.df=self.df.drop(columns=["name"])
+        self.df = self.df.drop(columns=["name"])
 
         # Convert to series
         ser_metrics = self.df.squeeze()
-        
-        return self.data_point_class(id=id,name=name,ser_metrics=ser_metrics)
 
+        return self.data_point_class(id=id, name=name, ser_metrics=ser_metrics)

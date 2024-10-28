@@ -41,7 +41,9 @@ countries.calculate_statistics(metrics=metrics)
 
 country = select_country(sidebar_container, countries)
 
-st.markdown("Drill down on:  \n" + "  \n".join([x for x in country.drill_down_metrics]))
+st.markdown(
+    "Drill down on:  \n" + "  \n".join([x for x in country.drill_down_metrics.keys()])
+)
 
 st.write(
     "This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key."

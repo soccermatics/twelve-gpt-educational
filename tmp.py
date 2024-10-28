@@ -1,3 +1,17 @@
+from classes.data_source import CountryStats
+import copy
+
+countries = CountryStats()
+metrics = [m for m in countries.df.columns if m not in ["country"]]
+
+countries.calculate_statistics(metrics=metrics)
+country_names = countries.df["country"].values.tolist()
+
+country = copy.deepcopy(countries)
+country.df = country.df[country.df["country"] == country_names[1]]
+country = country.to_data_point()
+
+
 # %%
 import pandas as pd
 
