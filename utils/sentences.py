@@ -1,4 +1,4 @@
-# Give the correct gnder words
+# Give the correct gender words
 def pronouns(gender):
     if gender.lower() == "male":
         subject_p, object_p, possessive_p = "he", "him", "his"

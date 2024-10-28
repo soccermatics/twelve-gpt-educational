@@ -241,7 +241,7 @@ class CountryStats(Stats):
                                 self.drill_down_metric_country_question[metric][
                                     country
                                 ],
-                                drill_down_data_raw[metric][country],
+                                round(drill_down_data_raw[metric][country]),
                             ),
                         )
                         for metric in metrics
@@ -257,6 +257,9 @@ class CountryStats(Stats):
 
         if metrics is None:
             metrics = [m for m in df.columns if m not in ["country"]]
+
+        # drill_down_metrics = df[metrics].abs().idxmax(axis=1)
+        # df["drill_down_metric"] = drill_down_metrics
 
         df_z = df[metrics].apply(zscore, nan_policy="omit")
 

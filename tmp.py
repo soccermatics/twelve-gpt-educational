@@ -1,5 +1,9 @@
 from classes.data_source import CountryStats
 import copy
+from classes.description import (
+    CountryDescription,
+)
+import json
 
 countries = CountryStats()
 metrics = [m for m in countries.df.columns if m not in ["country"]]
@@ -11,6 +15,27 @@ country = copy.deepcopy(countries)
 country.df = country.df[country.df["country"] == country_names[1]]
 country = country.to_data_point()
 
+
+with open("data/wvs/description_dict.json", "r") as f:
+    description_dict = json.load(f)
+
+thresholds_dict = dict(
+    (
+        metric,
+        [
+            2.5,
+            1.5,
+            0.5,
+            -0.5,
+            -1.5,
+            -2.5,
+        ],
+    )
+    for metric in metrics
+)
+description = CountryDescription(
+    country, description_dict=description_dict, thresholds_dict=thresholds_dict
+)
 
 # %%
 import pandas as pd

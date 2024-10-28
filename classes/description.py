@@ -13,6 +13,7 @@ from utils.gemini import convert_messages_format
 from classes.data_point import Player, Country, Person
 from classes.data_source import PersonStat
 
+import json
 
 from settings import USE_GEMINI
 
@@ -319,6 +320,10 @@ class CountryDescription(Description):
         self.description_dict = description_dict
         self.thresholds_dict = thresholds_dict
 
+        # read data/wvs/intermediate_data/relevant_questions.json
+        with open("data/wvs/intermediate_data/relevant_questions.json", "r") as f:
+            self.relevant_questions = json.load(f)
+
         super().__init__()
 
     def get_intro_messages(self) -> List[Dict[str, str]]:
@@ -363,13 +368,11 @@ class CountryDescription(Description):
 
     def synthesize_text(self):
 
-        country = self.country
-        metrics = self.country.relevant_metrics
-        description = f"Here is a statistical description of the core values of {country.name.capitalize()}. \n\n"
+        description = f"Here is a statistical description of the core values of {self.country.name.capitalize()}. \n\n"
 
         # subject_p, object_p, possessive_p = sentences.pronouns(country.gender)
 
-        for metric in metrics:
+        for metric in self.country.relevant_metrics:
 
             # # TODO: customize this text?
             # description += f"{country.name.capitalize()} was found to be "
@@ -381,14 +384,28 @@ class CountryDescription(Description):
             # description += " in " + metric.lower()  # .replace("_", " ")
             # description += " compared to other countries in the same survey. "
 
-            description += f"{country.name.capitalize()} was found to "
+            description += f"{self.country.name.capitalize()} was found to "
             description += sentences.describe_level(
-                country.ser_metrics[metric + "_Z"],
+                self.country.ser_metrics[metric + "_Z"],
                 thresholds=self.thresholds_dict[metric],
                 words=self.description_dict[metric],
             )
             description += " compared to other countries in the same survey. "
 
+            if metric in self.country.drill_down_metrics:
+
+                question, value = self.country.drill_down_metrics[metric]
+                description += "In response to the question '"
+                description += self.relevant_questions[metric][question][0]
+                description += "', on average participants "
+                description += self.relevant_questions[metric][question][1]
+                description += " '"
+                description += self.relevant_questions[metric][question][2][str(value)]
+                description += "' "
+                description += self.relevant_questions[metric][question][3]
+                description += ". "
+
+            description += "\n\n"
         # st.write(description)
 
         return description

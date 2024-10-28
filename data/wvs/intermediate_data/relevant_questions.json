@@ -1,0 +1,566 @@
+{
+  "Traditional vs Secular Values": {
+    "Q164": [
+      "How important is God in your life?",
+      "indicated God to be",
+      {
+        "1": "not at all important",
+        "2": "not at all important",
+        "3": "unimportant",
+        "4": "somewhat unimportant",
+        "5": "neither important nor unimportant",
+        "6": "neither important nor unimportant",
+        "7": "somewhat important",
+        "8": "important",
+        "9": "very important",
+        "10": "very important"
+      },
+      "in their life"
+    ],
+    "Q8": [
+      "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important?",
+      "",
+      {
+        "1": "mentioned",
+        "2": "not mentioned"
+      },
+      "children's independence as especially important"
+    ],
+    "Q14": [
+      "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important?",
+      "",
+      {
+        "1": "mentioned",
+        "2": "not mentioned"
+      },
+      "children's determination, perseverance as especially important"
+    ],
+    "Q15": [
+      "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important?",
+      "",
+      {
+        "1": "mentioned",
+        "2": "not mentioned"
+      },
+      "children's religious faith as especially important"
+    ],
+    "Q17": [
+      "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important?",
+      "",
+      {
+        "1": "mentioned",
+        "2": "not mentioned"
+      },
+      "children's obedience as especially important"
+    ],
+    "Q184": [
+      "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Abortion",
+      "indicated that abortion is",
+      {
+        "1": "never justifiable",
+        "2": "almost never justifiable",
+        "3": "unjustifiable",
+        "4": "sometimes unjustifiable",
+        "5": "neither justifiable nor unjustifiable",
+        "6": "neither justifiable nor unjustifiable",
+        "7": "sometimes justifiable",
+        "8": "justifiable",
+        "9": "almost always justifiable",
+        "10": "always justifiable"
+      },
+      ""
+    ],
+    "Q254": [
+      "How proud are you to be of the nationality of this country?",
+      "indicated that they are",
+      {
+        "1": "yery proud",
+        "2": "quite proud",
+        "3": "not very proud",
+        "4": "not at all proud",
+        "5": "I am not [country's nationality]"
+      },
+      ""
+    ],
+    "Q45": [
+      "In the future, would it be a good thing if we had greater respect for authority?",
+      "indicated that they think it would be",
+      {
+        "1": "good",
+        "2": "neither good nor bad",
+        "3": "bad"
+      },
+      ""
+    ]
+  },
+  "Survival vs Self-expression Values": {
+    "Q3": [
+      "How important is leisure time to you?",
+      "indicating that leisure time is",
+      {
+        "1": "very important",
+        "2": "rather important",
+        "3": "not very important",
+        "4": "not at all important"
+      },
+      ""
+    ],
+    "Q5": [
+      "How important is work to you?",
+      "indicating that work is",
+      {
+        "1": "very important",
+        "2": "rather important",
+        "3": "not very important",
+        "4": "not at all important"
+      },
+      ""
+    ],
+    "Q40": [
+      "Do you think that work is a duty towards society?",
+      "indicating that they",
+      {
+        "1": "agree strongly",
+        "2": "agree",
+        "3": "neither agree nor disagree",
+        "4": "disagree",
+        "5": "disagree strongly"
+      },
+      ""
+    ],
+    "Q41": [
+      "Do you think work should always come first, even if it means no spare time?",
+      "indicating that they",
+      {
+        "1": "agree strongly",
+        "2": "agree",
+        "3": "neither agree nor disagree",
+        "4": "disagree",
+        "5": "disagree strongly"
+      },
+      ""
+    ],
+    "Q43": [
+      "In the future, would it be a good thing if less importance is placed on work",
+      "indicating that they think it would be",
+      {
+        "1": "good",
+        "2": "neither good nor bad",
+        "3": "bad"
+      },
+      ""
+    ],
+    "Q131": [
+      "Could you tell me how secure do you feel these days in your neighborhood?",
+      "indicating that they feel",
+      {
+        "1": "very secure",
+        "2": "quite secure",
+        "3": "not very secure",
+        "4": "not at all secure"
+      },
+      ""
+    ],
+    "Q142": [
+      "To what degree are you worried about the following situations? Losing my job or not finding a job",
+      "indicating that they are",
+      {
+        "1": "very much",
+        "2": "a good deal",
+        "3": "not much",
+        "4": "not at all"
+      },
+      "worried about losing their job or not finding a job"
+    ],
+    "Q150": [
+      "Most people consider both freedom and security to be important, but if you had to choose between them, do you think security is more important than freedom",
+      "indicated",
+      {
+        "1": "freedom",
+        "2": "security"
+      },
+      ""
+    ],
+    "Q46": [
+      "Do you feel happy?",
+      "indicated that they are",
+      {
+        "1": "very happy",
+        "2": "rather happy",
+        "3": "not very happy",
+        "4": "not at all happy"
+      },
+      ""
+    ],
+    "Q49": [
+      "How satisfied are you with your life?",
+      "indicated that they are",
+      {
+        "1": "completely dissatisfied",
+        "2": "almost completely dissatisfied",
+        "3": "dissatisfied",
+        "4": "somewhat dissatisfied",
+        "5": "neither important nor dissatisfied",
+        "6": "neither important nor dissatisfied",
+        "7": "somewhat satisfied",
+        "8": "satisfied",
+        "9": "almost completely satisfied",
+        "10": "completely satisfied"
+      },
+      "with their life"
+    ],
+    "Q22": [
+      "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?",
+      "",
+      {
+        "1": "mentioned",
+        "2": "not mentioned"
+      },
+      "homosexuals as neighbors they would not like to have"
+    ],
+    "Q182": [
+      "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Homosexuality",
+      "indicated that it is",
+      {
+        "1": "never justifiable",
+        "2": "almost never justifiable",
+        "3": "unjustifiable",
+        "4": "sometimes unjustifiable",
+        "5": "neither justifiable nor unjustifiable",
+        "6": "neither justifiable nor unjustifiable",
+        "7": "sometimes justifiable",
+        "8": "justifiable",
+        "9": "almost always justifiable",
+        "10": "always justifiable"
+      },
+      ""
+    ],
+    "Q209": [
+      "I’m going to read out some forms of political action that people can take, and I'd like you to tell me, for each one, whether you have done any of these things, whether you might do it or would never under any circumstances do it: signing a petition",
+      "indicated that they",
+      {
+        "1": "have done",
+        "2": "might do",
+        "3": "would never do"
+      },
+      "that"
+    ],
+    "Q218": [
+      "I’m going to read out some other forms of political action that people can take using Internet and social media tools like Facebook, Twitter etc., and I'd like you to tell me, for each one, whether you have done any of these things, whether you might do it or would never under any circumstances do it: signing an electronic petition",
+      "indicated that they",
+      {
+        "1": "have done",
+        "2": "might do",
+        "3": "would never do"
+      },
+      "that"
+    ],
+    "Q57": [
+      "Most people can be trusted",
+      "indicated that",
+      {
+        "1": "most people can be trusted",
+        "2": "one needs to be very careful"
+      },
+      ""
+    ],
+    "Q58": [
+      "How much do you trust your family?",
+      "indicated that they",
+      {
+        "1": "trust completely",
+        "2": "trust somewhat",
+        "3": "do not trust very much",
+        "4": "do not trust at all"
+      },
+      "their family"
+    ],
+    "Q59": [
+      "How much do you trust your neighborhood?",
+      "indicated that they",
+      {
+        "1": "trust completely",
+        "2": "trust somewhat",
+        "3": "do not trust very much",
+        "4": "do not trust at all"
+      },
+      "their neighborhood"
+    ],
+    "Q60": [
+      "How much do you trust people you know personally?",
+      "indicated that they",
+      {
+        "1": "trust completely",
+        "2": "trust somewhat",
+        "3": "do not trust very much",
+        "4": "do not trust at all"
+      },
+      "people they know personally"
+    ],
+    "Q61": [
+      "How much do you trust people you meet for the first time?",
+      "indicated that they",
+      {
+        "1": "trust completely",
+        "2": "trust somewhat",
+        "3": "do not trust very much",
+        "4": "do not trust at all"
+      },
+      "people they meet for the first time"
+    ],
+    "Q62": [
+      "How much do you trust people of another religion?",
+      "indicated that they",
+      {
+        "1": "trust completely",
+        "2": "trust somewhat",
+        "3": "do not trust very much",
+        "4": "do not trust at all"
+      },
+      "people of another religion"
+    ],
+    "Q63": [
+      "How much do you trust people of another nationality?",
+      "indicated that they",
+      {
+        "1": "trust completely",
+        "2": "trust somewhat",
+        "3": "do not trust very much",
+        "4": "do not trust at all"
+      },
+      "people of another nationality"
+    ]
+  },
+  "Neutrality": {
+    "Q102R": [
+      "Are you a member of a consumer organization?",
+      "indicated that they",
+      {
+        "1": "are an active member",
+        "2": "are an inactive member",
+        "3": "don't belong"
+      },
+      ""
+    ],
+    "Q101R": [
+      "Are you a member of a charitable or humanitarian organization?",
+      "indicated that they",
+      {
+        "1": "are an active member",
+        "2": "are an inactive member",
+        "3": "don't belong"
+      },
+      ""
+    ],
+    "Q100R": [
+      "Are you a member of a professional organization?",
+      "indicated that they",
+      {
+        "1": "are an active member",
+        "2": "are an inactive member",
+        "3": "don't belong"
+      },
+      ""
+    ],
+    "Q103R": [
+      "Are you a member of a self-help or mutual aid group?",
+      "indicated that they",
+      {
+        "1": "are an active member",
+        "2": "are an inactive member",
+        "3": "don't belong"
+      },
+      ""
+    ]
+  },
+  "Fairness": {
+    "Q179": [
+      "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Stealing property",
+      "indicated that is is",
+      {
+        "1": "never justifiable",
+        "2": "almost never justifiable",
+        "3": "unjustifiable",
+        "4": "sometimes unjustifiable",
+        "5": "neither justifiable nor unjustifiable",
+        "6": "neither justifiable nor unjustifiable",
+        "7": "sometimes justifiable",
+        "8": "justifiable",
+        "9": "almost always justifiable",
+        "10": "always justifiable"
+      },
+      ""
+    ],
+    "Q181": [
+      "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Someone accepting a bribe in the course of their duties",
+      "indicated that is is",
+      {
+        "1": "never justifiable",
+        "2": "almost never justifiable",
+        "3": "unjustifiable",
+        "4": "sometimes unjustifiable",
+        "5": "neither justifiable nor unjustifiable",
+        "6": "neither justifiable nor unjustifiable",
+        "7": "sometimes justifiable",
+        "8": "justifiable",
+        "9": "almost always justifiable",
+        "10": "always justifiable"
+      },
+      ""
+    ],
+    "Q180": [
+      "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Cheating on taxes if you have a chance",
+      "indicated that is is",
+      {
+        "1": "never justifiable",
+        "2": "almost never justifiable",
+        "3": "unjustifiable",
+        "4": "sometimes unjustifiable",
+        "5": "neither justifiable nor unjustifiable",
+        "6": "neither justifiable nor unjustifiable",
+        "7": "sometimes justifiable",
+        "8": "justifiable",
+        "9": "almost always justifiable",
+        "10": "always justifiable"
+      },
+      ""
+    ],
+    "Q191": [
+      "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Violence against other people",
+      "indicated that is is",
+      {
+        "1": "never justifiable",
+        "2": "almost never justifiable",
+        "3": "unjustifiable",
+        "4": "sometimes unjustifiable",
+        "5": "neither justifiable nor unjustifiable",
+        "6": "neither justifiable nor unjustifiable",
+        "7": "sometimes justifiable",
+        "8": "justifiable",
+        "9": "almost always justifiable",
+        "10": "always justifiable"
+      },
+      ""
+    ],
+    "Q189": [
+      "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: For a man to beat his wife",
+      "indicated that is is",
+      {
+        "1": "never justifiable",
+        "2": "almost never justifiable",
+        "3": "unjustifiable",
+        "4": "sometimes unjustifiable",
+        "5": "neither justifiable nor unjustifiable",
+        "6": "neither justifiable nor unjustifiable",
+        "7": "sometimes justifiable",
+        "8": "justifiable",
+        "9": "almost always justifiable",
+        "10": "always justifiable"
+      },
+      ""
+    ]
+  },
+  "Skepticism": {
+    "Q73": [
+      "How much confidence do you have in the parliament?",
+      "indicated that they have",
+      {
+        "1": "a great deal",
+        "2": "quite a lot",
+        "3": "not very much",
+        "4": "none at all"
+      },
+      ""
+    ],
+    "Q71": [
+      "How much confidence do you have in the government?",
+      "indicated that they have",
+      {
+        "1": "a great deal",
+        "2": "quite a lot",
+        "3": "not very much",
+        "4": "none at all"
+      },
+      ""
+    ],
+    "Q74": [
+      "How much confidence do you have in the civil services",
+      "indicated that they have",
+      {
+        "1": "a great deal",
+        "2": "quite a lot",
+        "3": "not very much",
+        "4": "none at all"
+      },
+      ""
+    ],
+    "Q72": [
+      "How much confidence do you have in political parties?",
+      "indicated that they have",
+      {
+        "1": "a great deal",
+        "2": "quite a lot",
+        "3": "not very much",
+        "4": "none at all"
+      },
+      ""
+    ],
+    "Q70": [
+      "How much confidence do you have in the justice system/courts?",
+      "indicated that they have",
+      {
+        "1": "a great deal",
+        "2": "quite a lot",
+        "3": "not very much",
+        "4": "none at all"
+      },
+      ""
+    ]
+  },
+  "Societal Tranquility": {
+    "Q148": [
+      "To what degree are you worried about the following situations? A civil war",
+      "indicated that they worry",
+      {
+        "1": "very much",
+        "2": "a good deal",
+        "3": "not much",
+        "4": "not at all"
+      },
+      ""
+    ],
+    "Q147": [
+      "To what degree are you worried about the following situations? A terrorist attack",
+      "indicated that they worry",
+      {
+        "1": "very much",
+        "2": "a good deal",
+        "3": "not much",
+        "4": "not at all"
+      },
+      ""
+    ],
+    "Q146": [
+      "To what degree are you worried about the following situations? A war involving my country",
+      "indicated that they worry",
+      {
+        "1": "very much",
+        "2": "a good deal",
+        "3": "not much",
+        "4": "not at all"
+      },
+      ""
+    ],
+    "Q143": [
+      "To what degree are you worried about the following situations? Not being able to give one's children a good education",
+      "indicated that they worry",
+      {
+        "1": "very much",
+        "2": "a good deal",
+        "3": "not much",
+        "4": "not at all"
+      },
+      ""
+    ]
+  }
+}
