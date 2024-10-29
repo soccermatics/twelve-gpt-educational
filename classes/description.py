@@ -394,7 +394,13 @@ class CountryDescription(Description):
 
             if metric in self.country.drill_down_metrics:
 
+                if self.country.ser_metrics[metric + "_Z"] > 0:
+                    index = 1
+                else:
+                    index = 0
+
                 question, value = self.country.drill_down_metrics[metric]
+                question, value = question[index], value[index]
                 description += "In response to the question '"
                 description += self.relevant_questions[metric][question][0]
                 description += "', on average participants "
@@ -412,8 +418,9 @@ class CountryDescription(Description):
 
     def get_prompt_messages(self):
         prompt = (
-            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the social values held by population of the country. "
-            # f"The first sentence should use varied language to give an overview of the player. "
+            f"Please use the statistical description enclosed with ``` to give a concise, 2 short paragraph summary of the social values held by population of the country. "
+            f"The first sentence should focus on any values for which the country stands out. If the country is not far above or below average in any values, you can mention that. "
+            f"Make sure to mention that the values are relative to other countries in the survey and that the answers quoted reflect the average response of participants in the survey. "
             # "The second sentence should describe the player's specific strengths based on the metrics. "
             # "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
             # "Finally, summarise exactly how the player compares to others in the same position. "

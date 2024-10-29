@@ -14,6 +14,7 @@ from pathlib import Path
 import sys
 import pyarrow.parquet as pq
 
+from math import floor, ceil
 
 import classes.data_point as data_point
 
@@ -183,14 +184,25 @@ class CountryStats(Stats):
 
         # create a value column that has the values from the columns is given by the dict self.drill_down_metric_country_question
         # where the dict has format {country: question}
-        df["value"] = df.apply(
+        df["value_low"] = df.apply(
             lambda x: x[
-                self.drill_down_metric_country_question[metric_name][x["country"]]
+                self.drill_down_metric_country_question[metric_name][x["country"]][0]
             ],
             axis=1,
         )
 
-        return dict(zip(df.country.values, df.value.values))
+        df["value_high"] = df.apply(
+            lambda x: x[
+                self.drill_down_metric_country_question[metric_name][x["country"]][1]
+            ],
+            axis=1,
+        )
+
+        values = [
+            (floor(l), ceil(h)) for l, h in zip(df["value_low"], df["value_high"])
+        ]
+
+        return dict(zip(df.country.values, values))
 
     def get_drill_down_dict(
         self,
@@ -236,7 +248,7 @@ class CountryStats(Stats):
                                 self.drill_down_metric_country_question[metric][
                                     country
                                 ],
-                                round(drill_down_data_raw[metric][country]),
+                                drill_down_data_raw[metric][country],
                             ),
                         )
                         for metric in metrics
@@ -262,10 +274,18 @@ class CountryStats(Stats):
         for metric in set(negative_metrics).intersection(metrics):
             df_z[metric] = df_z[metric] * -1
 
+        # find the columns that has greatest magnitude
+        drill_down_metrics_high = df[metrics].idxmax(axis=1)
+        drill_down_metrics_low = df[metrics].idxmin(axis=1)
+
+        drill_down_metrics = [
+            (l, h) for l, h in zip(drill_down_metrics_low, drill_down_metrics_high)
+        ]
+
         ### Using the question with the greatest raw magnitude vs using the question with the greatest z-score magnitude
 
-        # find the columns that has greatest magnitude
-        drill_down_metrics = df[metrics].abs().idxmax(axis=1)
+        # # find the columns that has greatest magnitude
+        # drill_down_metrics = df[metrics].abs().idxmax(axis=1)
 
         # # find the columns that end with "_Z" and has greatest magnitude
         # drill_down_metrics = (
