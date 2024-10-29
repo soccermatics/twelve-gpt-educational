@@ -22,7 +22,7 @@
       "",
       {
         "1": "mentioned",
-        "2": "not mentioned"
+        "2": "did not mentioned"
       },
       "children's independence as especially important"
     ],
@@ -31,7 +31,7 @@
       "",
       {
         "1": "mentioned",
-        "2": "not mentioned"
+        "2": "did not mentioned"
       },
       "children's determination, perseverance as especially important"
     ],
@@ -40,7 +40,7 @@
       "",
       {
         "1": "mentioned",
-        "2": "not mentioned"
+        "2": "did not mentioned"
       },
       "children's religious faith as especially important"
     ],
@@ -49,7 +49,7 @@
       "",
       {
         "1": "mentioned",
-        "2": "not mentioned"
+        "2": "did not mentioned"
       },
       "children's obedience as especially important"
     ],
@@ -214,7 +214,7 @@
       "",
       {
         "1": "mentioned",
-        "2": "not mentioned"
+        "2": "did not mentioned"
       },
       "homosexuals as neighbors they would not like to have"
     ],
@@ -332,43 +332,43 @@
     ]
   },
   "Neutrality": {
-    "Q102R": [
+    "Q102": [
       "Are you a member of a consumer organization?",
       "indicated that they",
       {
-        "1": "are an active member",
-        "2": "are an inactive member",
-        "3": "don't belong"
+        "2": "are an active member",
+        "1": "are an inactive member",
+        "0": "don't belong"
       },
       ""
     ],
-    "Q101R": [
+    "Q101": [
       "Are you a member of a charitable or humanitarian organization?",
       "indicated that they",
       {
-        "1": "are an active member",
-        "2": "are an inactive member",
-        "3": "don't belong"
+        "2": "are an active member",
+        "1": "are an inactive member",
+        "0": "don't belong"
       },
       ""
     ],
-    "Q100R": [
+    "Q100": [
       "Are you a member of a professional organization?",
       "indicated that they",
       {
-        "1": "are an active member",
-        "2": "are an inactive member",
-        "3": "don't belong"
+        "2": "are an active member",
+        "1": "are an inactive member",
+        "0": "don't belong"
       },
       ""
     ],
-    "Q103R": [
+    "Q103": [
       "Are you a member of a self-help or mutual aid group?",
       "indicated that they",
       {
-        "1": "are an active member",
-        "2": "are an inactive member",
-        "3": "don't belong"
+        "2": "are an active member",
+        "1": "are an inactive member",
+        "0": "don't belong"
       },
       ""
     ]
@@ -376,7 +376,7 @@
   "Fairness": {
     "Q179": [
       "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Stealing property",
-      "indicated that is is",
+      "indicated that it is",
       {
         "1": "never justifiable",
         "2": "almost never justifiable",
@@ -393,7 +393,7 @@
     ],
     "Q181": [
       "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Someone accepting a bribe in the course of their duties",
-      "indicated that is is",
+      "indicated that it is",
       {
         "1": "never justifiable",
         "2": "almost never justifiable",
@@ -410,7 +410,7 @@
     ],
     "Q180": [
       "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Cheating on taxes if you have a chance",
-      "indicated that is is",
+      "indicated that it is",
       {
         "1": "never justifiable",
         "2": "almost never justifiable",
@@ -427,7 +427,7 @@
     ],
     "Q191": [
       "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: Violence against other people",
-      "indicated that is is",
+      "indicated that it is",
       {
         "1": "never justifiable",
         "2": "almost never justifiable",
@@ -444,7 +444,7 @@
     ],
     "Q189": [
       "Please tell me for each of the following actions whether you think it can always be justified, never be justified, or something in between: For a man to beat his wife",
-      "indicated that is is",
+      "indicated that it is",
       {
         "1": "never justifiable",
         "2": "almost never justifiable",

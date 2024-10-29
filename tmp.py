@@ -49,71 +49,6 @@ col = "goals"
 print(annotation_text.format(metric_name="Goals", data=ser_plot[col]))
 print()
 
-# %%
-
-description_dict = {
-    "Traditional vs Secular Values": [
-        "extremely secular",
-        "very secular",
-        "above averagely secular",
-        "neither traditional nor secular",
-        "above averagely traditional",
-        "very traditional",
-        "extremely traditional",
-    ],
-    "Survival vs Self-expression Values": [
-        "extremely self-expression orientated",
-        "very self-expression orientated",
-        "above averagely self-expression orientated",
-        "neither survival nor self-expression orientated",
-        "some what survival orientated",
-        "very survival orientated",
-        "extremely survival orientated",
-    ],
-    "Neutrality": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-    "Fairness": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-    "Skeptisism": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-    "Societal Tranquility": [
-        "extremely high",
-        "very high",
-        "above average",
-        "average",
-        "below average",
-        "very low",
-        "extremely low",
-    ],
-}
-
-
-# write to json
-import json
-
-with open("data/wvs/description_dict.json", "w") as f:
-    json.dump(description_dict, f)
 
 # %%
 
@@ -135,7 +70,7 @@ for col in df.columns:
 
 # %%
 
-threshold = 1.5
+threshold = 0.5
 
 # construct a new df that check if the abs of each value is greater than threshold
 df_abs = df.abs() > threshold

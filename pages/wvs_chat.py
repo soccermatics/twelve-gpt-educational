@@ -1,8 +1,18 @@
-# Library imports
+from classes.data_source import CountryStats
+
+countries = CountryStats()
+
+metrics = [m for m in countries.df.columns if m not in ["country"]]
+
+countries.calculate_statistics(metrics=metrics)
+
+# # save countries.df to csv
+# countries.df.to_csv("data/wvs/countries.csv", index=False)
+
+
 import streamlit as st
 from utils.utils import select_country, create_chat
 
-from classes.data_source import CountryStats
 
 from classes.chat import WVSChat
 from classes.visual import DistributionPlot
@@ -28,22 +38,9 @@ sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
 sidebar_container = st.sidebar.container()
 
-st.divider()
-
-countries = CountryStats()
-
-metrics = [m for m in countries.df.columns if m not in ["country"]]
-
-countries.calculate_statistics(metrics=metrics)
-
-# save countries.df to csv
-# countries.df.to_csv("data/wvs/countries.csv", index=False)
-
 country = select_country(sidebar_container, countries)
 
-# st.markdown(
-#     "Drill down on:  \n" + "  \n".join([x for x in country.drill_down_metrics.keys()])
-# )
+st.divider()
 
 st.write(
     "This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key."
@@ -53,9 +50,6 @@ st.write(
 with open("model cards/model-card-wvs-chat.md", "r", encoding="utf8") as file:
     # Read the contents of the file
     model_card_text = file.read()
-# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\model cards\style\python-code.css
-# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\pages\wvs_chat.py
-# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\pages\python-code.css
 
 load_css("model cards/style/python-code.css")
 st.expander("Model card", expanded=False).markdown(
@@ -133,5 +127,3 @@ chat.get_input()
 
 chat.display_messages()
 chat.save_state()
-
-# st.write("Under construction")
