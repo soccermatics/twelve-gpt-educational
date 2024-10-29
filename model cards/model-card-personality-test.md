@@ -102,10 +102,10 @@ Careful consideration should be made if applying these methods to data collected
 We have no further caveats and recommendations.
 
 ## References
-[1] Abood, N. (2019). Big five traits: A critical review. Gadjah Mada International Journal of Business, 21(2), 159–186. 
-[2] De Raad B, Barelds DP, Levert E, Ostendorf F, Mlacić B, Di Blas L, Hrebícková M, Szirmák Z, Szarota P, Perugini M, Church AT, Katigbak MS. Only three factors of personality description are fully replicable across languages: a comparison of 14 trait taxonomies. J Pers Soc Psychol. 2010 Jan;98(1):160-73. doi: 10.1037/a0017184. PMID: 20053040.
-[3] Triandis, Harry & Suh, Eunkook. (2002). Cultural Influences on Personality. Annual review of psychology. 53. 133-60. 10.1146/annurev.psych.53.100901.135200. 
-[4] Costa PT, Terracciano A, McCrae RR. Gender differences in personality traits across cultures: robust and surprising findings. J Pers Soc Psychol. 2001 Aug;81(2):322-331. doi: 10.1037/0022-3514.81.2.322. PMID: 11519935.
-[5] Stephen Bach, Managing Human Resources, fourth edition Personnel Management in Transition, BLACKWELL PUBLISHING
-[6] Miranda Bogen, Aaron RiekeHelp, Wanted - An Exploration of Hiring Algorithms, Equity and Bias, 2018
+[1] Abood, N. (2019). Big five traits: A critical review. Gadjah Mada International Journal of Business, 21(2), 159–186. <br>
+[2] De Raad B, Barelds DP, Levert E, Ostendorf F, Mlacić B, Di Blas L, Hrebícková M, Szirmák Z, Szarota P, Perugini M, Church AT, Katigbak MS. Only three factors of personality description are fully replicable across languages: a comparison of 14 trait taxonomies. J Pers Soc Psychol. 2010 Jan;98(1):160-73. doi: 10.1037/a0017184. PMID: 20053040. <br>
+[3] Triandis, Harry & Suh, Eunkook. (2002). Cultural Influences on Personality. Annual review of psychology. 53. 133-60. 10.1146/annurev.psych.53.100901.135200. <br>
+[4] Costa PT, Terracciano A, McCrae RR. Gender differences in personality traits across cultures: robust and surprising findings. J Pers Soc Psychol. 2001 Aug;81(2):322-331. doi: 10.1037/0022-3514.81.2.322. PMID: 11519935.<br>
+[5] Stephen Bach, Managing Human Resources, fourth edition Personnel Management in Transition, BLACKWELL PUBLISHING <br>
+[6] Miranda Bogen, Aaron RiekeHelp, Wanted - An Exploration of Hiring Algorithms, Equity and Bias, 2018 <br>
 [7] Miranda Bogen, All the Ways Hiring Algorithms Can Introduce Bias, Analytics and data science, 2019 [https://hbr.org/2019/05/all-the-ways-hiring-algorithms-can-introduce-bias]
