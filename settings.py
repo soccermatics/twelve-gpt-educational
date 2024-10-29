@@ -13,7 +13,7 @@ GPT4_KEY = st.secrets.get('GPT4o_KEY')
 GPT4_ENGINE = st.secrets.get("GPT4o_ENGINE")
 
 # Gemini secrets
-USE_GEMINI = st.secrets.get("USE_GEMINI", False)
+USE_GEMINI = st.secrets.get("USE_GEMINI", True)
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", "")
 GEMINI_CHAT_MODEL = st.secrets.get("GEMINI_CHAT_MODEL", "")
 GEMINI_EMBEDDING_MODEL = st.secrets.get("GEMINI_EMBEDDING_MODEL", "")
