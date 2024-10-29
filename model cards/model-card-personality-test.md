@@ -1,7 +1,8 @@
 # Model card for Personality Test Wordalisation
 
 The Personality GPT is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and
-is intended as an illustration of the methods. Here we detail the specific application to the Personality Test interpretation. It is thus intended as an example to help others building wordalisations. The wordalisations describe a person based on their answers to a personality test. Here is an example about what could be done for a job position, when the recruiter gives the personality test to a candidate. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, and was adapted for the Personality Test by Amandine Caut.
+is intended as an illustration of the methods. The specific application is to personality test data, creating a wordalisations thats 
+describes a person based on their answers to a personality test. The design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, and was adapted for personality tests by Amandine Caut.
 
 This model card is based on the [model cards paper](https://arxiv.org/abs/1810.03993) and is adapted specifically to Wordalisation applications as detailed in [Representing data in words](publication here). We also provide this model card as an example of 
 good practice for describing wordalisations.
@@ -18,7 +19,7 @@ Jump to section:
 
 ## Intended use
 
-The *primary use case* of this wordalisation is eductional. It shows how to convert a dataframe of personality test statistics about a person into a text about that person, which might be used by a recruiter. A *secondary use case* might be for users to understand more about the Big Five personality test. However, this version is not suitable for professional use, such as by a recruiter, primarily because it lacks the expertise of a licensed psychologist and also because its functionality is limited. Professional use is thus *out of scope*. Use of the chat for queires not relating to the data at hand is also *out of scope*. 
+The *primary use case* of this wordalisation is eductional. It shows how to convert a dataframe of personality test statistics about a person into a text about that person, which might be used by a recruiter. A *secondary use case* might be for users to understand more about the Big Five personality test. This version is not suitable for professional use, such as by a recruiter, because it was not built by qualitfied  psychologists nor has not been tested. However, the methods used here do have the potential to be adopted to a professional setting. The texts provided by the wordalisations do give a reasonable convincing description of the candidates. We thus discuss, in more detail below, the issues around potential professional applications. Use of the chat for queires not relating to the personality data at hand is *out of scope*. 
 
 ## Factors
 
