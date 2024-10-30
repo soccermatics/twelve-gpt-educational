@@ -2,11 +2,7 @@
 Entrypoint for streamlit app.
 Runs top to bottom every time the user interacts with the app (other than imports and cached functions).
 """
-from pathlib import Path
-import sys
-path_root = Path(__file__).parents[1]
-print(path_root)
-sys.path.append(str(path_root))
+
 # Library imports
 import traceback
 import copy
@@ -18,6 +14,8 @@ from utils.page_components import (
     add_common_page_elements,
 )
 
+
+# def show():
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
 sidebar_container = st.sidebar.container()

@@ -9,7 +9,7 @@ import numpy as np
 
 import utils.sentences as sentences
 from utils.gemini import convert_messages_format
-from classes.data_point import Player
+from classes.data_point import Player, Country
 
 
 from settings import USE_GEMINI
@@ -91,8 +91,8 @@ class Description(ABC):
 
         return intro
 
-
-    def get_messages_from_excel(self,
+    def get_messages_from_excel(
+        self,
         paths: Union[str, List[str]],
     ) -> List[Dict[str, str]]:
         """
@@ -138,8 +138,11 @@ class Description(ABC):
         try:
             paths = self.describe_paths
             messages += self.get_messages_from_excel(paths)
-        except FileNotFoundError as e:  # FIXME: When merging with new_training, add the other exception
+        except (
+            FileNotFoundError
+        ) as e:  # FIXME: When merging with new_training, add the other exception
             print(e)
+<<<<<<< HEAD
         
         # Ensure messages are in the correct format after getting from excel
         messages = [msg for msg in messages if isinstance(msg, dict) and "content" in msg and isinstance(msg["content"], str)]
@@ -159,6 +162,29 @@ class Description(ABC):
         # Filter again to ensure no non-string content is present
         messages = [msg for msg in messages if isinstance(msg, dict) and "content" in msg and isinstance(msg["content"], str)]
         
+=======
+        messages += self.get_prompt_messages()
+
+        messages = [
+            message for message in messages if isinstance(message["content"], str)
+        ]
+
+        try:
+            messages += self.get_messages_from_excel(
+                paths=self.gpt_examples_path,
+            )
+        except (
+            FileNotFoundError
+        ) as e:  # FIXME: When merging with new_training, add the other exception
+            print(e)
+
+        messages += [
+            {
+                "role": "user",
+                "content": f"Now do the same thing with the following: ```{self.synthesized_text}```",
+            }
+        ]
+>>>>>>> 8590277ac3e13771f83452ca53300339bae74d10
         return messages
 
 
@@ -169,22 +195,32 @@ class Description(ABC):
         Arguments:
         temperature: optional float
             The temperature of the GPT model.
-        
+
         Yields:
             str
         """
 
+<<<<<<< HEAD
 
         st.expander("Description messages", expanded=False).write(self.messages)
+=======
+        st.expander("Chat transcript", expanded=False).write(self.messages)
+>>>>>>> 8590277ac3e13771f83452ca53300339bae74d10
 
         if USE_GEMINI:
             import google.generativeai as genai
+
             converted_msgs = convert_messages_format(self.messages)
+
+            # # save converted messages to json
+            # import json
+            # with open("data/wvs/msgs_0.json", "w") as f:
+            #     json.dump(converted_msgs, f)
 
             genai.configure(api_key=GEMINI_API_KEY)
             model = genai.GenerativeModel(
                 model_name=GEMINI_CHAT_MODEL,
-                system_instruction=converted_msgs["system_instruction"]
+                system_instruction=converted_msgs["system_instruction"],
             )
             chat = model.start_chat(history=converted_msgs["history"])
             response = chat.send_message(content=converted_msgs["content"])
@@ -199,10 +235,10 @@ class Description(ABC):
             response = openai.ChatCompletion.create(
                 engine=GPT_ENGINE,
                 messages=self.messages,
-                temperature= temperature,
-                )
-        
-            answer=response['choices'][0]['message']['content']
+                temperature=temperature,
+            )
+
+            answer = response["choices"][0]["message"]["content"]
 
         return answer
 
@@ -221,7 +257,6 @@ class PlayerDescription(Description):
     def __init__(self, player: Player):
         self.player = player
         super().__init__()
-
 
     def get_intro_messages(self) -> List[Dict[str, str]]:
         """
@@ -266,20 +301,20 @@ class PlayerDescription(Description):
 
     def synthesize_text(self):
 
-        player=self.player
+        player = self.player
         metrics = self.player.relevant_metrics
         description = f"Here is a statistical description of {player.name}, who played for {player.minutes_played} minutes as a {player.position}. \n\n "
 
         subject_p, object_p, possessive_p = sentences.pronouns(player.gender)
-        
+
         for metric in metrics:
 
             description += f"{subject_p.capitalize()} was "
-            description += sentences.describe_level(player.ser_metrics[metric +"_Z"]) 
+            description += sentences.describe_level(player.ser_metrics[metric + "_Z"])
             description += " in " + sentences.write_out_metric(metric)
-            description += " compared to other players in the same playing position. "                            
+            description += " compared to other players in the same playing position. "
 
-        #st.write(description)
+        # st.write(description)
 
         return description
 
@@ -294,6 +329,7 @@ class PlayerDescription(Description):
         return [{"role": "user", "content": prompt}]
 
 
+<<<<<<< HEAD
 
 
 
@@ -367,3 +403,104 @@ class ShotDescription(Description):
 
 
 
+=======
+class CountryDescription(Description):
+    output_token_limit = 150
+
+    @property
+    def gpt_examples_path(self):
+        return f"{self.gpt_examples_base}/WVS_examples.xlsx"
+
+    @property
+    def describe_paths(self):
+        return [f"{self.describe_base}/WVS_qualities.xlsx"]
+
+    def __init__(self, country: Country, description_dict, thresholds_dict):
+        self.country = country
+        self.description_dict = description_dict
+        self.thresholds_dict = thresholds_dict
+
+        super().__init__()
+
+    def get_intro_messages(self) -> List[Dict[str, str]]:
+        """
+        Constant introduction messages for the assistant.
+
+        Returns:
+        List of dicts with keys "role" and "content".
+        """
+        intro = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a data analyst and a social scientist. "
+                    "You provide succinct and to the point explanations about countries using metrics derived from data collected in the World Value Survey. "
+                    "You use the information given to you from the data and answers to earlier questions to give summaries of how countries score in various metrics that attempt to measure the social values held by the population of that country."
+                ),
+            },
+            # {
+            #     "role": "user",
+            #     "content": "Do you refer to the game you are an expert in as soccer or football?",
+            # },
+            # {
+            #     "role": "assistant",
+            #     "content": (
+            #         "I refer to the game as football. "
+            #         "When I say football, I don't mean American football, I mean what Americans call soccer. "
+            #         "But I always talk about football, as people do in the United Kingdom."
+            #     ),
+            # },
+        ]
+        if len(self.describe_paths) > 0:
+            intro += [
+                {
+                    "role": "user",
+                    "content": "First, could you answer some questions about a the World Value Survey for me?",
+                },
+                {"role": "assistant", "content": "Sure!"},
+            ]
+
+        return intro
+
+    def synthesize_text(self):
+
+        country = self.country
+        metrics = self.country.relevant_metrics
+        description = f"Here is a statistical description of the core values of {country.name.capitalize()}. \n\n"
+
+        # subject_p, object_p, possessive_p = sentences.pronouns(country.gender)
+
+        for metric in metrics:
+
+            # # TODO: customize this text?
+            # description += f"{country.name.capitalize()} was found to be "
+            # description += sentences.describe_level(
+            #     country.ser_metrics[metric + "_Z"],
+            #     thresholds=self.thresholds_dict[metric],
+            #     words=self.description_dict[metric],
+            # )
+            # description += " in " + metric.lower()  # .replace("_", " ")
+            # description += " compared to other countries in the same survey. "
+
+            description += f"{country.name.capitalize()} was found to "
+            description += sentences.describe_level(
+                country.ser_metrics[metric + "_Z"],
+                thresholds=self.thresholds_dict[metric],
+                words=self.description_dict[metric],
+            )
+            description += " compared to other countries in the same survey. "
+
+        # st.write(description)
+
+        return description
+
+    def get_prompt_messages(self):
+        prompt = (
+            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the social values held by population of the country. "
+            # f"The first sentence should use varied language to give an overview of the player. "
+            # "The second sentence should describe the player's specific strengths based on the metrics. "
+            # "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
+            # "Finally, summarise exactly how the player compares to others in the same position. "
+        )
+        return [{"role": "user", "content": prompt}]
+>>>>>>> 8590277ac3e13771f83452ca53300339bae74d10
