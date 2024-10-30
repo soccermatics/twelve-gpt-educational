@@ -188,7 +188,6 @@ class Description(ABC):
             converted_msgs = convert_messages_format(self.messages)
 
             # # save converted messages to json
-            # import json
             # with open("data/wvs/msgs_0.json", "w") as f:
             #     json.dump(converted_msgs, f)
 
