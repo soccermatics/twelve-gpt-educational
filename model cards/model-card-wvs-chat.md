@@ -1,7 +1,8 @@
-# Model card for World Value Survey data Wordalisation and chatbot
+# Model card for World Value Survey Data Wordalisation and Chatbot
 
-In a nutshell, our app is a retrieval augmented chatbot for making reports about World Value Survey (WVS) data. The app is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and
-is intended as an illustration of the _wordalisation_ method. It is thus intended as an example to help others build similar tools. The wordalisations are constructed using various social metrics derived from data collected in the [World Value Survey](www.worldvaluessurvey.org) (WVS). These social metrics as well as the WVS are discussed in the [Datasets](#datasets) section. This work is a derivative of the full [Twelve GPT product](https://twelve.football). The original design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, with modification made by Beimnet Zenebe and Amy Rouillard to adapt it to the WVS use-case.
+In a nutshell, our app is a retrieval augmented chatbot for making reports about countries based on data derived from the [World Value Survey](www.worldvaluessurvey.org) (WVS). The app is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and is intended as an illustration of the _wordalisation_ method. It is thus intended as an example to help others build similar tools. The wordalisations are created by comparing a country's score across six social metrics to its relative position within the distribution of scores across all countries. The chosen social metrics, as well as the WVS, are discussed in the [Datasets](#datasets) section. 
+
+This work is a derivative of the full [Twelve GPT product](https://twelve.football). The original design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, with modification made by Beimnet Zenebe and Amy Rouillard to adapt it to the WVS use-case.
 
 This model card is based on the [model cards paper](https://arxiv.org/abs/1810.03993) and is adapted specifically to Wordalisation applications as detailed in [Representing data in words](publication here). We also provide this model card as an example of good practice for describing wordalisations.
 
@@ -17,8 +18,7 @@ Jump to section:
 
 ## Intended use
 
-The _primary use case_ of this wordalisation is educational.
-It shows how to convert a python pandas DataFrame of statistics about countries into a text that discusses a chosen country. The statistics relate to various social and political values, however we note that the results should be understood in the context of the WVS and the research in which the metrics were derived. The purpose of the wordalisation and chat functionality is to use the capacities of an LLM to make the raw statistics more digestible for a human reader, rather than to investigate the validity of the WVS study.
+The _primary use case_ of this wordalisation is educational. It shows how to convert a python pandas DataFrame of statistics about countries into a text that discusses a chosen country. The statistics relate to various social and political values, however we note that the results should be understood in the context of the WVS and the research in which the metrics were derived. The purpose of the wordalisation and chat functionality is to use the capabilities of an large language model (LLM) to turn the raw statistics into text that is more digestible for a human reader. Our goal was not to investigate the validity of the WVS study or the presented social metrics.
 
 This chatbot cannot be used for insight generation purposes, i.e. data analysis, firstly because we do not guarantee the quality of the data and because functionality is limited. Data analysis is thus _out of scope_. Use of the chat for queries not relating to the WVS data at hand is also _out of scope_.
 
@@ -26,8 +26,9 @@ We would also strongly oppose the generalization or stereotyping of any group of
 
 ## Factors
 
-The World Value Survey data and derived metrics, discussed in [Datasets](#datasets), relate to 66 countries that took part in the "wave 7" 2017-2022 survey. We would like to state that any conversations about countries not included in the survey are not guaranteed to hold any merit. We also note that the participants of the "wave 7" survey constitute only a small sample of the population of each countries, with the largest sample from a given country being 4000. Therefore, the values presented in the app should not be considered representative of the entire population of any given country.
+The World Value Survey data and derived metrics, discussed in [Datasets](#datasets), relate to 66 countries that took part in the WVS "wave 7" 2017-2022 survey. We would like to state that any reports or chats about countries not included in the survey are not guaranteed to hold any merit. We also note that the participants of the "wave 7" survey constitute only a small sample of the population of each countries, with the largest sample from a given country being 4000. Therefore, the values presented in the app should not be considered representative of the entire population of any given country.
 
+https://population.un.org/wpp/Download/Standard/CSV/
 
 Figure 1: World Value Survey data collection distribution. The colorscale indicates the number of participants in the survey from each country.
 
