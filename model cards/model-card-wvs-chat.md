@@ -26,15 +26,16 @@ We would also strongly oppose the generalization or stereotyping of any group of
 
 ## Factors
 
-The World Value Survey data and derived metrics, discussed in [Datasets](#datasets), relate to 66 countries that took part in the WVS "wave 7" 2017-2022 survey. We would like to state that any reports or chats about countries not included in the survey are not guaranteed to hold any merit. We also note that the participants of the "wave 7" survey constitute only a small sample of the population of each countries, with the largest sample from a given country being 4000. Therefore, the values presented in the app should not be considered representative of the entire population of any given country.
+The World Value Survey data and derived metrics, discussed in [Datasets](#datasets), relate to 66 countries that took part in the WVS "wave 7" 2017-2022 survey. We would like to state that any reports or chats about countries not included in the survey are not guaranteed to hold any merit. We also note that the participants of the "wave 7" survey constitute only a small sample of the population of each countries, see Figure 2. Therefore, the values presented in the app should not be considered representative of the entire population of any given country.
 
-https://population.un.org/wpp/Download/Standard/CSV/
+Figure 1: World Value Survey data collection distribution. The color-scale indicates the number of participants in the survey from each country.
 
-Figure 1: World Value Survey data collection distribution. The colorscale indicates the number of participants in the survey from each country.
+![WVS coverage](https://github.com/soccermatics/twelve-gpt-educational/blob/dev/model%20cards/imgs/sample_size_map.png)
 
-<img src="model cards/sample_size_map.png" alt="WVS coverage" width="500"/>
 
-![](sample_size_map.png)
+Figure 2: World Value Survey data collection distribution as a percentage of the coutries population. The populations were taken from the [United Nations Department of Economic and Social Affairs](https://population.un.org/wpp/Download/Standard/CSV/) data on world population prospects in 2017 (the first year of "wave 7"). The color-scale indicates the log of the percentage of the population of each country that participated.
+
+![WVS coverage percentage](https://github.com/soccermatics/twelve-gpt-educational/blob/dev/model%20cards/imgs/sample_size_percentage_map.png)
 
 ## Datasets
 
