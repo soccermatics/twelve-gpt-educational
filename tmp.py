@@ -1,3 +1,6 @@
+# %%
+# Debug the data loading and processing
+
 from classes.data_source import CountryStats
 import copy
 from classes.description import (
@@ -12,7 +15,7 @@ countries.calculate_statistics(metrics=metrics)
 country_names = countries.df["country"].values.tolist()
 
 country = copy.deepcopy(countries)
-country.df = country.df[country.df["country"] == country_names[1]]
+country.df = country.df[country.df["country"] == "United States of America"]
 country = country.to_data_point()
 
 
@@ -23,12 +26,10 @@ thresholds_dict = dict(
     (
         metric,
         [
-            2.5,
-            1.5,
-            0.5,
-            -0.5,
-            -1.5,
-            -2.5,
+            2,
+            1,
+            -1,
+            -2,
         ],
     )
     for metric in metrics
@@ -37,49 +38,9 @@ description = CountryDescription(
     country, description_dict=description_dict, thresholds_dict=thresholds_dict
 )
 
-# %%
-import pandas as pd
-
-annotation_text = "<span style=''>{metric_name}: {data:.2f} per 90</span>"
-
-# series with col "goals" and some dummy value
-ser_plot = pd.Series({"goals": 0.5})
-col = "goals"
-
-print(annotation_text.format(metric_name="Goals", data=ser_plot[col]))
-print()
-
 
 # %%
-
-import pandas as pd
-
-# read in "data/wvs/countries.csv"
-df = pd.read_csv("data/wvs/countries.csv")
-# select columns ending in "_Z"
-df = df.loc[:, df.columns.str.endswith("_Z")]
-# %%
-
-import matplotlib.pyplot as plt
-
-# for each column in df plot a histogram
-for col in df.columns:
-    plt.hist(df[col], bins=20)
-    plt.title(col)
-    plt.show()
-
-# %%
-
-threshold = 0.5
-
-# construct a new df that check if the abs of each value is greater than threshold
-df_abs = df.abs() > threshold
-# sum the number of True values for each column
-count = df_abs.sum(axis=1)
-
-# plot the count as a histogram
-plt.hist(count, bins=20)
-# %%
+# Generate country specific data for evaluation
 
 from classes.data_source import CountryStats
 from classes.description import CountryDescription
@@ -102,12 +63,10 @@ thresholds_dict = dict(
     (
         metric,
         [
-            2.5,
-            1.5,
-            0.5,
-            -0.5,
-            -1.5,
-            -2.5,
+            2,
+            1,
+            -1,
+            -2,
         ],
     )
     for metric in metrics

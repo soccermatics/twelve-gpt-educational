@@ -373,23 +373,15 @@ class CountryDescription(Description):
 
         for metric in self.country.relevant_metrics:
 
-            # # TODO: customize this text?
-            # description += f"{country.name.capitalize()} was found to be "
-            # description += sentences.describe_level(
-            #     country.ser_metrics[metric + "_Z"],
-            #     thresholds=self.thresholds_dict[metric],
-            #     words=self.description_dict[metric],
-            # )
-            # description += " in " + metric.lower()  # .replace("_", " ")
-            # description += " compared to other countries in the same survey. "
-
-            description += f"{self.country.name.capitalize()} was found to "
+            description += (
+                f"According to the WVS, {self.country.name.capitalize()} was found to "
+            )
             description += sentences.describe_level(
                 self.country.ser_metrics[metric + "_Z"],
                 thresholds=self.thresholds_dict[metric],
                 words=self.description_dict[metric],
             )
-            description += " compared to other countries in the same survey. "
+            description += " compared to other countries in the same wave. "
 
             if metric in self.country.drill_down_metrics:
 
@@ -418,11 +410,8 @@ class CountryDescription(Description):
     def get_prompt_messages(self):
         prompt = (
             f"Please use the statistical description enclosed with ``` to give a concise, 2 short paragraph summary of the social values held by population of the country. "
-            f"The first sentence should focus on any values for which the country stands out. If the country is not far above or below average in any values, you can mention that. "
-            f"Make sure to mention that the values are relative to other countries in the survey and that the answers quoted reflect the average response of participants in the survey. "
-            # "The second sentence should describe the player's specific strengths based on the metrics. "
-            # "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
-            # "Finally, summarise exactly how the player compares to others in the same position. "
+            f"The first paragraph should focus on any factors or values for which the country is above or bellow average. If the country is neither above nor below average in any values, mention that. "
+            f"The remaining paragraph should mention any specific values or factors that are neither high nor low compared to the average. "
         )
         return [{"role": "user", "content": prompt}]
 

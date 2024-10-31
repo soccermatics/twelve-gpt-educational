@@ -169,7 +169,7 @@ class CountryStats(Stats):
     def __init__(self):
 
         self.drill_down = self.get_drill_down_dict()
-        self.drill_down_threshold = 0.5
+        self.drill_down_threshold = 1
 
         super().__init__()
 
@@ -357,15 +357,17 @@ class CountryStats(Stats):
         # get the names of columns in ser_metrics than end in "_Z" with abs value greater than 1.5
         drill_down_metrics = ser_metrics[
             ser_metrics.index.str.endswith("_Z")
-            & (ser_metrics.abs() > self.drill_down_threshold)
+            & (ser_metrics.abs() >= self.drill_down_threshold)
         ].index.tolist()
-        drill_down_metrics = ["_".join(x.split("_")[:-1]) for x in drill_down_metrics]
+        drill_down_metrics = [
+            "_".join(x.split("_")[:-1]).lower() for x in drill_down_metrics
+        ]
 
         drill_down_values = dict(
             [
                 (key, value)
                 for key, value in self.drill_down[name].items()
-                if key in drill_down_metrics
+                if key.lower() in drill_down_metrics
             ]
         )
 

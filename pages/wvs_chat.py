@@ -51,9 +51,52 @@ with open("model cards/model-card-wvs-chat.md", "r", encoding="utf8") as file:
     # Read the contents of the file
     model_card_text = file.read()
 
+####
+import base64
+import re
+
+
+# Function to convert local images to base64
+def convert_to_base64(image_path):
+    with open(image_path, "rb") as img_file:
+        img_data = img_file.read()
+    return base64.b64encode(img_data).decode("utf-8")
+
+
+# Pattern for Markdown image links
+image_pattern = r"!\[(.*?)\]\((.*?)\)"
+
+
+# Replace image links in text
+def replace_images_in_text(text):
+    def replacer(match):
+        alt_text = match.group(1)
+        link = match.group(2)
+
+        if link.startswith("http"):
+            # If it's a URL, return markdown for web image
+            return f"![{alt_text}]({link})"
+        else:
+            # If it's a local file, convert to base64 and use HTML <img>
+            try:
+                data_url = convert_to_base64(link)
+                return f'<img src="data:image/gif;base64,{data_url}" alt="{alt_text}" style="width:100%; max-width:900px;">'
+            except FileNotFoundError:
+                return f"![{alt_text}](Image not found: {link})"
+
+    # Replace all image links with the appropriate HTML or markdown
+    return re.sub(image_pattern, replacer, text)
+
+
+# Process the text with image replacements
+processed_text = replace_images_in_text(model_card_text)
+
+####
+
 load_css("model cards/style/python-code.css")
 st.expander("Model card", expanded=False).markdown(
-    model_card_text, unsafe_allow_html=True
+    processed_text,  # model_card_text,
+    unsafe_allow_html=True,
 )
 
 st.expander("Dataframe used", expanded=False).write(countries.df)
@@ -65,12 +108,10 @@ thresholds_dict = dict(
     (
         metric,
         [
-            2.5,
-            1.5,
-            0.5,
-            -0.5,
-            -1.5,
-            -2.5,
+            2,
+            1,
+            -1,
+            -2,
         ],
     )
     for metric in metrics
