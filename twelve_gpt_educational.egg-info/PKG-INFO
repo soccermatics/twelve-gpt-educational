@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: twelve-gpt-educational
+Version: 0.1
+License-File: LICENSE
+Requires-Dist: streamlit
+Requires-Dist: pandas
+Requires-Dist: tiktoken

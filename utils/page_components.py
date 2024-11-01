@@ -1,27 +1,15 @@
 """
-Page components for app.py and pages/*.py
+Page components for pages/*.py
 """
 
 # Stdlib imports
 import base64
 from pathlib import Path
 
-from typing import Optional
-import traceback
-import copy
-import os
-import json
 import streamlit as st
-import pandas as pd
-import numpy as np
-import pyarrow.parquet as pq
-import requests
+import copy
 
-from classes.chat import Chat
-from classes.data_source import PlayerStats
-from classes.data_point import Player
-
-from utils.sentences import pronouns
+# from pages import about, football_scout, embedder, wvs_chat, own_page
 
 
 def insert_local_css():
@@ -35,34 +23,30 @@ def insert_local_css():
     logo_url = (
         "url(data:image/png;base64,"
         + base64.b64encode(
-            Path('data/ressources/img/twelve_logo_light.png')
-            .read_bytes()
+            Path("data/ressources/img/twelve_logo_light.png").read_bytes()
         ).decode()
         + ")"
     )
     font_url_medium = (
         "url(data:font/otf;base64,"
         + base64.b64encode(
-            Path('data/ressources/fonts/Gilroy-Medium.otf')
-            .read_bytes()
+            Path("data/ressources/fonts/Gilroy-Medium.otf").read_bytes()
         ).decode()
         + ")"
     )
     font_url_light = (
         "url(data:font/otf;base64,"
         + base64.b64encode(
-            Path('data/ressources/fonts/Gilroy-Light.otf')
-            .read_bytes()
+            Path("data/ressources/fonts/Gilroy-Light.otf").read_bytes()
         ).decode()
         + ")"
     )
-    
+
     css = css.replace("replace_logo_url", logo_url)
     css = css.replace("replace_font_url_medium", font_url_medium)
     css = css.replace("replace_font_url_light", font_url_light)
 
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-
 
 
 def set_page_config():
@@ -82,18 +66,44 @@ def set_page_config():
 
 def add_page_selector():
     st.image("data/ressources/img/TwelveEdu.png")
-    st.page_link("app.py", label="About")
+    st.page_link("pages/about.py", label="About")
     st.page_link("pages/football_scout.py", label="Football Scout")
     st.page_link("pages/embedder.py", label="Embdedding Tool")
+    st.page_link("pages/wvs_chat.py", label="World Value Survey")
+    st.page_link("pages/personality_test.py", label="Personality Chat")
     st.page_link("pages/own_page.py", label="Your Own Page")
     st.page_link("pages/anuerysm.py", label="Anuerysm")
     
+
+    # st.image("data/ressources/img/TwelveEdu.png")
+
+    # # Define the available pages using their module names, not file paths
+    # pages = {
+    #     "About": about,
+    #     "Football Scout": football_scout,
+    #     "Embedder": embedder,
+    #     "World Values Survey": wvs_chat,
+    #     "Your Own Page": own_page,
+    #     # Add other pages here
+    # }
+
+    # # Sidebar for page selection with default set to "About"
+    # selected_page = st.sidebar.radio(
+    #     "Select a page",
+    #     list(pages.keys()),
+    #     index=0,  # 'index=0' selects "About" by default
+    # )
+
+    # # Load and display the selected page's content by calling its `show` function
+    # page = pages[selected_page]
+    # # page.show()  # Assume each page has a `show()` function to display its content
+
 
 def add_common_page_elements():
     """
     Sets page config, injects local CSS, adds page selector and login button.
     Returns a container that MUST be used instead of st.sidebar in the rest of the app.
-    
+
     Returns:
         sidebar_container: A container in the sidebar to hold all other sidebar elements.
     """
@@ -113,13 +123,13 @@ def add_common_page_elements():
 
     sidebar_container.divider()
 
-    return sidebar_container    
+    return sidebar_container
 
 
-def select_player(container,players,gender,position):
+def select_player(container, players, gender, position):
 
     # Make a copy of Players object
-    player=copy.deepcopy(players)
+    player = copy.deepcopy(players)
 
     # Filter players by position and select a player with sidebar selectors
     with container:
@@ -132,10 +142,30 @@ def select_player(container,players,gender,position):
 
         # Return data point
 
-        player=player.to_data_point(gender,position)
-        
+        player = player.to_data_point(gender, position)
+
     return player
 
+
+def select_person(container, person_stat):
+
+    # Make a copy of Players object
+    person = copy.deepcopy(person_stat)
+
+    # Filter players by position and select a player with sidebar selectors
+    with container:
+
+        # Filter for player name
+        person.select_and_filter(
+            column_name="name",
+            label="Person",
+        )
+
+        # Return data point
+
+        person = person.to_data_point()
+
+    return person
 
 def select_individual(container,individuals):
 

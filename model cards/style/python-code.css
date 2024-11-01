@@ -1,0 +1,18 @@
+code {
+  background-color: #2b2b2b;
+  color: #f8f8f2;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+.stMarkdown pre {
+  background-color: #1e1e1e; /* Background color for the whole code box */
+  padding: 15px; /* Space inside the code box */
+  border-radius: 8px; /* Rounded corners for the box */
+  border: 1px solid #555; /* Optional: Border around the code box */
+  overflow-x: auto; /* Ensure horizontal scrolling for long lines of code */
+}
+.stMarkdown pre code {
+  background-color: transparent; /* Remove background of code itself */
+  color: #dcdcdc; /* Code text color */
+}

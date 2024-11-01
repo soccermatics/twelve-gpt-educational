@@ -19,21 +19,26 @@ from classes.chat import PlayerChat
 
 from utils.page_components import (
     add_common_page_elements,
+    #     select_player,
+    #     create_chat,
+)
+
+from utils.utils import (
     select_player,
     create_chat,
 )
 
+
+# def show():
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
 sidebar_container = st.sidebar.container()
 
 st.divider()
 
-
 # minimal_minutes is the minimum number of minutes a player must have played to be included in the analysis
 minimal_minutes = 300
 players = PlayerStats(minimal_minutes=minimal_minutes)
-
 
 # Define the metrics we are interested in and calculates them
 metrics = [
@@ -52,10 +57,12 @@ players.calculate_statistics(metrics=metrics)
 # Now select the focal player
 player = select_player(sidebar_container, players, gender="male", position="Forward")
 
-st.write("This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key.")
+st.write(
+    "This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key."
+)
 
 # Read in model card text
-with open("model cards/model-card-football-scout.md", 'r') as file:
+with open("model cards/model-card-football-scout.md", "r", encoding="utf8") as file:
     # Read the contents of the file
     model_card_text = file.read()
 

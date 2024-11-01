@@ -1,4 +1,4 @@
-# Give the correct gnder words
+# Give the correct gender words
 def pronouns(gender):
     if gender.lower() == "male":
         subject_p, object_p, possessive_p = "he", "him", "his"
@@ -7,11 +7,15 @@ def pronouns(gender):
 
     return subject_p, object_p, possessive_p
 
+
 # Describe the level of a metric in words
-def describe_level(value):
-    thresholds = [1.5, 1, 0.5, -0.5, -1]
-    words = ["outstanding", "excellent", "good", "average", "below average", "poor"]
+def describe_level(
+    value,
+    thresholds=[1.5, 1, 0.5, -0.5, -1],
+    words=["outstanding", "excellent", "good", "average", "below average", "poor"],
+):
     return describe(thresholds, words, value)
+
 
 def describe(thresholds, words, value):
     """
@@ -25,9 +29,16 @@ def describe(thresholds, words, value):
 
     return words[i]
 
+
 # Format the metrics for display and descriptions
 def format_metric(metric):
-    return metric.replace("_", " ").replace(" adjusted per90", "").replace("npxG","non-penalty expected goals").capitalize()
+    return (
+        metric.replace("_", " ")
+        .replace(" adjusted per90", "")
+        .replace("npxG", "non-penalty expected goals")
+        .capitalize()
+    )
+
 
 # look up formated metric name for display and descriptions
 def lookup_metric(metric):
@@ -37,8 +48,13 @@ def lookup_metric(metric):
     pass
 
 def write_out_metric(metric):
-    return metric.replace("_"," ").replace("adjusted","adjusted for possession").replace("per90","per 90").replace("npxG","non-penalty expected goals") + " minutes"
-
+    return (
+        metric.replace("_", " ")
+        .replace("adjusted", "adjusted for possession")
+        .replace("per90", "per 90")
+        .replace("npxG", "non-penalty expected goals")
+        + " minutes"
+    )
 def describe_contributions(value,  thresholds = [10, 5, 2, -2,-5,-10], words = ["implies a seriously increased risk", "implies an increased risk", "implies a small increase in risk", "does not significantly effect the risk", "implies slightly smaller risk", "implies a decreased risk", "implies a greatly decreased risk"]):
 
     return describe(thresholds, words, value)
