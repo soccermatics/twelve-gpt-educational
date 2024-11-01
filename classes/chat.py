@@ -442,11 +442,10 @@ class ModelChat(Chat):
         ]
         return first_messages
 
-
     def get_relevant_info(self, query):
- 
-        #If there is no query then use the last message from the user
-        if query=='':
+
+        # If there is no query then use the last message from the user
+        if query == "":
             query = self.visible_messages[-1]["content"]
         
         ret_val = "Here is a description of the individual in terms of data: \n\n"   
@@ -455,13 +454,89 @@ class ModelChat(Chat):
 
         # This finds some relevant information
         results = self.embeddings.search(query, top_n=5)
-        ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"   
-        ret_val +="\n".join(results["assistant"].to_list())
-        
+        ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"
+        ret_val += "\n".join(results["assistant"].to_list())
+
         ret_val += f"\n\nIf none of this information is relevent to the users's query then use the information below to remind the user about the chat functionality: \n"
         ret_val += "This chat can answer questions about a individual's statistics and what they mean for how they play football."
         ret_val += "The user can select the individual they are interested in using the menu to the left."
 
-        
         return ret_val
-        
+
+
+class WVSChat(Chat):
+    def __init__(
+        self,
+        chat_state_hash,
+        country,
+        countries,
+        description_dict,
+        thresholds_dict,
+        state="empty",
+    ):
+        # TODO:
+        self.embeddings = CountryEmbeddings()
+        self.country = country
+        self.countries = countries
+        self.description_dict = description_dict
+        self.thresholds_dict = thresholds_dict
+        super().__init__(chat_state_hash, state=state)
+
+    def get_input(self):
+        """
+        Get input from streamlit."""
+
+        if x := st.chat_input(
+            placeholder=f"What else would you like to know about {self.country.name}?"
+        ):
+            if len(x) > 500:
+                st.error(
+                    f"Your message is too long ({len(x)} characters). Please keep it under 500 characters."
+                )
+
+            self.handle_input(x)
+
+    def instruction_messages(self):
+        """
+        Instruction for the agent.
+        """
+        # TODO: Update first_messages
+        first_messages = [
+            {"role": "system", "content": "You are a researcher."},
+            {
+                "role": "user",
+                "content": (
+                    "After these messages you will be interacting with a user of a data analysis platform. "
+                    f"The user has selected the country {self.country.name}, and the conversation will be about different core value measured in the World Value Survey study. "
+                    # "You will receive relevant information to answer a user's questions and then be asked to provide a response. "
+                    "All user messages will be prefixed with 'User:' and enclosed with ```. "
+                    "When responding to the user, speak directly to them. "
+                    "Use the information provided before the query to provide 2 sentence answers."
+                    " Do not deviate from this information or provide additional information that is not in the text returned by the functions."
+                ),
+            },
+        ]
+        return first_messages
+
+    def get_relevant_info(self, query):
+
+        # If there is no query then use the last message from the user
+        if query == "":
+            query = self.visible_messages[-1]["content"]
+
+        ret_val = "Here is a description of the country in terms of data: \n\n"
+        description = CountryDescription(
+            self.country, self.description_dict, self.thresholds_dict
+        )
+        ret_val += description.synthesize_text()
+
+        # This finds some relevant information
+        results = self.embeddings.search(query, top_n=5)
+        ret_val += "\n\nHere is a description of some relevant information for answering the question:  \n"
+        ret_val += "\n".join(results["assistant"].to_list())
+
+        ret_val += f"\n\nIf none of this information is relevant to the users's query then use the information below to remind the user about the chat functionality: \n"
+        ret_val += "This chat can answer questions about a country's core values."
+        ret_val += "The user can select the country they are interested in using the menu to the left."
+
+        return ret_val

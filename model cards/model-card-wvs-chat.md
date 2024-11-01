@@ -1,6 +1,6 @@
 # Model card for World Value Survey Data Wordalisation and Chatbot
 
-In a nutshell, our app is a retrieval augmented chatbot for making reports about countries based on data derived from the [World Value Survey](www.worldvaluessurvey.org) (WVS). The app is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and is intended as an illustration of the _wordalisation_ method. It is thus intended as an example to help others build similar tools. The wordalisations are created by comparing a country's score across six social factors to its relative position within the distribution of scores across all countries. The chosen social factors, as well as the WVS, are discussed in the [Dataset](#dataset) section. 
+In a nutshell, our app is a retrieval augmented chatbot for making reports about countries based on data derived from the [World Value Survey](www.worldvaluessurvey.org) (WVS). The app is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational) and is intended as an illustration of the _wordalisation_ method. It is thus intended as an example to help others build similar tools. The wordalisations are created by comparing a country's score across six social factors to its relative position within the distribution of scores across all countries. The chosen social factors, as well as the WVS, are discussed in the [Dataset](#dataset) section.
 
 This work is a derivative of the full [Twelve GPT product](https://twelve.football). The original design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens, with modification made by Beimnet Zenebe and Amy Rouillard to adapt it to the WVS use-case.
 
@@ -28,57 +28,49 @@ We would also strongly oppose the generalization or stereotyping of any group of
 
 The World Value Survey data and derived factors, discussed in [Dataset](#dataset), relate to 66 countries that took part in the WVS "wave 7" 2017-2022 survey. We would like to state that any reports or chats about countries not included in the survey are not guaranteed to hold any merit. We also note that the participants of the "wave 7" survey constitute only a small sample of the population of each countries, see Figures 1 and 2. Therefore, the values and statements presented in the app should not be considered representative of the entire population of any given country.
 
-
 ![WVS coverage](https://github.com/soccermatics/twelve-gpt-educational/blob/dev/model%20cards/imgs/sample_size_map.png)
 
 ![WVS coverage](model cards/imgs/sample_size_map.png)
 
-
 Figure 1: World Value Survey data collection distribution. The color-scale indicates the number of participants in the survey from each country.
-
 
 ![WVS coverage percentage](https://github.com/soccermatics/twelve-gpt-educational/blob/dev/model%20cards/imgs/sample_size_percentage_map.png)
 
 ![WVS coverage percentage](model cards/imgs/sample_size_percentage_map.png)
 
-
 Figure 2: World Value Survey data collection distribution as a percentage of the coutries population. The populations were taken from the [United Nations Department of Economic and Social Affairs](https://population.un.org/wpp/Download/Standard/CSV/) data on world population prospects in 2017 (the first year of "wave 7"). The color-scale indicates the log of the percentage of the population of each country that participated.
-
 
 ## Dataset
 
 The data used in this project was constructed from the [World Value Survey Wave 7 (2017-2022)](https://www.worldvaluessurvey.org/WVSDocumentationWV7.jsp). The data consists of coded answers to a questionnaire which can be found at the same link. The WVS questionnaire was taken by participants from 62 countries and 4 regions (Hong Kong, Macao, Northern Ireland and Puerto Rico) with sample sizes varying from 447 in Northern Ireland to 4018 in Canada. It is clear from the map shown in Figure 1 that the data is not uniformly distributed across the globe, with the number of sampled African and European countries being especially low.
 
-From the raw survey data six social _factors_ were constructed. These are summerised and described in Table 1 and were calculated according to Ingelhart (2005) [1] and Allison (2021) [2], for factors indicated by $^1$ and $^2$ respectively. These factors were derived using factor analysis, which is a statistical method used to describe variability among observed, correlated variables in terms of a potentially lower number of unobserved variables called factors. 
+From the raw survey data six social _factors_ were constructed. These are summerised and described in Table 1 and were calculated according to Ingelhart (2005) [1] and Allison (2021) [2], for factors indicated by $^1$ and $^2$ respectively. These factors were derived using factor analysis, which is a statistical method used to describe variability among observed, correlated variables in terms of a potentially lower number of unobserved variables called factors.
 
 Table 1: Description of factors
 | Factor | Description |
-| --- |  --- |
-|Traditional vs Secular Values<sup>1</sup>|  Traditional values emphasize religion, authority, and a nationalistic outlook, while rejecting abortion. Secular values place less emphasis on religion, authority, independence and perseverance in children and are more accepting of abortion. |
-|Survival vs Self-expression Values<sup>1</sup> |  Survival values emphasize economic and physical security, with a focus on national identity and lower levels of trust and tolerance of homosexuality. Self-expression values prioritize leisure over work, tolerance of homosexuality, freedom, and political participation. Levels of trust are higher as well as ratings of happiness and life-satisfaction. |
+| --- | --- |
+|Traditional vs Secular Values<sup>1</sup>| Traditional values emphasize religion, authority, and a nationalistic outlook, while rejecting abortion. Secular values place less emphasis on religion, authority, independence and perseverance in children and are more accepting of abortion. |
+|Survival vs Self-expression Values<sup>1</sup> | Survival values emphasize economic and physical security, with a focus on national identity and lower levels of trust and tolerance of homosexuality. Self-expression values prioritize leisure over work, tolerance of homosexuality, freedom, and political participation. Levels of trust are higher as well as ratings of happiness and life-satisfaction. |
 |Neutrality <sup>2</sup>| Neutrality measures a lack of engagement in civic, political, or social organizations. High-scoring countries having little participation in consumer organisations, charitable or humanitarian organizations, professional organizations or self-help or mutual aid groups. |
 |Fairness <sup>2</sup>| Fairness is measured by attitudes toward whether the actions of stealing, bribery, cheating on taxes, and violence are ever justifiable. A high score in fairness is associated with these actions never being justifiable. |
 |Skepticism <sup>2</sup>| Skepticism represents distrust in government, civil services, political parties, and the justice system or courts. A high score in skepticism indicates a low confidence in these institutions.|
-|Societal Tranquility<sup>2</sup> |  Societal Tranquillity measures the level of worry felt about war, civil war, terrorism, and access to good education. Low scores in societal tranquillity indicate worry about these issues. |
+|Societal Tranquility<sup>2</sup> | Societal Tranquillity measures the level of worry felt about war, civil war, terrorism, and access to good education. Low scores in societal tranquillity indicate worry about these issues. |
 
-The social factors we present in the chat app are constructed such that they are a linear combinations of the observed variables. The weights and questions used to construct these factors are summerised in Table 2. The data was also normalised across answer codes, such that each answer is rescaled to a number between -1 and 1. This is to take into account the highly variable answer scales. Finaly, we also normalise each social factor by the sum of the weights to guarantee a ranges of -1 to 1. Our preprocessing pipeline is available as a [python notebook](https://github.com/soccermatics/twelve-gpt-educational/blob/dev/data/wvs/preprocessing/generate_data.ipynb), and the relevant data should be downloaded from the [official WVS site](https://www.worldvaluessurvey.org/WVSDocumentationWV7.jsp). 
+The social factors we present in the chat app are constructed such that they are a linear combinations of the observed variables. The weights and questions used to construct these factors are summerised in Table 2. The data was also normalised across answer codes, such that each answer is rescaled to a number between -1 and 1. This is to take into account the highly variable answer scales. Finaly, we also normalise each social factor by the sum of the weights to guarantee a ranges of -1 to 1. Our preprocessing pipeline is available as a [python notebook](https://github.com/soccermatics/twelve-gpt-educational/blob/dev/data/wvs/preprocessing/generate_data.ipynb), and the relevant data should be downloaded from the [official WVS site](https://www.worldvaluessurvey.org/WVSDocumentationWV7.jsp).
 
 The six social factors are intended to aggregate the answers to several survey questions in order to provide general insight into a country's social values. For example, is a country more traditional or secular? Do they believe that acts like corruption or stealing are ever justified? How active is the population in civic organizations? We point out that the number of questions aggregated is limited and it is unlikely that they can capture the full complexity of a country's values. See [Ethical considerations](#ethical-considerations) for further discussion.
 
 Table 2: Factors and their construction
-| Factor | Questions (codes and short description) | Weights | 
-| --- | --- | --- | 
+| Factor | Questions (codes and short description) | Weights |
+| --- | --- | --- |
 |Traditional vs Secular Values | Q164: How important is God in your life? </br> Q8: How important is independence in children to you? </br> Q14: How important is determination perseverance in children to you? </br> Q15: How important is religious faith in children to you? </br> Q17: How important is obedience in children to you? </br> Q184: Abortion. Is it ever justifiable? </br> Q254: How proud are you to be of the nationality of this country? </br> Q45: In the future, would it be a good thing if we had greater respect for authority? | 0.70 </br> 0.61 </br> 0.61 </br> 0.61 </br>0.61 </br>0.61 </br>0.60 </br>0.51 |
-|Survival vs Self-expression Values |Q3: How important is leisure time to you? </br> Q5: How important is work to you? </br> Q40: Do you think that work is a duty towards society? </br> Q41: Do you think work should always come first, even if it means no spare time? </br> Q43: In the future, would it be a good thing if less importance is placed on work. </br> Q131: Could you tell me how secure do you feel these days in your neighborhood? </br> Q142: To what degree are you worried about losing your job or not finding a job. </br> Q150: Most people consider both freedom and security to be important, which do you think is more important? </br> Q46: Do you feel happy? </br>    Q49: How satisfied are you with your life? </br>    Q22: Would you mind having people who are homosexuals as neighbors? </br>   Q182: Homosexuality. Is it ever justifiable? </br> Q209: Have you, might you or would you never, under any circumstances: Signing a petition. </br> Q218 : Have you, might you or would you never, under any circumstances: Signing an electronic (online) petition. </br> Q57: Can most people be trusted? </br>    Q58: How much do you trust your family? </br>    Q59: How much do you trust your neighborhood? </br>    Q60: How much do you trust people you know personally? </br>    Q61: How much do you trust people you meet for the first time? </br>    Q62: How much do you trust people of another religion? </br>    Q63: How much do you trust people of another nationality?| 0.59</br> 0.59 </br>0.59</br> 0.59</br> 0.59 </br>0.59 </br>0.59 </br>0.59 </br>0.59</br>0.59 </br>0.58 </br>0.58 </br>0.54 </br>0.54 </br>0.44 </br>0.44 </br>0.44 </br>0.44 </br>0.44 </br>0.44 </br>0.44|
+|Survival vs Self-expression Values |Q3: How important is leisure time to you? </br> Q5: How important is work to you? </br> Q40: Do you think that work is a duty towards society? </br> Q41: Do you think work should always come first, even if it means no spare time? </br> Q43: In the future, would it be a good thing if less importance is placed on work. </br> Q131: Could you tell me how secure do you feel these days in your neighborhood? </br> Q142: To what degree are you worried about losing your job or not finding a job. </br> Q150: Most people consider both freedom and security to be important, which do you think is more important? </br> Q46: Do you feel happy? </br> Q49: How satisfied are you with your life? </br> Q22: Would you mind having people who are homosexuals as neighbors? </br> Q182: Homosexuality. Is it ever justifiable? </br> Q209: Have you, might you or would you never, under any circumstances: Signing a petition. </br> Q218 : Have you, might you or would you never, under any circumstances: Signing an electronic (online) petition. </br> Q57: Can most people be trusted? </br> Q58: How much do you trust your family? </br> Q59: How much do you trust your neighborhood? </br> Q60: How much do you trust people you know personally? </br> Q61: How much do you trust people you meet for the first time? </br> Q62: How much do you trust people of another religion? </br> Q63: How much do you trust people of another nationality?| 0.59</br> 0.59 </br>0.59</br> 0.59</br> 0.59 </br>0.59 </br>0.59 </br>0.59 </br>0.59</br>0.59 </br>0.58 </br>0.58 </br>0.54 </br>0.54 </br>0.44 </br>0.44 </br>0.44 </br>0.44 </br>0.44 </br>0.44 </br>0.44|
 Neutrality | Q102R: Are you a member of a consumer organization? </br> Q101R: Are you a member of a charitable or humanitarian organization? </br> Q100R: Are you a member of a professional organization? </br> Q103R: Are you a member of a self-help or mutual aid group? | 0.76</br> 0.74 </br>0.72 </br>0.76|
-Fairness |Q179: Stealing property. Is it ever justifiable? </br> Q181: Someone accepting a bribe in the course of their duties. Is it ever justifiable? </br> Q180: Cheating on taxes if you have a chance. Is it ever justifiable? </br> Q191: Violence against other people. Is it ever justifiable? </br> Q189 : For a man to beat his wife. Is it ever justifiable?| 0.77</br>  0.74 </br>0.70 </br>0.63 </br>0.58 |
-Skepticism |Q73: How much confidence do you have in the parliament? </br> Q71: How much confidence do you have in the government? </br> Q74: How much confidence do you have in the civil services  </br> Q72: How much confidence do you have in political parties? </br> Q70: How much confidence do you have in the justice system/courts?| 0.77 </br> 0.74 </br>0.70 </br>0.63</br> 0.58|
+Fairness |Q179: Stealing property. Is it ever justifiable? </br> Q181: Someone accepting a bribe in the course of their duties. Is it ever justifiable? </br> Q180: Cheating on taxes if you have a chance. Is it ever justifiable? </br> Q191: Violence against other people. Is it ever justifiable? </br> Q189 : For a man to beat his wife. Is it ever justifiable?| 0.77</br> 0.74 </br>0.70 </br>0.63 </br>0.58 |
+Skepticism |Q73: How much confidence do you have in the parliament? </br> Q71: How much confidence do you have in the government? </br> Q74: How much confidence do you have in the civil services </br> Q72: How much confidence do you have in political parties? </br> Q70: How much confidence do you have in the justice system/courts?| 0.77 </br> 0.74 </br>0.70 </br>0.63</br> 0.58|
 Societal Tranquility | Q148: To what degree are you worried about the following situations? A civil war </br> Q147: To what degree are you worried about the following situations? A terrorist attack </br> Q146: To what degree are you worried about the following situations? A war involving my country </br> Q143: To what degree are you worried about the following situations? Not being able to give one's children a good education | 0.82</br> 0.80</br> 0.80</br> 0.49|
 
-
-
-
-In addition to the wordalisation of these factors we provide question and answer pairs to the chatbot. The first set of question and answer pairs were derived from the texts [1] and [2] as well as the World Value Survey website [3]. They are intended to contextualize the data and factors and can be found in the [WVS Qualities](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx) spreadsheet. The descriptions provided in Table 1 are extracted from this spreadsheet. 
+In addition to the wordalisation of these factors we provide question and answer pairs to the chatbot. The first set of question and answer pairs were derived from the texts [1] and [2] as well as the World Value Survey website [3]. They are intended to contextualize the data and factors and can be found in the [WVS Qualities](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/describe/WVS_qualities.xlsx) spreadsheet. The descriptions provided in Table 1 are extracted from this spreadsheet.
 
 In addition, we provide question and answer pairs that are intend to provide good examples of how that chat bot should discuss the chosen country. These in-context-learning examples and can be found [here](https://github.com/soccermatics/twelve-gpt-educational/blob/wvs_chat/data/gpt_examples/WVS_examples.xlsx). The usage of the above mentioned question-answer pairs is detailed in the [Normative model](#normative-model) section.
 
@@ -96,8 +88,7 @@ At the stage of _tell it what data to use_, we apply a model that maps the z-sco
 
 We would also like to emphasis that factor scores and z-score values are devoid of any absolute meaning, and do not reflect any notion of better or worse. In other words, we do not consider that any particular result to be more or less favorable in a moral sense.
 
-
-#### Implementation  
+#### Implementation
 
 We use the following function to translate z-scores into evaluation words:
 
@@ -137,7 +128,7 @@ In addition to the factor z-score wordalisation, we also provided information ab
 
 ### Language model
 
-Our implementation supports both GPT4o and ChatGPT and related APIs, as well as Gemini API. Since these language model's training data included text about these countries, this knowledge will likely effect both the initial response and subsequent queries within the same chat. This means that some aspects of the answers may come from data external to that in the provided dataframe. 
+Our implementation supports both GPT4o and ChatGPT and related APIs, as well as Gemini API. Since these language model's training data included text about these countries, this knowledge will likely effect both the initial response and subsequent queries within the same chat. This means that some aspects of the answers may come from data external to that in the provided dataframe.
 
 ## Evaluation
 
@@ -163,7 +154,7 @@ While some effort was made to accommodate multiple languages, questionnaires whe
 
 In the context of the factors mentioned in [Dataset](#dataset), the data can only give a rough indication of the attitudes of a population, during the period 2017-2022. Therefore, the summaries generated by the [Normative model](#normative-model) may contain out of date information and should not be considered a reflection of the beliefs or attitudes of any given individual.
 
-We also would like to note that it is an open question as to whether the derived factors summerised in Tables 1 and 2 give any meaningful insights and we would urge users to consider them within the research context in which they were derived, see [1] and [2] and the World Value Survey website [3]. 
+We also would like to note that it is an open question as to whether the derived factors summerised in Tables 1 and 2 give any meaningful insights and we would urge users to consider them within the research context in which they were derived, see [1] and [2] and the World Value Survey website [3].
 
 ## Caveats and recommendations
 
