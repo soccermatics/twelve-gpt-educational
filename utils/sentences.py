@@ -29,10 +29,16 @@ def describe(thresholds, words, value):
 def format_metric(metric):
     return metric.replace("_", " ").replace(" adjusted per90", "").replace("npxG","non-penalty expected goals").capitalize()
 
+# look up formated metric name for display and descriptions
+def lookup_metric(metric):
+    # implement a lookup table for metric descriptions
+    # parameters = pd.read_excel("data/medical/Anuerysm model - 2.xlsx")
+    # return parameters[parameters['Parameter'] == metric]['Explanation'].values[0]
+    pass
+
 def write_out_metric(metric):
     return metric.replace("_"," ").replace("adjusted","adjusted for possession").replace("per90","per 90").replace("npxG","non-penalty expected goals") + " minutes"
 
-def describe_contributions(value):
-    thresholds = [10, 5, 2, -2,-5,-10]
-    words = ["implies a seriously increased risk", "implies an increased risk", "implies a small increase in risk", "does not significantly effect the risk", "implies slightly smaller risk", "implies a decreased risk", "implies a greatly decreased risk"]
+def describe_contributions(value,  thresholds = [10, 5, 2, -2,-5,-10], words = ["implies a seriously increased risk", "implies an increased risk", "implies a small increase in risk", "does not significantly effect the risk", "implies slightly smaller risk", "implies a decreased risk", "implies a greatly decreased risk"]):
+
     return describe(thresholds, words, value)

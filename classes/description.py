@@ -297,10 +297,11 @@ class IndividualDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/Anuerysm.xlsx"]
 
-    def __init__(self, individual: Individual,metrics,parameter_explanation):
+    def __init__(self, individual: Individual,metrics,parameter_explanation, thresholds):
         self.metrics = metrics
         self.individual = individual
         self.parameter_explanation = parameter_explanation
+        self.thresholds = thresholds
         super().__init__()
 
 
@@ -351,10 +352,10 @@ class IndividualDescription(Description):
                 if individual.ser_metrics["Gender"] == 1:
                     description += f"Being male "
                 else:
-                    description += f"Being male "
+                    description += f"Being female "
             else:   
                 description += f"A {self.parameter_explanation[metric]} of {individual.ser_metrics[metric]} "
-            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"]) 
+            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"], thresholds=self.thresholds) 
             description += " of anuerysm compared to other patients that come into the clinic. "                            
 
         st.write(description)

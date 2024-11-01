@@ -196,6 +196,18 @@ class Model(Data):
 
         self.df = df
 
+    def most_variable_data(self):
+        df = self.df
+        contribution_columns = [col for col in df.columns if '_contribution' in col]
+        self.std_contributions = df[contribution_columns].std()
+        most_vairable_column= self.std_contributions.idxmax()
+        most_variable_data = self.df[most_vairable_column]
+        mean, std = np.mean(most_variable_data),np.std(most_variable_data)
+
+        thresholds = [round(mean + i * std, 2) for i in range(-3, 4) if i != 0]
+        return thresholds
+    
+
     def to_data_point(self) -> data_point.Individual:
         
         id = self.df['ID'].iloc[0]

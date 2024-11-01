@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-from utils.sentences import format_metric
+from utils.sentences import format_metric, lookup_metric
 
 from classes.data_point import Player
 from classes.data_source import PlayerStats
@@ -122,16 +122,24 @@ class DistributionPlot(Visual):
             temp_hover_string = hover_string
 
             metric_name = format_metric(col)
-
             temp_df = pd.DataFrame(df_plot[col+hover])
             temp_df['name'] = metric_name
-            
+            # only use 2 colors for the anuerysm plot
+            if 'Anuerysm' in df_plot.columns:
+                marker_colors = [
+                    rgb_to_color(self.table_red, opacity=0.2) if val == 1 else rgb_to_color(self.bright_green, opacity=0.2)
+                    for val in df_plot['Anuerysm']
+                ]
+            else:
+                marker_colors = [rgb_to_color(self.bright_green, opacity=0.2)] * len(df_plot)
+
             self.fig.add_trace(
                 go.Scatter(
                     x=df_plot[col+plots], y=np.ones(len(df_plot))*i,
                     mode="markers",
                     marker={
-                        "color": rgb_to_color(self.bright_green, opacity=0.2), "size": 10,
+                        "color": marker_colors,
+                        "size": 10,
                     },
                     hovertemplate='%{text}<br>'+temp_hover_string+'<extra></extra>',
                     text=names,
@@ -217,8 +225,30 @@ class DistributionPlot(Visual):
 
 class DistributionModelPlot(DistributionPlot):
 
+    def __init__(self, thresolds, columns, *args, **kwargs):
+        self.thresolds = thresolds
+        super().__init__(columns,*args, **kwargs)
+
+
     def _setup_axes(self):
-        self.fig.update_xaxes(range=[-20, 20], fixedrange=True, tickmode="array", tickvals=[-10, 0, 10], ticktext=["Lower Risk", "Average", "Greater Risk"])
+        self.fig.update_xaxes(
+            range=[min(self.thresolds), max(self.thresolds)], 
+            fixedrange=True, 
+            tickmode="array", 
+            tickvals=self.thresolds, 
+            ticktext=["Substantially Reduced", "Reduced Risk", "Marginally Reduced Risk", "", "Mildly Increased Risk", "Elevated Risk", "High Risk"]
+        )
+        for tick in self.thresolds:
+            self.fig.add_shape(
+            type="line",
+            x0=tick,
+            y0=0,
+            x1=tick,
+            y1=1,
+            xref='x',
+            yref='paper',
+            line=dict(color=rgb_to_color(self.bright_green), width=1)
+            )
         self.fig.update_yaxes(showticklabels=False, fixedrange=True, gridcolor=rgb_to_color(self.medium_green), zerolinecolor=rgb_to_color(self.medium_green))
 
     def add_individual(self, individual, n_group, metrics):

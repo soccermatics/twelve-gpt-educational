@@ -46,6 +46,14 @@ st.expander("Model card", expanded=False).markdown(model_card_text)
 
 st.expander("Dataframe used", expanded=False).write(individuals.df)
 
+thresholds = individuals.most_variable_data()            
+with st.expander("Feature Contributions Variance", expanded=False):
+    st.write(individuals.std_contributions.sort_values(ascending=False))
+    st.write("The most variable feature is",individuals.std_contributions.idxmax())
+    st.write("The thresholds value are",str(thresholds))
+
+
+
 # Chat state hash determines whether or not we should load a new chat or continue an old one
 # We can add or remove variables to this hash to change conditions for loading a new chat
 to_hash = (individual.id,)
@@ -59,13 +67,13 @@ if chat.state == "empty":
 
     # Make a plot of the distribution of the metrics for all players
     # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-    visual = DistributionModelPlot(metrics)
+    visual = DistributionModelPlot(thresholds,metrics)
     visual.add_title('Evaluation of individual','')
     visual.add_individuals(individuals, metrics=metrics)
     visual.add_individual(individual, len(individuals.df), metrics=metrics)
 
     # Now call the description class to get the summary of the player
-    description = IndividualDescription(individual,metrics,parameter_explanation=individuals.parameter_explanation)
+    description = IndividualDescription(individual,metrics,parameter_explanation=individuals.parameter_explanation, thresholds = [10, 5, 2, -2,-5,-10])
     summary = description.stream_gpt()
 
     # Add the visual and summary to the chat
