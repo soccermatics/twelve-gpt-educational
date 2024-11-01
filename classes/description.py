@@ -187,9 +187,9 @@ class Description(ABC):
 
             converted_msgs = convert_messages_format(self.messages)
 
-            # # save converted messages to json
-            # with open("data/wvs/msgs_0.json", "w") as f:
-            #     json.dump(converted_msgs, f)
+            # save converted messages to json
+            with open("data/wvs/msgs_0.json", "w") as f:
+                json.dump(converted_msgs, f)
 
             genai.configure(api_key=GEMINI_API_KEY)
             model = genai.GenerativeModel(
@@ -337,28 +337,16 @@ class CountryDescription(Description):
                 "role": "system",
                 "content": (
                     "You are a data analyst and a social scientist. "
-                    "You provide succinct and to the point explanations about countries using metrics derived from data collected in the World Value Survey. "
-                    "You use the information given to you from the data and answers to earlier questions to give summaries of how countries score in various metrics that attempt to measure the social values held by the population of that country."
+                    "You provide succinct and to the point explanations about countries using social factors derived from the World Value Survey. "
+                    "You use the information given to you to answer questions about how countries score in various social factors that attempt to measure the social values held by the population of a country."
                 ),
             },
-            # {
-            #     "role": "user",
-            #     "content": "Do you refer to the game you are an expert in as soccer or football?",
-            # },
-            # {
-            #     "role": "assistant",
-            #     "content": (
-            #         "I refer to the game as football. "
-            #         "When I say football, I don't mean American football, I mean what Americans call soccer. "
-            #         "But I always talk about football, as people do in the United Kingdom."
-            #     ),
-            # },
         ]
         if len(self.describe_paths) > 0:
             intro += [
                 {
                     "role": "user",
-                    "content": "First, could you answer some questions about a the World Value Survey for me?",
+                    "content": "First, could you answer some questions about the World Value Survey for me?",
                 },
                 {"role": "assistant", "content": "Sure!"},
             ]
@@ -367,15 +355,13 @@ class CountryDescription(Description):
 
     def synthesize_text(self):
 
-        description = f"Here is a statistical description of the core values of {self.country.name.capitalize()}. \n\n"
+        description = f"Here is a statistical description of the societal values of {self.country.name.capitalize()}."
 
         # subject_p, object_p, possessive_p = sentences.pronouns(country.gender)
 
         for metric in self.country.relevant_metrics:
 
-            description += (
-                f"According to the WVS, {self.country.name.capitalize()} was found to "
-            )
+            description += f"\n\nAccording to the WVS, {self.country.name.capitalize()} was found to "
             description += sentences.describe_level(
                 self.country.ser_metrics[metric + "_Z"],
                 thresholds=self.thresholds_dict[metric],
@@ -402,7 +388,6 @@ class CountryDescription(Description):
                 description += self.relevant_questions[metric][question][3]
                 description += ". "
 
-            description += "\n\n"
         # st.write(description)
 
         return description
