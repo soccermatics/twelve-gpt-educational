@@ -171,7 +171,7 @@ We have no further caveats and recommendations.
 
 ## References
 
-[1] Ingelhart, R. and Welzel, C., 2005. Modernization, cultural change, and democracy: The human development sequence.
+[1] Inglehart, R., 2005. Christian Welzel Modernization, Cultural Change, and Democracy The Human Development Sequence. Cambridge: Cambridge university press.
 
 [2] Allison, L., Wang, C. and Kaminsky, J., 2021. Religiosity, neutrality, fairness, skepticism, and societal tranquility: A data science analysis of the World Values Survey. Plos one, 16(1), p.e0245231.
 

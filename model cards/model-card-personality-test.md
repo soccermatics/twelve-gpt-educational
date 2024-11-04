@@ -90,7 +90,7 @@ No systematic *quantitative analyses* have been carried out on this wordalisatio
 
 ## Ethical considerations
 
-Severel ethical challenges have arisen in this project.
+Several ethical challenges have arisen in this project.
 First, there are no professional psychologists or psychiatrists involved in interpreting the results. The interpretation is done by statistic method as mention above.
 Second, the Big Five personality test has several criticisms, such as being overly simplistic [1] and subject to cultural bias. Indeed, according to [2,3,4] the personality is developped in an environmental and cultural context. The test can not be apply universally [1,2], and should have more traits [1].
 Third, the test can be easily manipulated by individuals seeking to present a more favorable personality.
