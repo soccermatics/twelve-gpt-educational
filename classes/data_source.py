@@ -582,39 +582,99 @@ class Model(Data):
     data_point_class = data_point.Individual
 
     def __init__(self):
-        self.df = self.get_processed_data()
-        self.parameters = self.read_model()
+        self.df=None
+        self.parameters=None
+        # self.df = self.get_processed_data()
+        # self.parameters = self.read_model()
+        pass
         
 
     def get_raw_data(self):
         df = pd.read_excel("data/medical/Anuerysm data.xlsx")
         return df
+    def set_data(self, df_raw, parameters):
+        self.df= df_raw
+        self.parameters= parameters
 
-    def process_data(self, df_raw):
+    # def process_data(self, df_raw):
 
-        st.write(df_raw)
+    #     # st.write(df_raw)
+    #     # In column "Gender" use 1 if male and 0 if female
+    #     df_raw['Gender'] = df_raw['Gender'].replace({'Male': 1, 'Female': 0})
+    #     df_raw['Anuerysm'] = df_raw['Anuerysm'].replace({'Yes': 1, 'No': 0})
+    #     if not('ID' in df_raw.columns):
+    #         df_raw['ID'] = df_raw.index
+
+    #     return df_raw 
+    def process_data(self):
+
+        # st.write(df_raw)
         # In column "Gender" use 1 if male and 0 if female
-        df_raw['Gender'] = df_raw['Gender'].replace({'Male': 1, 'Female': 0})
-        df_raw['Anuerysm'] = df_raw['Anuerysm'].replace({'Yes': 1, 'No': 0})
+        # df_raw['Gender'] = df_raw['Gender'].replace({'Male': 1, 'Female': 0})
+        # df_raw['Anuerysm'] = df_raw['Anuerysm'].replace({'Yes': 1, 'No': 0})
+        df_raw=self.df
         if not('ID' in df_raw.columns):
             df_raw['ID'] = df_raw.index
 
-        return df_raw   
-    
-    def read_model(self):
-        parameters = pd.read_excel("data/medical/Anuerysm model.xlsx")
-        
-        return parameters
-    
-    def weight_contributions(self):
-        
-        df = self.df
+        self.df=df_raw
 
-        parameters = self.parameters
+        parameters=self.parameters
+
         self.intercept = parameters[parameters['Parameter'] == 'Intercept']['Value'].values[0]
         # Drop intercept
         self.parameters = parameters[parameters['Parameter'] != 'Intercept']
 
+        return df_raw   
+    
+    def read_model(self):
+        parameters = pd.read_excel("data/medical/Anuerysm model - 2.xlsx")
+        
+        return parameters
+    def load_in_model(self, data, parameters ):
+        self.df = data
+        self.parameters = parameters
+        # parameters = pd.read_excel("data/medical/Anuerysm Parameters.xlsx")   
+        # self.intercept=weights[weights['Feature'] == 'const']['Coefficient'].values[0]  
+        # weights = weights[weights['Feature'] != 'Intercept']   
+        # print(weights)
+        # for i,row in weights.iterrows():
+        #     parameters.loc[parameters['Parameter'] == row['Feature'],'Value'] = row['Coefficient']
+        # df = self.df
+        # for i,row in parameters.iterrows():
+        #     df[row['Parameter']+'_contribution'] = df[row['Parameter']] * row['Value']
+        #     #Remove the mean
+        #     df[row['Parameter']+'_contribution'] = df[row['Parameter']+'_contribution'] - df[row['Parameter']+'_contribution'].mean()
+        # self.parameters_explanations = parameters.set_index('Parameter')['Explanation'].to_dict()
+        # self.df = df
+        # st.write(self.parameters_explanations)
+        
+    
+    # def weight_contributions(self):
+        
+    #     df = self.df
+        
+    #     parameters = self.parameters
+    #     self.intercept = parameters[parameters['Parameter'] == 'Intercept']['Value'].values[0]
+    #     # Drop intercept
+    #     self.parameters = parameters[parameters['Parameter'] != 'Intercept']
+
+    #     for i,row in self.parameters.iterrows():
+    #         df[row['Parameter']+'_contribution'] = df[row['Parameter']] * row['Value']
+    #         #Remove the mean
+    #         df[row['Parameter']+'_contribution'] = df[row['Parameter']+'_contribution'] - df[row['Parameter']+'_contribution'].mean()
+        
+
+    #     self.parameter_explanation = parameters.set_index('Parameter')['Explanation'].to_dict()
+    #     # st.write(self.parameter_explanation)
+
+    #     self.df = df
+    
+    def weight_contributions(self):
+        
+        df = self.df
+        
+        parameters = self.parameters
+        
         for i,row in self.parameters.iterrows():
             df[row['Parameter']+'_contribution'] = df[row['Parameter']] * row['Value']
             #Remove the mean
@@ -622,9 +682,9 @@ class Model(Data):
         
 
         self.parameter_explanation = parameters.set_index('Parameter')['Explanation'].to_dict()
-        st.write(self.parameter_explanation)
 
         self.df = df
+        
 
     def most_variable_data(self):
         df = self.df
@@ -645,7 +705,7 @@ class Model(Data):
         #Reindexing dataframe
         
         self.df.reset_index(drop=True, inplace=True)
-        self.df=self.df.drop(columns=["ID","Anuerysm"])
+        self.df=self.df.drop(columns=["ID","Aneurysm"])
 
 
         # Convert to series
