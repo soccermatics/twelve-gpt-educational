@@ -428,7 +428,7 @@ class PersonDescription(Description):
                 "role": "system",
                 "content": (
                     "You are a recruiter. "
-                    "You provide succinct and to the point explanations about a candiate using data.  "
+                    "You provide succinct and to the point explanations about a candidate using data.  "
                     "You use the information given to you from the data and answers"
                     "to earlier user/assistant pairs to give summaries of candidates."
                 ),
