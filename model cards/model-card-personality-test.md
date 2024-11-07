@@ -80,6 +80,7 @@ In this example, we created question-answer pairs to represent each personality 
 
  We create an excel document with two columns one `Users', with the questions, and one `Assistant' with the corresponding answers. We obtain the example table \ref{tab:table_openness}. In the case of the personality tests, we reiterate the process for the four others traits. It enables the system to acquire insights into each personality trait. At this stage, we can equip the chat with professional expertise.
 
+Table 2: 
 | **User** | **Assistant** |
 |----------|---------------|
 | What is openness to experience? | Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. |
@@ -99,6 +100,7 @@ Agreeableness will include *friendly and compassionate* if the z-score is positi
 Conscientiousness will be described as *efficient and organized* for a positive z-score, and *extravagant and careless* for a negative one.  
 Openness will have the adjectives *inventive and curious* if the z-score is positive, and *consistent and cautious* otherwise.
 
+Table 3: 
 | **Z-score value**      | **Text description**                   |
 |------------------------|----------------------------------------|
 | Below -2               | 'The candidate is extremely '          |
@@ -114,10 +116,10 @@ Highlighting it as a key characteristic of the individual. This ensures that mor
 
 #### Tell is how to answer
 
-We have now constructed a description based on the data and the zscore. At this stage the aim is to show to the AI agent, how to answer. For this purpose, we create an excel file with one column, 'user', that correspond to the 'constructed' description example, and on column 'assistant', that will give a modified description. In this example, we produce four examples of candidate' profile description. We illustrate it by the Table \ref{tab:PT_tell_it_how_to_answer}.
+We have now constructed a description based on the data and the zscore. At this stage the aim is to show to the AI agent, how to answer. For this purpose, we create an excel file with one column, 'user', that correspond to the 'constructed' description example, and on column 'assistant', that will give a modified description. In this example, we produce four examples of candidate' profile description. We illustrate it by the Table 4.
 This somewhat compromises how the texts for these four candidates are constructed. These examples and the prompt used emphasise highlighting positive and negative aspects of the person personality, and ignoring aspects which are average or typical.
 
-
+Table 4:
 | **User** | **Assistant** |
 |----------|---------------|
 | The candidate is very outgoing and energetic. In particular, they said that they start conversations. The candidate is quite sensitive and nervous. The candidate tends to feel more negative emotions like anxiety. The candidate is quite friendly and compassionate. The candidate tends to be more cooperative, polite, kind, and friendly. The candidate is very efficient and organized. The candidate tends to be more careful or diligent. In particular, they said that they pay attention to details. The candidate is relatively consistent and cautious. The candidate tends to be less open. | The candidate is outgoing, energetic, and takes the initiative in starting conversations. They are sensitive and can feel nervous at times, often experiencing anxiety or negative emotions. Despite this, they are friendly, compassionate, and naturally inclined to be cooperative, polite, and kind. Their efficiency and organizational skills stand out, as they are diligent and pay close attention to details. While generally consistent and cautious, the candidate tends to be more reserved and less open in new or unfamiliar situations. |
