@@ -442,22 +442,19 @@ class LessonChat(Chat):
         first_messages = [
             {"role": "system", "content": (
                 #"You are talking to a learner about the following topic: " + self.overallThesis + ". "
-                "You are an instructor, you guiding the user to learn about  for loops in C" 
+                "You are an instructor, you guiding the user to learn about  for loops in C programming" 
                 
                 )
             },
             {"role": "user", "content": (
                 f"After these messages you will be interacting with the user who will tell you what they know about for loops. "
-                f"Your task is to gauge the understading of the use on the topic of for loops and ask them a question that will help fill the knowledge gaps they have. "
+                f"Your task is to gauge the understading of the use on the topic of for loops and then ask them a question that will help fill the knowledge gaps they have. "
                 f"You will receive relevant information to answer a user's questions. The relevant information has different options for which is the preffered option. "
-                f"You can respond using the number 1 preffered ways but you can gauge based on the user response "
+                f"You can respond using the number 1 preffered way but if the user responds with the same answer as the previous response, you can number 2 preffered way. "
                 f"All user messages will be prefixed with 'user:' and enclosed with ```. "
                 f"When responding to the user, speak directly to them. "
-                f"If the user has understading of the for loops, ask them to write code that demonstrate the use of for loops, like displaying a range of numbers"
-                f"Evaluate the response, and check for syntax and logical errors in the student submission. "
-                f"If the user says they do not know about loops, ask them a question on topics that preceed for loops. "
-                f"If the user is able to write the basic loops, give the user a complex task to solve with the for loop. "
-                f"At the end of the conversation give the user a programming task to practice their knowledge of the for loop. "
+                f"When responding to the user query, if there is no relevant information provided, consider the entire conversation with the user and ask them a related question based on the conversation. "
+                #f"At the end of the conversation give the user a programming task to practice their knowledge of the for loop in C programming langauge. "
                 f"Do not deviate from this information or provide additional information that is not in the text returned by the functions."
                 )
             },
@@ -482,6 +479,7 @@ class LessonChat(Chat):
         results = results.sort_values('similarities', ascending=False)
         sorted_results =results.reset_index(drop=True)
         st.write(sorted_results)
+        #If there are more than one row which gretor than the sililarity threshold, reccomend the most prefered and the second most preffered
         if len(sorted_results)>0:
             greator_similarities=sorted_results['similarities'] >= similaritythreshold
             responce=[]
@@ -492,12 +490,7 @@ class LessonChat(Chat):
                 ret_val +="\n".join(sorted_results.loc[[i]]["assistant"].to_list())
             result = " ".join(responce)
             return result
-            '''
-            for i in range(len(sorted_results)):
-                if sorted_results.iloc[i]['similarities'] >= similaritythreshold:
-                    ret_val = f"\n\nHere is the {i+1} st preffered way for answering the user question:  \n"   
-                    ret_val +="\n".join(sorted_results.loc[[i]]["assistant"].to_list())
-                    return ret_val'''
+            
 
                     #st.write(ret_val)
             if sorted_results.iloc[0]['similarities'] < similaritythreshold:

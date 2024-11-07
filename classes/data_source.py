@@ -270,18 +270,18 @@ class Lesson(Data):
                 prefix=prefix.rstrip('')
                 df['step'] = df['step'].astype(str)
                 new_view=df[df['step']==prefix]['topic'].values[0]
-                if new_view == 'Get started with for loop':
+                if new_view == 'defination':
                     current_view = new_view
-                if current_view == 'Get started with for loop':
+                if current_view == 'defination':
                     current_view = new_view
-                elif current_view == 'Get started with for loop' and new_view == 'for loop':
-                    current_view = 'for loop'
-                elif current_view == 'for loop' and new_view == 'Loop defination':
-                    current_view = 'Loop defination'
-                elif current_view == 'for loop' and new_view == 'Loop function':
-                    current_view = 'Loop function'
-                elif current_view == 'for loop' and new_view == 'variable assignment':
-                    current_view = 'variable assignment'
+                elif current_view == 'defination' and new_view == 'implementation':
+                    current_view = 'implementation'
+                elif current_view == 'implementation' and new_view == 'defination':
+                    current_view = 'defination'
+                elif current_view == 'implementation' and new_view == 'condtion':
+                    current_view = 'condition'
+                elif current_view == 'imlementation' and new_view == 'increment':
+                    current_view = 'increment'
                     #elif current_view == 'Pro' and new_view == 'Pro':
                        # current_view = 'Pro'
 
@@ -311,9 +311,9 @@ class Lesson(Data):
         #st.write(list_of_arguments)
         # For each argument in the list, find all rows of dateframe where df['assistant'] is within 2 and 4 and they are 'Pro
         for subargument in list_of_arguments:
-            argument_df2 = df[df['assistant'].str.startswith(subargument)]
-            argument_df2 = argument_df2[argument_df2['assistant'].str.len() <= len(argument)+4]
-            argument_df2 = argument_df2[argument_df2['assistant'].str.len() > len(argument) + 2 ]
+            argument_df2 = df[df['step'].str.startswith(subargument)]
+            argument_df2 = argument_df2[argument_df2['step'].str.len() <= len(argument)+4]
+            argument_df2 = argument_df2[argument_df2['step'].str.len() > len(argument) + 2 ]
             argument_df2 = argument_df2[argument_df2['topic']=='for loops']
             # Add these to the arguments.
             argument_df = pd.concat([argument_df,argument_df2])
