@@ -50,12 +50,8 @@ from utils.page_components import (
 
 from classes.chat import PlayerChat
 
-from utils.page_components import (
-    add_common_page_elements,
-    select_player,
-    create_chat,
-)
-
+from utils.page_components import add_common_page_elements
+from utils.utils import select_player, create_chat
 
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()

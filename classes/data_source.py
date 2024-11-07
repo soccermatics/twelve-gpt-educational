@@ -165,7 +165,6 @@ class PlayerStats(Stats):
         # Convert to series
         ser_metrics = self.df.squeeze()
 
-<<<<<<< HEAD
     
 
 
@@ -588,7 +587,6 @@ class Shots(Data):
 
 
         
-=======
         return self.data_point_class(
             id=id,
             name=name,
@@ -866,4 +864,3 @@ class CountryStats(Stats):
             relevant_metrics=self.metrics,
             drill_down_metrics=drill_down_metrics,
         )
->>>>>>> 8590277ac3e13771f83452ca53300339bae74d10

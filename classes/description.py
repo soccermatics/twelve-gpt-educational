@@ -142,7 +142,6 @@ class Description(ABC):
             FileNotFoundError
         ) as e:  # FIXME: When merging with new_training, add the other exception
             print(e)
-<<<<<<< HEAD
         
         # Ensure messages are in the correct format after getting from excel
         messages = [msg for msg in messages if isinstance(msg, dict) and "content" in msg and isinstance(msg["content"], str)]
@@ -162,7 +161,6 @@ class Description(ABC):
         # Filter again to ensure no non-string content is present
         messages = [msg for msg in messages if isinstance(msg, dict) and "content" in msg and isinstance(msg["content"], str)]
         
-=======
         messages += self.get_prompt_messages()
 
         messages = [
@@ -184,7 +182,6 @@ class Description(ABC):
                 "content": f"Now do the same thing with the following: ```{self.synthesized_text}```",
             }
         ]
->>>>>>> 8590277ac3e13771f83452ca53300339bae74d10
         return messages
 
 
@@ -200,12 +197,9 @@ class Description(ABC):
             str
         """
 
-<<<<<<< HEAD
 
         st.expander("Description messages", expanded=False).write(self.messages)
-=======
         st.expander("Chat transcript", expanded=False).write(self.messages)
->>>>>>> 8590277ac3e13771f83452ca53300339bae74d10
 
         if USE_GEMINI:
             import google.generativeai as genai
@@ -329,7 +323,6 @@ class PlayerDescription(Description):
         return [{"role": "user", "content": prompt}]
 
 
-<<<<<<< HEAD
 
 
 
@@ -350,7 +343,7 @@ class ShotDescription(Description):
         self.shot_id = shot_id
         super().__init__()
 
-    def _synthesize_text(self):
+    def synthesize_text(self):
 
         shots = self.shots
         shot_data = shots.df_shots[shots.df_shots['id'] == self.shot_id]  # Fix here to use self.shot_id
@@ -391,7 +384,7 @@ class ShotDescription(Description):
 
     def get_prompt_messages(self):
         # Generate synthesized text first
-        shot_description = self._synthesize_text()
+        shot_description = self.synthesize_text()
 
         # Include the synthesized shot description in the message to be sent to the language model
         prompt = (
@@ -403,7 +396,6 @@ class ShotDescription(Description):
 
 
 
-=======
 class CountryDescription(Description):
     output_token_limit = 150
 
@@ -503,4 +495,3 @@ class CountryDescription(Description):
             # "Finally, summarise exactly how the player compares to others in the same position. "
         )
         return [{"role": "user", "content": prompt}]
->>>>>>> 8590277ac3e13771f83452ca53300339bae74d10
