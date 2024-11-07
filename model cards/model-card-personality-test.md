@@ -76,56 +76,38 @@ For example:
 
 In this example, we created question-answer pairs to represent each personality trait in the Personality Wordalisation framework. To ensure these pairs accurately reflect each trait, we used descriptions from Wikipedia to contextualize the measurements in the data. Each trait—Extraversion, Conscientiousness, Openness, Agreeableness, and Neuroticism—is represented through multiple question-answer pairs derived from Wikipedia's explanations. The goal is to identify the questions that best capture the essence of each trait through their corresponding answers. To illustrate, below is an example using the Wikipedia description of 'Openness'. From the following description: 
 
- \textit{"Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. People who are open to experience are intellectually curious, open to emotion, sensitive to beauty, and willing to try new things. They tend to be, when compared to closed people, more creative and more aware of their feelings. They are also more likely to hold unconventional beliefs. Open people can be perceived as unpredictable or lacking focus, and more likely to engage in risky behaviour or drug-taking. Moreover, individuals with high openness are said to pursue self-actualisation specifically by seeking out intense, euphoric experiences. Conversely, those with low openness want to be fulfilled by persevering and are characterised as pragmatic and data-driven – sometimes even perceived to be dogmatic and closed-minded. Some disagreement remains about how to interpret and contextualise the openness factor as there is a lack of biological support for this particular trait. Openness has not shown a significant association with any brain regions as opposed to the other four traits which did when using brain imaging to detect changes in volume associated with each trait."} \footnote{https://en.wikipedia.org/wiki/Big\_Five\_personality\_traits}
+ _"Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. People who are open to experience are intellectually curious, open to emotion, sensitive to beauty, and willing to try new things. They tend to be, when compared to closed people, more creative and more aware of their feelings. They are also more likely to hold unconventional beliefs. Open people can be perceived as unpredictable or lacking focus, and more likely to engage in risky behaviour or drug-taking. Moreover, individuals with high openness are said to pursue self-actualisation specifically by seeking out intense, euphoric experiences. Conversely, those with low openness want to be fulfilled by persevering and are characterised as pragmatic and data-driven – sometimes even perceived to be dogmatic and closed-minded. Some disagreement remains about how to interpret and contextualise the openness factor as there is a lack of biological support for this particular trait. Openness has not shown a significant association with any brain regions as opposed to the other four traits which did when using brain imaging to detect changes in volume associated with each trait."_ [https://en.wikipedia.org/wiki/Big\_Five\_personality\_traits]
 
  We create an excel document with two columns one `Users', with the questions, and one `Assistant' with the corresponding answers. We obtain the example table \ref{tab:table_openness}. In the case of the personality tests, we reiterate the process for the four others traits. It enables the system to acquire insights into each personality trait. At this stage, we can equip the chat with professional expertise.
 
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{p{6cm}|p{10cm}}
-         User & Assistant\\
-         \hline
-         What is openness to experience? & Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. \\
-         \\
-         What characteristics do people with high openness to experience typically have? & People who are open to experience are intellectually curious, open to emotion, sensitive to beauty, and willing to try new things. They tend to be, when compared to closed people, more creative and more aware of their feelings. They are also more likely to hold unconventional beliefs.  \\
-          \\
-         How might people with high openness to experience be perceived? & Open people can be perceived as unpredictable or lacking focus, and more likely to engage in risky behaviour or drug-taking. Moreover, individuals with high openness are said to pursue self-actualisation specifically by seeking out intense, euphoric experiences. \\
-          \\
-         How might people with low openness to experience be perceived? & People with low openness want to be fulfilled by persevering and are characterised as pragmatic and data-driven – sometimes even perceived to be dogmatic and closed-minded. \\
-          \\
-         What is the current scientific consensus on the biological basis of openness to experience? & Some disagreement remains about how to interpret and contextualise the openness factor as there is a lack of biological support for this particular trait. Openness has not shown a significant association with any brain regions as opposed to the other four traits which did when using brain imaging to detect changes in volume associated with each trait.
-    \end{tabular}
-    \caption{Example of a pairs of questions and answers for the personality test chatbot construction.}
-    \label{tab:table_openness}
-\end{table}
+| **User** | **Assistant** |
+|----------|---------------|
+| What is openness to experience? | Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. |
+| What characteristics do people with high openness to experience typically have? | People who are open to experience are intellectually curious, open to emotion, sensitive to beauty, and willing to try new things. They tend to be, when compared to closed people, more creative and more aware of their feelings. They are also more likely to hold unconventional beliefs. |
+| How might people with high openness to experience be perceived? | Open people can be perceived as unpredictable or lacking focus, and more likely to engage in risky behaviour or drug-taking. Moreover, individuals with high openness are said to pursue self-actualisation specifically by seeking out intense, euphoric experiences. |
+| How might people with low openness to experience be perceived? | People with low openness want to be fulfilled by persevering and are characterised as pragmatic and data-driven – sometimes even perceived to be dogmatic and closed-minded. |
+| What is the current scientific consensus on the biological basis of openness to experience? | Some disagreement remains about how to interpret and contextualise the openness factor as there is a lack of biological support for this particular trait. Openness has not shown a significant association with any brain regions as opposed to the other four traits which did when using brain imaging to detect changes in volume associated with each trait. |
+
 
 #### Tell it what data to use
 
-The creation of personality descriptions is handled by the description.py script. Using the z-score results, the script generates a personalized paragraph for each individual. Each paragraph includes at least one phrase corresponding to each of the five personality traits. Each phrase will have an adjective depending of the z-score. This is done by the function categorie\_description as we can see in the following table \ref{tab:categorie_description_personality}. The description is followed by two adjectives for each category, determined by the z-score's direction—positive or negative. Extraversion will be described as \textit{outgoing and energetic} if the z-score is positive, and as \textit{solitary and reserved} if the z-score is negative.
-Neuroticism will be characterized by \textit{sensitive and nervous} for a positive z-score, and \textit{resilient and confident} for a negative z-score.
-Agreeableness will include \textit{friendly and compassionate} if the z-score is positive, while \textit{critical and rational} will apply if it is negative.
-Conscientiousness will be described as \textit{efficient and organized} for a positive z-score, and \textit{extravagant and careless} for a negative one.
-Openness will have the adjectives \textit{inventive and curious} if the z-score is positive, and \textit{consistent and cautious} otherwise.
+The creation of personality descriptions is handled by the `description.py` script. Using the z-score results, the script generates a personalized paragraph for each individual. Each paragraph includes at least one phrase corresponding to each of the five personality traits. Each phrase will have an adjective depending on the z-score. This is done by the function `categorie_description` as we can see in the following table (refer to Table \ref{tab:categorie_description_personality}).
 
+The description is followed by two adjectives for each category, determined by the z-score's direction—positive or negative. Extraversion will be described as *outgoing and energetic* if the z-score is positive, and as *solitary and reserved* if the z-score is negative.  
+Neuroticism will be characterized by *sensitive and nervous* for a positive z-score, and *resilient and confident* for a negative z-score.  
+Agreeableness will include *friendly and compassionate* if the z-score is positive, while *critical and rational* will apply if it is negative.  
+Conscientiousness will be described as *efficient and organized* for a positive z-score, and *extravagant and careless* for a negative one.  
+Openness will have the adjectives *inventive and curious* if the z-score is positive, and *consistent and cautious* otherwise.
 
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{c|c}
-         Zscore value & Text description\\
-         \hline
-         Below -2 & 'The candidate is extremely '\\
-         Between -2 and -1 & 'The candidate is very '\\
-         Between -1 and -0.5 & 'The candidate is quite '\\
-         Between -0.5 and 0.5 &  'The candidate is relatively '\\
-         Between 0.5 and 1 & 'The candidate is quite '\\
-         Between 1 and 2 & 'The candidate is very '\\
-         Higher than 2 & 'The candidate is extremely '
-    \end{tabular}
-    \caption{The thresholds and the corresponding description used to explain in words the zscore of each category. For example a candidate that score 1.5 in the category 'Extraversion', will be describe as 'The candidate is very outgoing and energetic'. }
-    \label{tab:categorie_description_personality}
-\end{table}
-
-
+| **Z-score value**      | **Text description**                   |
+|------------------------|----------------------------------------|
+| Below -2               | 'The candidate is extremely '          |
+| Between -2 and -1      | 'The candidate is very '               |
+| Between -1 and -0.5    | 'The candidate is quite '              |
+| Between -0.5 and 0.5   | 'The candidate is relatively '         |
+| Between 0.5 and 1      | 'The candidate is quite '              |
+| Between 1 and 2        | 'The candidate is very '               |
+| Higher than 2          | 'The candidate is extremely '          |
 
 
 Highlighting it as a key characteristic of the individual. This ensures that more extreme scores are The goal is to highlight key characteristics by drawing attention to extreme scores, ensuring that these traits stand out in the final description. If the z-score for a particular trait exceeds 1 or falls below -1, we add a specific phrase to emphasize this trait. We first review the 10 questions within the category to find the question with the highest score for z-scores above 1. The added phrase will begin with "In particular, they said that" followed by the question text. Similarly, for z-scores below -1, we identify the question with the lowest score and apply the same phrasing to underline that trait. This ensures that significant traits are properly highlighted in the description.
@@ -135,26 +117,10 @@ Highlighting it as a key characteristic of the individual. This ensures that mor
 We have now constructed a description based on the data and the zscore. At this stage the aim is to show to the AI agent, how to answer. For this purpose, we create an excel file with one column, 'user', that correspond to the 'constructed' description example, and on column 'assistant', that will give a modified description. In this example, we produce four examples of candidate' profile description. We illustrate it by the Table \ref{tab:PT_tell_it_how_to_answer}.
 This somewhat compromises how the texts for these four candidates are constructed. These examples and the prompt used emphasise highlighting positive and negative aspects of the person personality, and ignoring aspects which are average or typical.
 
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{p{8cm}|p{8cm}}
-         User & Assistant\\
-         \hline
-         The candidate is very outgoing and energetic. In particular they said that they start conversations. The candidate is quite sensitive and nervous. The candidate tends to feel more negative emotions anxiety. The candidate is quite friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. The candidate is very efficient and organized. The candidate tends to be more careful or diligent. In particular they said that they pay attention to details. The candidate is relatively consistent and cautious. The candidate tends to be less open.
-          & The candidate is outgoing, energetic, and takes the initiative in starting conversations. They are sensitive and can feel nervous at times, often experiencing anxiety or negative emotions. Despite this, they are friendly, compassionate, and naturally inclined to be cooperative, polite, and kind. Their efficiency and organizational skills stand out, as they are diligent and pay close attention to details. While generally consistent and cautious, the candidate tends to be more reserved and less open in new or unfamiliar situations.
 
-    \end{tabular}
-    \caption{Example of the constructed description and the final description}
-    \label{tab:PT_tell_it_how_to_answer}
-\end{table}
-
-
-
-
-
-
-
-
+| **User** | **Assistant** |
+|----------|---------------|
+| The candidate is very outgoing and energetic. In particular, they said that they start conversations. The candidate is quite sensitive and nervous. The candidate tends to feel more negative emotions like anxiety. The candidate is quite friendly and compassionate. The candidate tends to be more cooperative, polite, kind, and friendly. The candidate is very efficient and organized. The candidate tends to be more careful or diligent. In particular, they said that they pay attention to details. The candidate is relatively consistent and cautious. The candidate tends to be less open. | The candidate is outgoing, energetic, and takes the initiative in starting conversations. They are sensitive and can feel nervous at times, often experiencing anxiety or negative emotions. Despite this, they are friendly, compassionate, and naturally inclined to be cooperative, polite, and kind. Their efficiency and organizational skills stand out, as they are diligent and pay close attention to details. While generally consistent and cautious, the candidate tends to be more reserved and less open in new or unfamiliar situations. |
 
 
 
