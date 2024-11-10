@@ -167,7 +167,7 @@ def select_person(container, person_stat):
 
     return person
 
-def select_individual(container,individuals):
+def select_individual(container,individuals, columns=None):
 
     # Make a copy of Players object
     individual=copy.deepcopy(individuals)
@@ -183,7 +183,7 @@ def select_individual(container,individuals):
 
         # Return data point
 
-        individual=individual.to_data_point()
+        individual=individual.to_data_point(columns=columns)
         
     return individual
 
