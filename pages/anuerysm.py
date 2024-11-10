@@ -7,6 +7,7 @@ Runs top to bottom every time the user interacts with the app (other than import
 import traceback
 import copy
 import pandas as pd
+import json
 
 import streamlit as st
 
@@ -37,182 +38,8 @@ model_card_text = "We need to write this."
 
 st.expander("Model card", expanded=False).markdown(model_card_text)
 global data, model_features
-data=None
-model_features= None
-
-def trainModel():
-    # Let user pick csv file
-    
-    st.write("Upload a CSV file to use as the data source.")
-    uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="data_file")
-    
-    if uploaded_file is not None:
-        data = pd.read_csv(uploaded_file)
-        st.write("Upload a CSV file to explaining the features.")
-        feature_file = st.file_uploader("Choose a CSV file", type="csv", key="feature_file")
-        if feature_file is not None:
-            feature_data = pd.read_csv(feature_file)
-            
-            st.write("Choose target column")
-            target = st.radio("Target column", data.columns)
-            features = [col for col in data.columns if col != target]
-            model=TrainModel(data, target, features)
-            # merge explantions with coef_df on matching feature names
-            coef_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
-            model.coef_df['Explanation'] = model.coef_df['Parameter'].map(coef_explanations)
-            st.write("First Fit Model coefficients:", model.coef_df)
-            
-            
-            
-            model_features= model.coef_df
-            model=Model()
-            model.set_data(data, model_features)
-            model.process_data()
-            model.weight_contributions()
-            st.write("Dataframe used:", model.df)
-            # Now select the focal player
-            individual = select_individual(sidebar_container, model)
-            thresholds = model.most_variable_data()            
-            st.write("Feature Contributions Variance")
-            st.write(model.std_contributions.sort_values(ascending=False))
-            st.write("The most variable feature is",model.std_contributions.idxmax())
-            st.write("The thresholds value are",str(thresholds))
-
-            # individuals.load_in_model(data, model.coef_df)
-            # individuals.weight_contributions()
-            # thresholds = individuals.most_variable_data()     
-            # metrics =  individuals.parameters['Parameter']       
-            # model.selectFeatures()
-            # visual = DistributionModelPlot(thresholds,metrics)
-            # visual.add_title('New Model','')
-            # visual.add_individuals(individuals, metrics=metrics)
-            # visual.add_individual(individual, len(individuals.df), metrics=metrics)
-
-            # Chat state hash determines whether or not we should load a new chat or continue an old one
-            # We can add or remove variables to this hash to change conditions for loading a new chat
-            to_hash = (individual.id,)
-            # Now create the chat as type PlayerChat
-            chat = create_chat(to_hash, ModelChat, individual, model)
-
-            metrics =  model.parameters['Parameter']
-
-            # Now we want to add basic content to chat if it's empty
-            if chat.state == "empty":
-
-                # Make a plot of the distribution of the metrics for all players
-                # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-                visual = DistributionModelPlot(thresholds,metrics)
-                visual.add_title('Evaluation of individual','')
-                visual.add_individuals(model, metrics=metrics)
-                visual.add_individual(individual, len(model.df), metrics=metrics)
-
-                # Now call the description class to get the summary of the player
-                description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, thresholds = [10, 5, 2, -2,-5,-10])
-                summary = description.stream_gpt()
-
-                # Add the visual and summary to the chat
-                chat.add_message(
-                    "Please can you summarise this individual for me?",
-                    role="user",
-                    user_only=False,
-                    visible=False,
-                )
-                chat.add_message(visual)
-                chat.add_message(summary)
-
-                chat.state = "default"
-
-            # Now we want to get the user input, display the messages and save the state
-            chat.get_input()
-            chat.display_messages()
-            chat.save_state()
-
-def loadModel():
-
-    st.write("Upload a CSV file to use as the data source.")
-    uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="data_file")
-    
-    if uploaded_file is not None:
-        data = pd.read_csv(uploaded_file)
-        st.write("Upload a CSV file to explaining the features.")
-        feature_file = st.file_uploader("Choose a CSV file", type="csv", key="feature_file")
-        if feature_file is not None:
-            feature_data = pd.read_csv(feature_file)
-            st.write("Upload a CSV file of the weights (coefficients) found in your model")
-            weights_file = st.file_uploader("Choose a CSV file", type="csv", key="weight_file")
-            if weights_file is not None:
-                weights_data = pd.read_csv(weights_file)
-                parameter_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
-                weights_data['Explanation'] = weights_data['Parameter'].map(parameter_explanations)
-
-                st.write("Feature Explanation:", weights_data)
-                
-                
-                
-                model_features= weights_data
-                model=Model()
-                model.set_data(data, model_features)
-                model.process_data()
-                model.weight_contributions()
-                st.write("Dataframe used:", model.df)
-                
-                # # Now select the focal player
-                individual = select_individual(sidebar_container, model)
-                thresholds = model.most_variable_data()            
-                st.write("Feature Contributions Variance")
-                st.write(model.std_contributions.sort_values(ascending=False))
-                st.write("The most variable feature is",model.std_contributions.idxmax())
-                st.write("The thresholds value are",str(thresholds))
-
-                # individuals.load_in_model(data, model.coef_df)
-                # individuals.weight_contributions()
-                # thresholds = individuals.most_variable_data()     
-                # metrics =  individuals.parameters['Parameter']       
-                # model.selectFeatures()
-                # visual = DistributionModelPlot(thresholds,metrics)
-                # visual.add_title('New Model','')
-                # visual.add_individuals(individuals, metrics=metrics)
-                # visual.add_individual(individual, len(individuals.df), metrics=metrics)
-
-                # Chat state hash determines whether or not we should load a new chat or continue an old one
-                # We can add or remove variables to this hash to change conditions for loading a new chat
-                to_hash = (individual.id,)
-                # Now create the chat as type PlayerChat
-                chat = create_chat(to_hash, ModelChat, individual, model)
-
-                metrics =  model.parameters['Parameter']
-
-                # Now we want to add basic content to chat if it's empty
-                if chat.state == "empty":
-
-                    # Make a plot of the distribution of the metrics for all players
-                    # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-                    visual = DistributionModelPlot(thresholds,metrics)
-                    visual.add_title('Evaluation of individual','')
-                    visual.add_individuals(model, metrics=metrics)
-                    visual.add_individual(individual, len(model.df), metrics=metrics)
-
-                    # Now call the description class to get the summary of the player
-                    description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, thresholds = [10, 5, 2, -2,-5,-10])
-                    summary = description.stream_gpt()
-
-                    # Add the visual and summary to the chat
-                    chat.add_message(
-                        "Please can you summarise this individual for me?",
-                        role="user",
-                        user_only=False,
-                        visible=False,
-                    )
-                    chat.add_message(visual)
-                    chat.add_message(summary)
-
-                    chat.state = "default"
-
-                # Now we want to get the user input, display the messages and save the state
-                chat.get_input()
-                chat.display_messages()
-                chat.save_state()
-                    
+# data=None
+# model_features= None
 
 def setup_model(train=False):
     st.write("Upload a CSV file to use as the data source.")
@@ -234,21 +61,39 @@ def setup_model(train=False):
                     st.write("Feature Explanation:", weights_data)
                     return (data, weights_data)
             else:
-                st.write("Choose target column")
-                target = st.radio("Target column", data.columns)
-                features = [col for col in data.columns if col != target]
-                model=TrainModel(data, target, features)
-                # model.selectFeatures()
-                # merge explantions with coef_df on matching feature names
-                coef_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
-                model.coef_df['Explanation'] = model.coef_df['Parameter'].map(coef_explanations)
-                st.write("Model coefficients:", model.coef_df)
-                # Keep only the Intercept, target, and parameters in model.coef_df in data
-                columns_to_keep = [target] + [param for param in model.coef_df['Parameter'].tolist() if param in data.columns]
-                data = data[columns_to_keep]
-                return (data, model.coef_df)
+                categorical_interpretations=None
+                has_categorical = st.radio("Does your data have categorical features?", ("Yes", "No"))
+                if has_categorical == "Yes":
+                    st.write("Upload a JSON file detailing the interpretations of the categorical data.")
+                    json_file = st.file_uploader("Choose a JSON file", type="json", key="category_json_file")
+                    if json_file is not None:
+                        categorical_interpretations = json.load(json_file)
+                        # st.write("Categorical Interpretations:", categorical_interpretations)
+                if has_categorical == "No" or categorical_interpretations is not None:
+                    st.write("Choose target column")
+                    target = st.radio("Target column", data.columns)
+                    features = [col for col in data.columns if col != target]
+                    # model=TrainModel(data, target, features)
+                    try:
+                        model=TrainModel(data, target, features)
+                    except Exception as e:
+                        st.error(f"An error occurred while training the model: {e} Pick a traget column that is binary.")
+                        return
+                    # model.selectFeatures()
+                    # merge explantions with coef_df on matching feature names
+                    coef_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
+                    model.coef_df['Explanation'] = model.coef_df['Parameter'].map(coef_explanations)
+                    st.write("Training Output:", model.coef_df)
+                    # Keep only the Intercept, target, and parameters in model.coef_df in data
+                    columns_to_keep = [target] + [param for param in model.coef_df['Parameter'].tolist() if param in data.columns]
+                    data = data[columns_to_keep]
+                    data = data.head(200)
+                    if categorical_interpretations is not None:
+                        return (data, model.coef_df, categorical_interpretations, target)
+                    else:
+                        return (data, model.coef_df)
     
-def setup_chat(data, model_features):
+def setup_chat(data, model_features, categorical_interpretations=None, target=None):
     model=Model()
     model.set_data(data, model_features)
     model.process_data()
@@ -256,22 +101,13 @@ def setup_chat(data, model_features):
     st.write("Dataframe used:", model.df)
     
     # # Now select the focal player
-    individual = select_individual(sidebar_container, model)
+    columns = ["ID", target]
+    individual = select_individual(sidebar_container, model, columns=columns)
     thresholds = model.most_variable_data()            
-    st.write("Feature Contributions Variance")
-    st.write(model.std_contributions.sort_values(ascending=False))
+    # st.write("Feature Contributions Variance")
+    # st.write(model.std_contributions.sort_values(ascending=False))
     st.write("The most variable feature is",model.std_contributions.idxmax())
     st.write("The thresholds value are",str(thresholds))
-
-    # individuals.load_in_model(data, model.coef_df)
-    # individuals.weight_contributions()
-    # thresholds = individuals.most_variable_data()     
-    # metrics =  individuals.parameters['Parameter']       
-    # model.selectFeatures()
-    # visual = DistributionModelPlot(thresholds,metrics)
-    # visual.add_title('New Model','')
-    # visual.add_individuals(individuals, metrics=metrics)
-    # visual.add_individual(individual, len(individuals.df), metrics=metrics)
 
     # Chat state hash determines whether or not we should load a new chat or continue an old one
     # We can add or remove variables to this hash to change conditions for loading a new chat
@@ -286,13 +122,13 @@ def setup_chat(data, model_features):
 
         # Make a plot of the distribution of the metrics for all players
         # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
-        visual = DistributionModelPlot(thresholds,metrics)
+        visual = DistributionModelPlot(thresholds,metrics, model_features=model_features)
         visual.add_title('Evaluation of individual','')
-        visual.add_individuals(model, metrics=metrics)
+        visual.add_individuals(model, metrics=metrics, target=target)
         visual.add_individual(individual, len(model.df), metrics=metrics)
 
         # Now call the description class to get the summary of the player
-        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, thresholds = [10, 5, 2, -2,-5,-10])
+        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, categorical_interpretations= categorical_interpretations , thresholds = [10, 5, 2, -2,-5,-10])
         summary = description.stream_gpt()
 
         # Add the visual and summary to the chat
@@ -320,8 +156,8 @@ if model_option == "Train a new model":
     # trainModel()
     result = setup_model(train=True)
     if result is not None:
-        data, model_features = result
-        setup_chat(data, model_features)
+        data, model_features, categorical_interpretations, target = result
+        setup_chat(data, model_features, categorical_interpretations, target)
     
 else:
     result = setup_model(train=False)

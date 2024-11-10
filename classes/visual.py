@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-from utils.sentences import format_metric
+from utils.sentences import format_metric, lookup_metric
 from classes.data_point import Player, Country, Person, Individual
 from classes.data_source import PlayerStats, CountryStats, PersonStat, Model
 from typing import Union
@@ -201,7 +201,7 @@ class DistributionPlot(Visual):
             zerolinecolor=rgb_to_color(self.medium_green),
         )
 
-    def add_group_data(self, df_plot, plots, names, legend, hover="", hover_string=""):
+    def add_group_data(self, df_plot, plots, names, legend, hover="", hover_string="", target=None):
         showlegend = True
 
         for i, col in enumerate(self.columns):
@@ -210,11 +210,11 @@ class DistributionPlot(Visual):
             metric_name = format_metric(col)
             temp_df = pd.DataFrame(df_plot[col+hover])
             temp_df['name'] = metric_name
-            # only use 2 colors for the anuerysm plot
-            if 'Anuerysm' in df_plot.columns:
+            # only use 2 colors for the logistic regression chat plot
+            if target in df_plot.columns:
                 marker_colors = [
                     rgb_to_color(self.table_red, opacity=0.2) if val == 1 else rgb_to_color(self.bright_green, opacity=0.2)
-                    for val in df_plot['Anuerysm']
+                    for val in df_plot[target]
                 ]
             else:
                 marker_colors = [rgb_to_color(self.bright_green, opacity=0.2)] * len(df_plot)
@@ -237,7 +237,7 @@ class DistributionPlot(Visual):
             )
             showlegend = False
 
-    def add_data_point(self, ser_plot, plots, name, hover='', hover_string="", text=None,annotation=""):
+    def add_data_point(self, ser_plot, plots, name, hover='', hover_string="", text=None,annotation="", target=None):
         if text is None:
             text = [name]
         elif isinstance(text, str):
@@ -249,7 +249,11 @@ class DistributionPlot(Visual):
         for i, col in enumerate(self.columns):
             temp_hover_string = hover_string
 
-            metric_name = format_metric(col)
+            # metric_name = format_metric(col)
+            metric_name= lookup_metric(col, self.model_features)
+
+            if target is not None and ser_plot[target] == 1:
+                color = self.table_red
 
             self.fig.add_trace(
                 go.Scatter(
@@ -579,8 +583,9 @@ class DistributionPlotPersonality(Visual):
 
 class DistributionModelPlot(DistributionPlot):
 
-    def __init__(self, thresolds, columns, *args, **kwargs):
+    def __init__(self, thresolds, columns, model_features= None,   *args, **kwargs):
         self.thresolds = thresolds
+        self.model_features = model_features
         super().__init__(columns,*args, **kwargs)
 
 
@@ -590,7 +595,7 @@ class DistributionModelPlot(DistributionPlot):
             fixedrange=True, 
             tickmode="array", 
             tickvals=self.thresolds, 
-            ticktext=["Substantially Reduced", "Reduced Risk", "Marginally Reduced Risk", "", "Mildly Increased Risk", "Elevated Risk", "High Risk"]
+            ticktext=["Substantially Reduced", "Reduced Risk", "Marginally Reduced Risk", "Mildly Increased Risk", "Elevated Risk", "Substantially High Risk"]
         )
         for tick in self.thresolds:
             self.fig.add_shape(
@@ -605,7 +610,7 @@ class DistributionModelPlot(DistributionPlot):
             )
         self.fig.update_yaxes(showticklabels=False, fixedrange=True, gridcolor=rgb_to_color(self.medium_green), zerolinecolor=rgb_to_color(self.medium_green))
 
-    def add_individual(self, individual, n_group, metrics):
+    def add_individual(self, individual, n_group, metrics, target=None):
         
         # Make list of all metrics with _Z and _Rank added at end 
         metrics_Z = [metric + "_contribution" for metric in metrics]
@@ -616,13 +621,13 @@ class DistributionModelPlot(DistributionPlot):
             name=str(individual.id),
             hover='',
             hover_string="Value: %{customdata:.2f}",
+            target=target
         )
 
-    def add_individuals(self, individuals, metrics):
+    def add_individuals(self, individuals, metrics, target=None):
 
         # Make list of all metrics with _Z and _Rank added at end 
         metrics_Z = [metric + "_contribution" for metric in metrics]
-        
         self.add_group_data(
             df_plot=individuals.df,
             plots = '_contribution',
@@ -630,4 +635,5 @@ class DistributionModelPlot(DistributionPlot):
             hover='',
             hover_string="Value: %{customdata:.2f}",
             legend=f"Other individuals  ", #space at end is important
+            target=target
         )

@@ -4,15 +4,9 @@ from sklearn.model_selection import train_test_split
 import streamlit as st
 class TrainModel():
     def __init__(self, data, target, features):
+        
         # encode the categorical variables 
         self.features= features
-        # data['Gender'].replace('Male', 1, inplace=True)
-        # data['Gender'].replace('Female', 0, inplace=True)
-        # data['Aneurysm'].replace('Yes', 1, inplace=True)
-        # data['Aneurysm'].replace('No', 0, inplace=True)
-        # if not('ID' in data.columns):
-        #     data['ID'] = data.index
-        # print("Training model")
         X = data[features]
         y = data[target]
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -23,8 +17,6 @@ class TrainModel():
         logit_model = sm.Logit(y_train, X_train)  # Initialize the model
         result = logit_model.fit()  # Fit the model
 
-
-        # print(result.summary())
         # Extract coefficients and put them in a DataFrame
         coef = result.params
         coef_df = coef.reset_index()
@@ -32,7 +24,6 @@ class TrainModel():
         coef_df['index'].replace('const', 'Intercept', inplace=True)
         coef_df.columns = ['Parameter', 'Value']
         self.coef_df = coef_df
-        
 
     def selectFeatures(self):
         significance_level= 0.05
