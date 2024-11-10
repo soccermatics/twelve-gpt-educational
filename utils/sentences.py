@@ -7,7 +7,11 @@ def pronouns(gender):
 
     return subject_p, object_p, possessive_p
 
-
+def article(word):
+    if word.strip()[0].lower() in ["a", "e", "i", "o", "u"]:
+        return "An"
+    else:
+        return "A"
 # Describe the level of a metric in words
 def describe_level(
     value,
@@ -41,11 +45,11 @@ def format_metric(metric):
 
 
 # look up formated metric name for display and descriptions
-def lookup_metric(metric):
-    # implement a lookup table for metric descriptions
-    # parameters = pd.read_excel("data/medical/Anuerysm model - 2.xlsx")
-    # return parameters[parameters['Parameter'] == metric]['Explanation'].values[0]
-    pass
+def lookup_metric(metric, parameters):
+    # for column name look up Explanation in the parameters
+    explanation = parameters.loc[parameters['Parameter'] == metric, 'Explanation'].values[0]
+    explanation.strip().capitalize()
+    return explanation
 
 def write_out_metric(metric):
     return (

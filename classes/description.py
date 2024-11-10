@@ -687,10 +687,11 @@ class IndividualDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/Anuerysm.xlsx"]
 
-    def __init__(self, individual: Individual,metrics,parameter_explanation, thresholds):
+    def __init__(self, individual: Individual,metrics,parameter_explanation, categorical_interpretations , thresholds):
         self.metrics = metrics
         self.individual = individual
         self.parameter_explanation = parameter_explanation
+        self.categorical_interpretations = categorical_interpretations
         self.thresholds = thresholds
         super().__init__()
 
@@ -727,26 +728,26 @@ class IndividualDescription(Description):
         individual=self.individual
         metrics = self.metrics
         description = f"Here is a statistical description of the factors related to anuerysm for the patient patient. \n\n "
-
-        if individual.ser_metrics["Gender"] == 1:
-            gender='male'
-        else:
-            gender='female'
-
-        subject_p, object_p, possessive_p = sentences.pronouns(gender)
         
-        st.write(individual.ser_metrics)
-
+        # need to convert categorical values back to value here!
+    
+        # for column, category_feature in self.categorical_interpretations.items():
+        #     if column in individual.ser_metrics:
+        #         individual.ser_metrics[column] = category_feature.get(str(int(individual.ser_metrics[column])), individual.ser_metrics[column])
+        
+        # subject_p, object_p, possessive_p = sentences.pronouns(gender)
+        
         for metric in metrics:
-            if metric == "Gender":
-                if individual.ser_metrics["Gender"] == 1:
-                    description += f"Being male "
-                else:
-                    description += f"Being female "
-            else:   
-                description += f"A {self.parameter_explanation[metric]} of {individual.ser_metrics[metric]} "
-            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"], thresholds=self.thresholds) 
-            description += " of anuerysm compared to other patients that come into the clinic. "                            
+            if metric in self.categorical_interpretations:
+                # if categorical interpretation is available, look up the value in the interpretation dictionary
+                value = self.categorical_interpretations[metric].get(str(int(individual.ser_metrics[metric])), individual.ser_metrics[metric])
+                description+= f" {value} "
+            else:
+                # if no interpretation is available, just use the value
+                description+= sentences.article(self.parameter_explanation[metric].lower()) + f" {self.parameter_explanation[metric].lower()} of {individual.ser_metrics[metric]} "
+            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"], thresholds=self.thresholds)
+            description += " of developing cardio vascular issues compared to other patients that come into the clinic. "
+            
 
         st.write(description)
 
