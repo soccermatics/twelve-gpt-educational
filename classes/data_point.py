@@ -60,5 +60,5 @@ class Individual(Stat):
 
         # Unpack ser_info
         self.id=id
-        self.ser_metrics = ser_metrics  
+        self.ser_metrics = ser_metrics 
         

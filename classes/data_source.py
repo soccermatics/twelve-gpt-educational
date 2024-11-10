@@ -613,8 +613,10 @@ class Model(Data):
         # df_raw['Gender'] = df_raw['Gender'].replace({'Male': 1, 'Female': 0})
         # df_raw['Anuerysm'] = df_raw['Anuerysm'].replace({'Yes': 1, 'No': 0})
         df_raw=self.df
-        if not('ID' in df_raw.columns):
+        if not any(col.lower() == 'id' for col in df_raw.columns):
             df_raw['ID'] = df_raw.index
+        else:
+            df_raw.columns = [col if col.upper() != 'ID' else 'ID' for col in df_raw.columns]
 
         self.df=df_raw
 
@@ -674,7 +676,6 @@ class Model(Data):
         df = self.df
         
         parameters = self.parameters
-        
         for i,row in self.parameters.iterrows():
             df[row['Parameter']+'_contribution'] = df[row['Parameter']] * row['Value']
             #Remove the mean
@@ -698,14 +699,14 @@ class Model(Data):
         return thresholds
     
 
-    def to_data_point(self) -> data_point.Individual:
+    def to_data_point(self, columns=None ) -> data_point.Individual:
         
         id = self.df['ID'].iloc[0]
 
         #Reindexing dataframe
-        
         self.df.reset_index(drop=True, inplace=True)
-        self.df=self.df.drop(columns=["ID","Aneurysm"])
+        self.df=self.df.drop(columns=columns)
+        
 
 
         # Convert to series
