@@ -72,7 +72,7 @@ def add_page_selector():
     st.page_link("pages/wvs_chat.py", label="World Value Survey")
     st.page_link("pages/personality_test.py", label="Personality Chat")
     st.page_link("pages/own_page.py", label="Your Own Page")
-    st.page_link("pages/anuerysm.py", label="Anuerysm")
+    st.page_link("pages/medical_chat.py", label="Medical Chat")
     
 
     # st.image("data/ressources/img/TwelveEdu.png")
