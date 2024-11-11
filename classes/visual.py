@@ -173,6 +173,7 @@ class Visual:
 
 
 class DistributionPlot(Visual):
+    model_features = None
     def __init__(self, columns, labels=None, *args, **kwargs):
         self.empty = True
         self.columns = columns
@@ -250,7 +251,10 @@ class DistributionPlot(Visual):
             temp_hover_string = hover_string
 
             # metric_name = format_metric(col)
-            metric_name= lookup_metric(col, self.model_features)
+            if self.model_features:
+                metric_name = lookup_metric(col, self.model_features)
+            else:
+                metric_name = format_metric(col)
 
             if target is not None and ser_plot[target] == 1:
                 color = self.table_red
