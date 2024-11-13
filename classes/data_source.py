@@ -169,6 +169,229 @@ class PlayerStats(Stats):
 
 
 
+class CountryStats(Stats):
+    data_point_class = data_point.Country
+    # This can be used if some metrics are not good to perform, like tackles lost.
+    negative_metrics = []
+
+    def __init__(self):
+
+        self.drill_down = self.get_drill_down_dict()
+        self.drill_down_threshold = 1
+
+        super().__init__()
+
+    def get_drill_down_data(self, file_path):
+        df = self.process_data(self.get_z_scores(pd.read_csv(file_path)))
+
+        return dict(zip(df.country.values, df.drill_down_metric.values))
+
+    def get_drill_down_data_values(self, file_path, metric_name):
+
+        df = self.process_data(pd.read_csv(file_path))
+
+        # create a value column that has the values from the columns is given by the dict self.drill_down_metric_country_question
+        # where the dict has format {country: question}
+        df["value_low"] = df.apply(
+            lambda x: x[
+                self.drill_down_metric_country_question[metric_name][x["country"]][0]
+            ],
+            axis=1,
+        )
+
+        df["value_high"] = df.apply(
+            lambda x: x[
+                self.drill_down_metric_country_question[metric_name][x["country"]][1]
+            ],
+            axis=1,
+        )
+
+        values = [
+            (floor(l), ceil(h)) for l, h in zip(df["value_low"], df["value_high"])
+        ]
+
+        return dict(zip(df.country.values, values))
+
+    def get_drill_down_dict(
+        self,
+    ):
+
+        # read all .csv files from path ending in _pre.csv
+        path = "data/wvs/intermediate_data/"
+        all_files = os.listdir(path)
+
+        self.drill_down_metric_country_question = dict(
+            (
+                "_".join(file.split("_")[:-1]),
+                self.get_drill_down_data(path + file),
+            )
+            for file in all_files
+            if file.endswith("_pre.csv")
+        )
+
+        drill_down_data_raw = dict(
+            (
+                "_".join(file.split("_")[:-1]),
+                self.get_drill_down_data_values(
+                    path + file, "_".join(file.split("_")[:-1])
+                ),
+            )
+            for file in all_files
+            if file.endswith("_raw.csv")
+        )
+
+        metrics = [m for m in self.drill_down_metric_country_question.keys()]
+        countries = [
+            k for k in self.drill_down_metric_country_question[metrics[0]].keys()
+        ]
+
+        drill_down = [
+            (
+                country,
+                dict(
+                    [
+                        (
+                            metric,
+                            (
+                                self.drill_down_metric_country_question[metric][
+                                    country
+                                ],
+                                drill_down_data_raw[metric][country],
+                            ),
+                        )
+                        for metric in metrics
+                    ]
+                ),
+            )
+            for country in countries
+        ]
+
+        return dict(drill_down)
+
+    def get_z_scores(self, df, metrics=None, negative_metrics=[]):
+
+        if metrics is None:
+            metrics = [m for m in df.columns if m not in ["country"]]
+
+        df_z = df[metrics].apply(zscore, nan_policy="omit")
+
+        # Rename every column to include "Z" at the end
+        df_z.columns = [f"{col}_Z" for col in df_z.columns]
+
+        # Here we get opposite value of metrics if their weight is negative
+        for metric in set(negative_metrics).intersection(metrics):
+            df_z[metric] = df_z[metric] * -1
+
+        # find the columns that has greatest magnitude
+        drill_down_metrics_high = df[metrics].idxmax(axis=1)
+        drill_down_metrics_low = df[metrics].idxmin(axis=1)
+
+        drill_down_metrics = [
+            (l, h) for l, h in zip(drill_down_metrics_low, drill_down_metrics_high)
+        ]
+
+        ### Using the question with the greatest raw magnitude vs using the question with the greatest z-score magnitude
+
+        # # find the columns that has greatest magnitude
+        # drill_down_metrics = df[metrics].abs().idxmax(axis=1)
+
+        # # find the columns that end with "_Z" and has greatest magnitude
+        # drill_down_metrics = (
+        #     df_z[df_z.columns[df_z.columns.str.endswith("_Z")]]
+        #     .abs()
+        #     .idxmax(axis=1)
+        #     .apply(lambda x: "_".join(x.split("_")[:-1]))
+        # )
+
+        ###
+
+        df_z["drill_down_metric"] = drill_down_metrics
+
+        # # Here we want to use df_metric_zscores to get the ranks and pct_ranks due to negative metrics
+        # df_ranks = df[metrics].rank(ascending=False)
+
+        # # Rename every column to include "Ranks" at the end
+        # df_ranks.columns = [f"{col}_Ranks" for col in df_ranks.columns]
+
+        # Add ranks and pct_ranks as new columns
+        # return pd.concat([df, df_z, df_ranks], axis=1)
+        return pd.concat([df, df_z], axis=1)
+
+    def select_random(self):
+        # return the index of the random sample
+        return self.df.sample(1).index[0]
+
+    def get_raw_data(self):
+
+        df = pd.read_csv("data/wvs/wave_7.csv")
+
+        return df
+
+    def process_data(self, df_raw):
+
+        # raise error if df_raw["country"] contains any NaN values
+        if df_raw["country"].isnull().values.any():
+            raise ValueError("Country column contains NaN values")
+        # raise error if df_raw["country"] contains any empty strings
+        if (df_raw["country"] == "").values.any():
+            raise ValueError("Country column contains empty strings")
+
+        # raise error if df_raw["country"] contains any duplicates
+        if df_raw["country"].duplicated().any():
+            raise ValueError("Country column contains duplicates")
+
+        # # raise warning is any nan values are present in the dataframe
+        # if df_raw.isnull().values.any():
+        #     st.warning("Data contains NaN values")
+
+        if len(df_raw) < 10:  # Or else plots won't work
+            raise Exception("Not enough data points")
+
+        return df_raw
+
+    def to_data_point(self) -> data_point.Country:
+
+        id = self.df.index[0]
+
+        # Reindexing dataframe
+        self.df.reset_index(drop=True, inplace=True)
+
+        name = self.df["country"][0]
+        self.df = self.df.drop(columns=["country"])
+
+        # Convert to series
+        ser_metrics = self.df.squeeze()
+
+        # get the names of columns in ser_metrics than end in "_Z" with abs value greater than 1.5
+        drill_down_metrics = ser_metrics[
+            ser_metrics.index.str.endswith("_Z")
+            & (ser_metrics.abs() >= self.drill_down_threshold)
+        ].index.tolist()
+        drill_down_metrics = [
+            "_".join(x.split("_")[:-1]).lower() for x in drill_down_metrics
+        ]
+
+        drill_down_values = dict(
+            [
+                (key, value)
+                for key, value in self.drill_down[name].items()
+                if key.lower() in drill_down_metrics
+            ]
+        )
+
+        return self.data_point_class(
+            id=id,
+            name=name,
+            ser_metrics=ser_metrics,
+            relevant_metrics=self.metrics,
+            drill_down_metrics=drill_down_values,
+        )
+
+
+
+
+
+
 class Shots(Data):
     def __init__(self):
         #self.raw_hash_attrs = (competition.id, match.id, team.id)
@@ -177,11 +400,12 @@ class Shots(Data):
         #self.match = match
         #self.team = team
         self.df_shots = self.get_processed_data()  # Process the raw data directly
-        self.model_params = ['Intercept', 'start_x' , 'angle_to_goal' , 'distance_to_goal' , 'players_in_triangle' , 'gk_dist_to_goal' , 'dist_to_nearest_opponent' , 'angle_to_nearest_opponent' , 'from_throw_in' , 'from_counter' , 'from_keeper' , 'header']
         self.xG_Model = self.load_model()  # Load the model once
-        self.df_cum_xG, self.df_contributions = self.get_xG_contributions()
+        self.parameters = self.read_model_params()
+        #self.df_cum_xG, self.df_contributions = self.get_xG_contributions()
+        self.df_contributions = self.weight_contributions()
         # Add total xG to df_shots
-        self.df_shots["xG"] = self.df_cum_xG.iloc[:, -1]
+        #self.df_shots["xG"] = self.xG_Model.predict(self.df_shots)
     #@st.cache_data(hash_funcs={"classes.data_source.Shots": lambda self: hash(self.raw_hash_attrs)}, ttl=5*60)
 
 
@@ -392,14 +616,13 @@ class Shots(Data):
 
             # Combine both dictionaries into a single row dictionary
             return {**teammate_coords, **opponent_coords}
-
-
-        test_shot['from_throw_in'] = (test_shot['play_pattern_name'] == 'From Throw In').astype(int)
-        test_shot['from_counter'] = (test_shot['play_pattern_name'] == 'From Counter').astype(int)
-        test_shot['from_keeper'] = (test_shot['play_pattern_name'] == 'From Keeper').astype(int)
-        test_shot['right_foot'] = (test_shot['body_part_name'] == 'Right Foot').astype(int)
-
-        model_vars = test_shot[["id", "index", "x", "y", 'play_pattern_name', 'from_throw_in', 'from_counter', 'from_keeper', 'right_foot']].copy()
+        
+        model_vars = test_shot[["id", "index", "x", "y"]].copy()
+        model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
+        model_vars["left_foot"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Left Foot" else 0)
+        model_vars["throw in"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Throw In" else 0)
+        model_vars["corner"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Corner" else 0)
+        model_vars["free_kich"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Free Kick" else 0)
         model_vars["goal"] = test_shot.outcome_name.apply(lambda cell: 1 if cell == "Goal" else 0)
 
         # Add necessary features and correct transformations
@@ -414,18 +637,19 @@ class Shots(Data):
                                     np.arctan(7.32 * model_vars["x"] / (model_vars["x"]**2 + model_vars["c"]**2 - (7.32/2)**2)),
                                     np.arctan(7.32 * model_vars["x"] / (model_vars["x"]**2 + model_vars["c"]**2 - (7.32/2)**2)) + np.pi) * 180 / np.pi
 
-        model_vars["distance_to_goal"] = np.sqrt(model_vars["x"]**2 + model_vars["c"]**2)
+        model_vars["distance to goal"] = np.sqrt(model_vars["x"]**2 + model_vars["c"]**2)
 
         # Add other features (assuming your earlier functions return correct results)
         model_vars["dist_to_gk"] = test_shot.apply(dist_to_gk, track_df=track_df, axis=1)
         model_vars["gk_distance_y"] = test_shot.apply(y_to_gk, track_df=track_df, axis=1)
         model_vars["close_players"] = test_shot.apply(three_meters_away, track_df=track_df, axis=1)
-        model_vars["players_in_triangle"] = test_shot.apply(players_in_triangle, track_df=track_df, axis=1)
-        model_vars["gk_dist_to_goal"] = test_shot.apply(gk_dist_to_goal, track_df=track_df, axis=1)
-        model_vars["dist_to_nearest_opponent"] = test_shot.apply(nearest_opponent_distance, track_df=track_df, axis=1)
-        model_vars["nearest_teammate_distance"] = test_shot.apply(nearest_teammate_distance, track_df=track_df, axis=1)
+        model_vars["triangle zone"] = test_shot.apply(players_in_triangle, track_df=track_df, axis=1)
+        model_vars["gk distance to goal"] = test_shot.apply(gk_dist_to_goal, track_df=track_df, axis=1)
+        model_vars["distance to nearest opponent"] = test_shot.apply(nearest_opponent_distance, track_df=track_df, axis=1)
         model_vars["angle_to_nearest_opponent"] = test_shot.apply(nearest_opponent_angle, track_df=track_df, axis=1)
-        #model_vars["angle_to_gk"] = shot_df.apply(angle_to_gk, track_df=track_df, axis=1)
+        model_vars["angle_to_gk"] = test_shot.apply(angle_to_gk, track_df=track_df, axis=1)
+        model_vars['distance from touchline']= model_vars['c']**2
+        model_vars['angle to gk and opponent']= model_vars['angle_to_goal']*model_vars['angle_to_gk']*model_vars['angle_to_nearest_opponent']
         # Merge player position data by applying the transpose_player_positions function
         player_position_features = test_shot.apply(transpose_player_positions, track_df=track_df, axis=1)
 
@@ -436,7 +660,7 @@ class Shots(Data):
 
 
         # Binary features
-        model_vars["is_closer"] = np.where(model_vars["gk_dist_to_goal"] > model_vars["distance_to_goal"], 1, 0)
+        model_vars["is_closer"] = np.where(model_vars["gk distance to goal"] > model_vars["distance to goal"], 1, 0)
         model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars['goal'] = test_shot.outcome_name.apply(lambda cell: 1 if cell == "Goal" else 0)
         model_vars['Intercept'] = 1
@@ -444,9 +668,43 @@ class Shots(Data):
         #model_vars.rename(columns={'const': 'Intercept'}, inplace=True)  # Rename 'const' to 'Intercept'
 
         # model_vars.dropna(inplace=True)
-        #st.write(model_vars.columns)
 
         return model_vars
+    
+
+    def read_model_params(self):
+        parameters = pd.read_excel("data/model_params.xlsx")
+        return parameters
+
+
+    def weight_contributions(self):
+        
+        df_shots = self.df_shots
+        parameters = self.parameters
+        self.intercept = parameters[parameters['Parameter'] == 'Intercept']['Value'].values[0]
+        # Drop intercept
+        self.parameters = parameters[parameters['Parameter'] != 'Intercept']
+
+        for i,row in self.parameters.iterrows():
+            df_shots[row['Parameter']+'_contribution'] = df_shots[row['Parameter']] * row['Value']
+            #Remove the mean
+            df_shots[row['Parameter']+'_contribution'] = df_shots[row['Parameter']+'_contribution'] - df_shots[row['Parameter']+'_contribution'].mean()
+        
+        df_contribution = df_shots[['id'] + [col for col in df_shots.columns if 'contribution' in col]]
+
+        # Calculate linear combination directly from original feature values and their coefficients
+        linear_combination = self.intercept + sum(
+            df_shots[param['Parameter']] * param['Value']
+            for _, param in self.parameters.iterrows()
+        )
+        
+        # Apply logistic function to get xG values
+        df_contribution['xG'] = 1 / (1 + np.exp(-linear_combination))
+
+        #self.parameter_explanation = parameters.set_index('Parameter')['Explanation'].to_dict()
+        #st.write(self.parameter_explanation)
+
+        return df_contribution
 
 
 
@@ -515,39 +773,7 @@ class Shots(Data):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-    # def get_xG_contributions(self, df_shots=None):
-    #     if df_shots is None:
-    #         df_shots = self.df_shots
-
-    #     linear_combinations = np.array([
-    #         list(accumulate(
-    #             zip(shot[self.model_params].to_list(), self.xG_Model.params[self.model_params]),
-    #             lambda x, y: x + y[0] * y[1],
-    #             initial=0
-    #         ))[1:] for _, shot in df_shots.iterrows()
-    #     ])
-    #     cumulative_xG = 1 / (1 + np.exp(-linear_combinations))
-    #     contributions = np.diff(cumulative_xG, prepend=0, axis=1)
-    #     #st.write(df_shots[self.model_params])
-    #     #st.write(self.xG_Model.params[self.model_params])
-    #     df_cum_xG = pd.DataFrame(cumulative_xG, columns=self.model_params, index=df_shots.index)
-    #     df_contributions = pd.DataFrame(contributions, columns=self.model_params, index=df_shots.index)
-    #     st.markdown("### Expected Goals (xG) Contributions")
-    #     st.write(df_contributions)
-    #     st.write(df_cum_xG)
-    #     return df_cum_xG, df_contributions
-
+ 
     @staticmethod
     def load_model():
 
@@ -572,295 +798,3 @@ class Shots(Data):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        return self.data_point_class(
-            id=id,
-            name=name,
-            minutes_played=minutes_played,
-            gender=gender,
-            position=position,
-            ser_metrics=ser_metrics,
-            relevant_metrics=self.metrics,
-        )
-
-
-class CountryStats(Stats):
-    data_point_class = data_point.Country
-    # This can be used if some metrics are not good to perform, like tackles lost.
-    negative_metrics = []
-
-    def __init__(self):
-
-        self.core_value_dict = pd.read_csv("data/wvs/values.csv")
-        # convert to dictionary using the value and name columns
-        self.core_value_dict = self.core_value_dict.set_index("value")["name"].to_dict()
-
-        super().__init__()
-
-    def select_random(self):
-        # return the index of the random sample
-        return self.df.sample(1).index[0]
-
-    def get_raw_data(self):
-
-        df = pd.read_csv("data/wvs/wave_7.csv")
-
-        return df
-
-    def process_data(self, df_raw):
-        df_raw = df_raw.rename(columns=self.core_value_dict)
-
-        country_codes_dict = {
-            "AFG": "Afghanistan",
-            "ALB": "Albania",
-            "DZA": "Algeria",
-            "AND": "Andorra",
-            "AGO": "Angola",
-            "ATG": "Antigua and Barbuda",
-            "ARG": "Argentina",
-            "ARM": "Armenia",
-            "AUS": "Australia",
-            "AUT": "Austria",
-            "AZE": "Azerbaijan",
-            "BHS": "Bahamas",
-            "BHR": "Bahrain",
-            "BGD": "Bangladesh",
-            "BRB": "Barbados",
-            "BLR": "Belarus",
-            "BEL": "Belgium",
-            "BLZ": "Belize",
-            "BEN": "Benin",
-            "BTN": "Bhutan",
-            "BOL": "Bolivia",
-            "BIH": "Bosnia and Herzegovina",
-            "BWA": "Botswana",
-            "BRA": "Brazil",
-            "BRN": "Brunei",
-            "BGR": "Bulgaria",
-            "BFA": "Burkina Faso",
-            "BDI": "Burundi",
-            "CPV": "Cabo Verde",
-            "KHM": "Cambodia",
-            "CMR": "Cameroon",
-            "CAN": "Canada",
-            "CAF": "Central African Republic",
-            "TCD": "Chad",
-            "CHL": "Chile",
-            "CHN": "China",
-            "COL": "Colombia",
-            "COM": "Comoros",
-            "COG": "Congo",
-            "CRI": "Costa Rica",
-            "HRV": "Croatia",
-            "CUB": "Cuba",
-            "CYP": "Cyprus",
-            "CZE": "Czechia",
-            "DNK": "Denmark",
-            "DJI": "Djibouti",
-            "DMA": "Dominica",
-            "DOM": "Dominican Republic",
-            "ECU": "Ecuador",
-            "EGY": "Egypt",
-            "SLV": "El Salvador",
-            "GNQ": "Equatorial Guinea",
-            "ERI": "Eritrea",
-            "EST": "Estonia",
-            "SWZ": "Eswatini",
-            "ETH": "Ethiopia",
-            "FJI": "Fiji",
-            "FIN": "Finland",
-            "FRA": "France",
-            "GAB": "Gabon",
-            "GMB": "Gambia",
-            "GEO": "Georgia",
-            "DEU": "Germany",
-            "GHA": "Ghana",
-            "GRC": "Greece",
-            "GRD": "Grenada",
-            "GTM": "Guatemala",
-            "GIN": "Guinea",
-            "GNB": "Guinea-Bissau",
-            "GUY": "Guyana",
-            "HTI": "Haiti",
-            "HND": "Honduras",
-            "HUN": "Hungary",
-            "ISL": "Iceland",
-            "IND": "India",
-            "IDN": "Indonesia",
-            "IRN": "Iran",
-            "IRQ": "Iraq",
-            "IRL": "Ireland",
-            "ISR": "Israel",
-            "ITA": "Italy",
-            "JAM": "Jamaica",
-            "JPN": "Japan",
-            "JOR": "Jordan",
-            "KAZ": "Kazakhstan",
-            "KEN": "Kenya",
-            "KIR": "Kiribati",
-            "PRK": "Korea, North",
-            "KOR": "Korea, South",
-            "KWT": "Kuwait",
-            "KGZ": "Kyrgyzstan",
-            "LAO": "Laos",
-            "LVA": "Latvia",
-            "LBN": "Lebanon",
-            "LSO": "Lesotho",
-            "LBR": "Liberia",
-            "LBY": "Libya",
-            "LIE": "Liechtenstein",
-            "LTU": "Lithuania",
-            "LUX": "Luxembourg",
-            "MDG": "Madagascar",
-            "MWI": "Malawi",
-            "MYS": "Malaysia",
-            "MDV": "Maldives",
-            "MLI": "Mali",
-            "MLT": "Malta",
-            "MHL": "Marshall Islands",
-            "MRT": "Mauritania",
-            "MUS": "Mauritius",
-            "MEX": "Mexico",
-            "FSM": "Micronesia",
-            "MDA": "Moldova",
-            "MCO": "Monaco",
-            "MNG": "Mongolia",
-            "MNE": "Montenegro",
-            "MAR": "Morocco",
-            "MOZ": "Mozambique",
-            "MMR": "Myanmar",
-            "NAM": "Namibia",
-            "NRU": "Nauru",
-            "NPL": "Nepal",
-            "NLD": "Netherlands",
-            "NZL": "New Zealand",
-            "NIC": "Nicaragua",
-            "NER": "Niger",
-            "NGA": "Nigeria",
-            "MKD": "North Macedonia",
-            "NOR": "Norway",
-            "OMN": "Oman",
-            "PAK": "Pakistan",
-            "PLW": "Palau",
-            "PAN": "Panama",
-            "PNG": "Papua New Guinea",
-            "PRY": "Paraguay",
-            "PER": "Peru",
-            "PHL": "Philippines",
-            "POL": "Poland",
-            "PRT": "Portugal",
-            "QAT": "Qatar",
-            "ROU": "Romania",
-            "RUS": "Russia",
-            "RWA": "Rwanda",
-            "KNA": "Saint Kitts and Nevis",
-            "LCA": "Saint Lucia",
-            "VCT": "Saint Vincent and the Grenadines",
-            "WSM": "Samoa",
-            "SMR": "San Marino",
-            "STP": "Sao Tome and Principe",
-            "SAU": "Saudi Arabia",
-            "SEN": "Senegal",
-            "SRB": "Serbia",
-            "SYC": "Seychelles",
-            "SLE": "Sierra Leone",
-            "SGP": "Singapore",
-            "SVK": "Slovakia",
-            "SVN": "Slovenia",
-            "SLB": "Solomon Islands",
-            "SOM": "Somalia",
-            "ZAF": "South Africa",
-            "SSD": "South Sudan",
-            "ESP": "Spain",
-            "LKA": "Sri Lanka",
-            "SDN": "Sudan",
-            "SUR": "Suriname",
-            "SWE": "Sweden",
-            "CHE": "Switzerland",
-            "SYR": "Syria",
-            "TWN": "Taiwan",
-            "TJK": "Tajikistan",
-            "TZA": "Tanzania",
-            "THA": "Thailand",
-            "TLS": "Timor-Leste",
-            "TGO": "Togo",
-            "TON": "Tonga",
-            "TTO": "Trinidad and Tobago",
-            "TUN": "Tunisia",
-            "TUR": "Turkey",
-            "TKM": "Turkmenistan",
-            "TUV": "Tuvalu",
-            "UGA": "Uganda",
-            "UKR": "Ukraine",
-            "ARE": "United Arab Emirates",
-            "GBR": "United Kingdom",
-            "USA": "United States",
-            "URY": "Uruguay",
-            "UZB": "Uzbekistan",
-            "VUT": "Vanuatu",
-            "VEN": "Venezuela",
-            "VNM": "Vietnam",
-            "YEM": "Yemen",
-            "ZMB": "Zambia",
-            "ZWE": "Zimbabwe",
-            "HKG": "Hong Kong",
-            "MAC": "Macao",
-            "PRI": "Puerto Rico",
-            "NIR": "Northern Ireland",
-        }
-
-        country_names = df_raw["country"].values.tolist()
-        # check if the country names are in the country_codes_dict
-        if not set(country_names).issubset(set(country_codes_dict.keys())):
-            # print the country names that are not in the country_codes_dict
-            print(set(country_names) - set(country_codes_dict.keys()))
-            raise ValueError("Country names do not match the country codes")
-
-        df_raw["country"] = df_raw["country"].map(country_codes_dict)
-
-        # df_raw = df_raw.replace({-1: np.nan})
-
-        if len(df_raw) < 10:  # Or else plots won't work
-            raise Exception("Not enough players with enough minutes")
-
-        return df_raw
-
-    def to_data_point(self) -> data_point.Country:
-
-        id = self.df.index[0]
-
-        # Reindexing dataframe
-        self.df.reset_index(drop=True, inplace=True)
-
-        name = self.df["country"][0]
-        self.df = self.df.drop(columns=["country"])
-
-        # Convert to series
-        ser_metrics = self.df.squeeze()
-
-        # get the names of columns in ser_metrics than end in "_Z" with abs value greater than 1.5
-        drill_down_metrics = ser_metrics[
-            ser_metrics.index.str.endswith("_Z") & (ser_metrics.abs() > 1.0)
-        ].index.tolist()
-
-        return self.data_point_class(
-            id=id,
-            name=name,
-            ser_metrics=ser_metrics,
-            relevant_metrics=self.metrics,
-            drill_down_metrics=drill_down_metrics,
-        )

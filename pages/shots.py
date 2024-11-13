@@ -34,9 +34,9 @@ import tiktoken
 import os
 from utils.utils import normalize_text
 
-from classes.data_source import PlayerStats
-from classes.data_point import Player
-from classes.data_source import PlayerStats, Shots
+#from classes.data_source import PlayerStats
+#from classes.data_point import Player
+from classes.data_source import Shots
 from classes.visual import ShotVisual
 from classes.chat import Chat
 from classes.description import ShotDescription
@@ -65,6 +65,7 @@ st.markdown("# This is the shots and xG explanation page")
 st.markdown("### Shots and xG")
 shots = Shots()
 shots_df= shots.df_shots
+
 df_contributions = shots.df_contributions
 
 # Create a dropdown to select a shot ID from the available shot IDs in shots.df_shots['id']
@@ -72,7 +73,7 @@ shot_id = st.sidebar.selectbox("Select Shot ID", shots_df['id'].unique())
 st.markdown("#### Selected Shot Data")
 st.write(shots_df[shots_df['id']== shot_id]) 
 st.markdown("#### Feature Contributions")
-st.write(df_contributions[df_contributions['shot_id']== shot_id])
+st.write(df_contributions[df_contributions['id']== shot_id])
 
 visuals = ShotVisual(metric=None)
 visuals.add_shot(shots, shot_id)
