@@ -700,6 +700,7 @@ class Shots(Data):
         
         # Apply logistic function to get xG values
         df_contribution['xG'] = 1 / (1 + np.exp(-linear_combination))
+        df_shots['xG'] = 1 / (1 + np.exp(-linear_combination))
 
         #self.parameter_explanation = parameters.set_index('Parameter')['Explanation'].to_dict()
         #st.write(self.parameter_explanation)
