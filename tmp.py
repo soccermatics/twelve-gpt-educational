@@ -202,3 +202,224 @@ for country_name in country_names:
 df = pd.DataFrame(factors, columns=["country"] + tmp_country.relevant_metrics)
 df.to_csv("data/wvs/country_ground_truth.csv", index=False)
 # %%
+# %%
+# Generate player specific data for evaluation
+
+from classes.data_source import PlayerStats
+from classes.description import PlayerDescription
+import copy
+import json
+import pandas as pd
+import utils.sentences as sentences
+
+
+players = PlayerStats()
+
+metrics = [m for m in players.df.columns if m not in ["player_name"]]
+
+players.calculate_statistics(metrics=metrics)
+
+player_names = players.df["player_name"].values.tolist()
+
+description_dict = dict(
+    (
+        metric,
+        ["outstanding", "excellent", "good", "average", "below average", "poor"],
+    )
+    for metric in metrics
+)
+
+thresholds_dict = dict(
+    (
+        metric,
+        [1.5, 1, 0.5, -0.5, -1],
+    )
+    for metric in metrics
+)
+
+
+def select_player(players, player_name):
+
+    players = PlayerStats()
+    players.calculate_statistics(metrics=metrics)
+    # Make a copy of Players object
+    player = copy.deepcopy(players)
+
+    # rnd = int(player.select_random()) # does not work because of page refresh!
+    # Filter player by position and select a player with sidebar selectors
+    player.df = player.df[player.df["player_name"] == player_name]
+    # Return data point
+
+    player = player.to_data_point(gender="male", position="Forward")
+
+    return player
+
+
+texts = []
+texts_empty = []
+for player_name in player_names:
+    # try:
+    tmp_player = select_player(players, player_name)
+    c_description = PlayerDescription(
+        tmp_player,
+    )
+
+    text = c_description.synthesize_text()
+    text_empty = f"Here is a statistical description of {tmp_player.name}...```"
+
+    texts.append(text)
+    texts_empty.append(text_empty)
+    # except:
+    #     texts.append("")
+    #     texts_empty.append("")
+    #     print(f"Error with {player_name}")
+
+
+# zip country names and texts into a dataframe and save
+df = pd.DataFrame({"player": player_names, "text": texts, "text_empty": texts_empty})
+df.to_csv("data/wvs/player_texts.csv", index=False)
+
+factors = []
+for name in player_names:
+    tmp_player = select_player(players, name)
+    data = [tmp_player.name]
+    for metric in tmp_player.relevant_metrics:
+        try:
+            text = sentences.describe_level(
+                tmp_player.ser_metrics[metric + "_Z"],
+                thresholds=thresholds_dict[metric],
+                words=description_dict[metric],
+            )
+            data.append(text)
+        except:
+            data.append(None)
+            print(f"Error with {name}")
+
+    factors.append(data)
+
+# create a dataframe with columns 'player' and and each factor from tmp_player.relevant_metrics
+df = pd.DataFrame(factors, columns=["player"] + tmp_player.relevant_metrics)
+df.to_csv("data/wvs/player_ground_truth.csv", index=False)
+# %%
+
+# Generate player specific data for evaluation
+
+from classes.data_source import PersonStat
+from classes.description import PersonDescription
+import copy
+import json
+import pandas as pd
+import utils.sentences as sentences
+
+
+people = PersonStat()
+
+metrics = [m for m in people.df.columns if m not in ["name"]]
+
+people.calculate_statistics(metrics=metrics)
+
+people_names = people.df["name"].values.tolist()
+
+
+def select_person(people, player_name):
+
+    people = PersonStat()
+    people.calculate_statistics(metrics=metrics)
+
+    person = copy.deepcopy(people)
+
+    person.df = person.df[person.df["name"] == player_name]
+
+    person = person.to_data_point()
+
+    return person
+
+
+texts = []
+texts_empty = []
+for player_name in people_names:
+    # try:
+    tmp_person = select_person(people, player_name)
+    c_description = PersonDescription(
+        tmp_person,
+    )
+
+    text = c_description.synthesize_text()
+    text_empty = f"The candidate is..."
+
+    texts.append(text)
+    texts_empty.append(text_empty)
+    # except:
+    #     texts.append("")
+    #     texts_empty.append("")
+    #     print(f"Error with {player_name}")
+
+
+# zip country names and texts into a dataframe and save
+df = pd.DataFrame({"person": people_names, "text": texts, "text_empty": texts_empty})
+df.to_csv("data/wvs/personality_texts.csv", index=False)
+
+
+factors = []
+for name in people_names:
+    tmp_person = select_person(people, name)
+    data = [tmp_person.name]
+
+    # extraversion
+    extraversion = tmp_person.ser_metrics["extraversion_Z"]
+    cat_0 = "solitary and reserved"
+    cat_1 = "outgoing and energetic"
+    if extraversion > 0:
+        data.append(cat_1)
+    else:
+        data.append(cat_0)
+
+    # neuroticism
+    neuroticism = tmp_person.ser_metrics["neuroticism_Z"]
+    cat_0 = "resilient and confident"
+    cat_1 = "sensitive and nervous"
+    if neuroticism > 0:
+        data.append(cat_1)
+    else:
+        data.append(cat_0)
+
+    # agreeableness
+    agreeableness = tmp_person.ser_metrics["agreeableness_Z"]
+    cat_0 = "critical and rational"
+    cat_1 = "friendly and compassionate"
+    if agreeableness > 0:
+        data.append(cat_1)
+    else:
+        data.append(cat_0)
+
+    # conscientiousness
+    conscientiousness = tmp_person.ser_metrics["conscientiousness_Z"]
+    cat_0 = "extravagant and careless"
+    cat_1 = "efficient and organized"
+
+    if conscientiousness > 0:
+        data.append(cat_1)
+    else:
+        data.append(cat_0)
+
+    # openness
+    openness = tmp_person.ser_metrics["openness_Z"]
+    cat_0 = "consistent and cautious"
+    cat_1 = "inventive and curious"
+
+    if openness > 0:
+        data.append(cat_1)
+    else:
+        data.append(cat_0)
+
+    factors.append(data)
+
+# create a dataframe with columns 'player' and and each factor from tmp_person.relevant_metrics
+df = pd.DataFrame(
+    factors,
+    columns=["person"]
+    + ["extraversion", "neuroticism", "agreeableness", "conscientiousness", "openness"],
+)
+df.to_csv("data/wvs/personality_ground_truth.csv", index=False)
+
+# %%
