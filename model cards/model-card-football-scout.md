@@ -26,7 +26,7 @@ The Football Scout Wordalisation is applied to a very specific demographic group
 
 ## Datasets
 
-The dataframe used in this project was constructed from a dataset of actions taken by [Premier League players](https://figshare.com/collections/Soccer_match_event_dataset/4415000/2) during the 2017-18 season. A *preprocessing* step, largely based on this [tutotrial](https://soccermatics.readthedocs.io/en/latest/lesson3/ScoutingPlayers.html), converted player actions to a dataframe of counts per ninety and corrected for possession of the ball. Only those players who play as forwards (an attacking role) are included in the dataset.
+The dataframe used in this project was constructed from a dataset of actions taken by [Premier League players](https://figshare.com/collections/Soccer_match_event_dataset/4415000/2) during the 2017-18 season. A *preprocessing* step, largely based on this [tutotrial](https://soccermatics.readthedocs.io/en/latest/lesson3/ScoutingPlayers.html), converted player actions to a dataframe of counts per ninety and corrected for possession of the ball. Only those players who play as forwards (an attacking role) are included in the dataset. The data includes the following metrics adjusted for possession per ninety minutes played: non-penalty expected goals (a measure of shot quality), goals, assists, key passes, smart passes, final third passes (those taking the ball into the opponents third of the pitch), final third receptions (of the ball), ground duels won and air duels won.
 
 ## Model
 
