@@ -328,7 +328,7 @@ class PlayerDescription(Description):
 
 class ShotDescription(Description):
 
-    output_token_limit = 300
+    output_token_limit = 500
 
     @property
     def gpt_examples_path(self):
@@ -350,6 +350,9 @@ class ShotDescription(Description):
 
         if shot_data.empty:
             raise ValueError(f"No shot found with ID {self.shot_id}")
+        
+        player_name = shot_data['player_name'].iloc[0]
+        team_name = shot_data['team_name'].iloc[0]
 
         start_x = shot_data['start_x'].iloc[0]
         start_y = shot_data['start_y'].iloc[0]
@@ -370,7 +373,7 @@ class ShotDescription(Description):
         shot_contributions = self.shots.df_contributions[self.shots.df_contributions['id'] == self.shot_id]
 
         shot_description = (
-            f"The shot starting from {start_x}, {start_y} with an xG value of {xG} resulted in a {goal_status_text}."
+            f"Player {player_name} from {team_name} took the shot starting from {start_x}, {start_y} with an xG value of {xG} resulted in a {goal_status_text}."
             f"The angle to goal was {angle_to_goal} degrees, the distance to goal was {distance_to_goal} meters, the distance to the nearest opponent was {distance_to_nearest_opponent} meters, and the distance of the goalkeeper to goal was {gk_dist_to_goal} meters."
             f"The xG of this shot is {xG} meaning that we expect this shot to result in goal with {xG} chance."
         )
@@ -388,9 +391,11 @@ class ShotDescription(Description):
 
         # Include the synthesized shot description in the message to be sent to the language model
         prompt = (
-            "Here is a description of a shot in football:\n"
-            f"{shot_description}\n"
-            "Based on this information, please provide insightful commentary."
+            f"Explain the goal probability of this shot based on its features, highlighting the contributions of the most important features you have been given to the xG value."
+            "Provide a detailed analysis of this shot's goal probability. Highlight each feature's contribution and explain why it increases or decreases the chance of scoring."
+            "Compare this shot's features and xG value with similar shots from other players. What differentiates this shot from the average?"
+            "As a coach, suggest ways to improve the shot-taking ability of the player based on the contribution of the features and the outcome of this shot."
+            "Write a personalized message for the player who took this shot, explaining how their positioning and decision-making influenced the xG and outcome."
         )
         return [{"role": "user", "content": prompt}]
 

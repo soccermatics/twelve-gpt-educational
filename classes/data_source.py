@@ -55,9 +55,9 @@ class Data:
             "Child class must implement process_data(self, df_raw)"
         )
 
-    def get_processed_data(self):
+    def get_processed_data(self, match_id):
 
-        raw = self.get_raw_data()
+        raw = self.get_raw_data(match_id)
         return self.process_data(raw)
 
     def select_and_filter(self, column_name, label, default_index=0):
@@ -393,46 +393,31 @@ class CountryStats(Stats):
 
 
 class Shots(Data):
-    def __init__(self):
-        #self.raw_hash_attrs = (competition.id, match.id, team.id)
-        #self.proc_hash_attrs = (competition.id, match.id, team.id)
-        #self.competition = competition
-        #self.match = match
-        #self.team = team
-        self.df_shots = self.get_processed_data()  # Process the raw data directly
+    def __init__(self, match_id):
+        self.df_shots = self.get_processed_data(match_id)  # Process the raw data directly
         self.xG_Model = self.load_model()  # Load the model once
         self.parameters = self.read_model_params()
-        #self.df_cum_xG, self.df_contributions = self.get_xG_contributions()
         self.df_contributions = self.weight_contributions()
-        # Add total xG to df_shots
-        #self.df_shots["xG"] = self.xG_Model.predict(self.df_shots)
     #@st.cache_data(hash_funcs={"classes.data_source.Shots": lambda self: hash(self.raw_hash_attrs)}, ttl=5*60)
 
 
-    def get_raw_data(self):
+    def get_raw_data(self, match_id=None):
         parser = Sbopen()
-        #get list of games during Indian Super League season
-        df_match = parser.match(competition_id=55, season_id=282)
-
-        # matches = df_match.match_id.unique()
-        matches= [3942819]
         shot_df = pd.DataFrame()
         track_df = pd.DataFrame()
         #store data in one dataframe
-        for match in matches:
-            #open events
-            df_event = parser.event(match)[0]
+        df_event = parser.event(match_id)[0]
             #open 360 data
-            df_track = parser.event(match)[2]
+        df_track = parser.event(match_id)[2]
             #get shots
-            shots = df_event.loc[df_event["type_name"] == "Shot"]
-            shots.x = shots.x.apply(lambda cell: cell*105/120)
-            shots.y = shots.y.apply(lambda cell: cell*68/80)
-            df_track.x = df_track.x.apply(lambda cell: cell*105/120)
-            df_track.y = df_track.y.apply(lambda cell: cell*68/80)
+        shots = df_event.loc[df_event["type_name"] == "Shot"]
+        shots.x = shots.x.apply(lambda cell: cell*105/120)
+        shots.y = shots.y.apply(lambda cell: cell*68/80)
+        df_track.x = df_track.x.apply(lambda cell: cell*105/120)
+        df_track.y = df_track.y.apply(lambda cell: cell*68/80)
             #append event and trackings to a dataframe
-            shot_df = pd.concat([shot_df, shots], ignore_index = True)
-            track_df = pd.concat([track_df, df_track], ignore_index = True)
+        shot_df = pd.concat([shot_df, shots], ignore_index = True)
+        track_df = pd.concat([track_df, df_track], ignore_index = True)
 
         #reset indicies
         shot_df.reset_index(drop=True, inplace=True)
@@ -446,6 +431,13 @@ class Shots(Data):
         df_raw = (shot_df, track_df) 
 
         return df_raw
+    
+    def filter_by_match(self, match_id):
+        """
+        Filter shots and tracking data for a specific match ID.
+        """
+        self.df_shots = self.df_shots[self.df_shots['match_id'] == match_id]
+        self.df_contributions = self.df_contributions[self.df_contributions[['match_id'] == match_id]]
 
 
     def process_data(self, df_raw: tuple) -> pd.DataFrame:
@@ -617,7 +609,7 @@ class Shots(Data):
             # Combine both dictionaries into a single row dictionary
             return {**teammate_coords, **opponent_coords}
         
-        model_vars = test_shot[["id", "index", "x", "y"]].copy()
+        model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y"]].copy()
         model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars["left_foot"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Left Foot" else 0)
         model_vars["throw in"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Throw In" else 0)
@@ -690,7 +682,7 @@ class Shots(Data):
             #Remove the mean
             df_shots[row['Parameter']+'_contribution'] = df_shots[row['Parameter']+'_contribution'] - df_shots[row['Parameter']+'_contribution'].mean()
         
-        df_contribution = df_shots[['id'] + [col for col in df_shots.columns if 'contribution' in col]]
+        df_contribution = df_shots[['id'] + ['match_id'] + [col for col in df_shots.columns if 'contribution' in col]]
 
         # Calculate linear combination directly from original feature values and their coefficients
         linear_combination = self.intercept + sum(
@@ -708,73 +700,6 @@ class Shots(Data):
         return df_contribution
 
 
-
-    def get_xG_contributions(self, df_shots=None):
-        if df_shots is None:
-            df_shots = self.df_shots
-
-        # Get model parameters including intercept
-        model_params = self.model_params  # This includes the intercept, assumed to be labeled 'const'
-        #model_params = [param if param != "Intercept" else "const" for param in self.xG_Model.params.index.tolist()]
-
-        intercept = self.xG_Model.params[0]  # Intercept is the first element in the model params
-
-        # Initialize lists to store cumulative xG and contributions for each shot
-        cumulative_xG_list = []
-        contributions_list = []
-        shot_ids = []
-
-        # Loop over each shot in the DataFrame
-        for _, shot in df_shots.iterrows():
-            cumulative_xG_shot = []  # Cumulative xG for this shot
-            prev_xG = 1 / (1 + np.exp(-intercept))  # xG with just intercept
-            shot_ids.append(shot['id'])  # Store the shot ID
-            
-
-            
-            # First, calculate the xG for intercept only and store
-            cumulative_xG_shot.append(prev_xG)
-
-            # Now iteratively add features and calculate xG
-            for i, feature in enumerate(model_params[1:], start=1):  # model_params[1:] skips intercept
-                # Get current subset of parameters
-                relevant_params = model_params[:i+1]  # Include intercept and features up to the current one
-                relevant_weights = self.xG_Model.params[:i+1]  # Corresponding weights
-                
-                # Linear combination for the relevant features
-                linear_combination = np.dot(shot[relevant_params], relevant_weights)
-                
-                # Calculate xG using the sigmoid function
-                current_xG = 1 / (1 + np.exp(-linear_combination))
-                
-                # Append the current xG to the cumulative list
-                cumulative_xG_shot.append(current_xG)
-
-            # Now that cumulative xG is calculated for this shot, we calculate contributions
-            contributions_shot = np.diff(cumulative_xG_shot, prepend=prev_xG)
-
-            # Append cumulative xG and contributions for this shot
-            cumulative_xG_list.append(cumulative_xG_shot)
-            contributions_list.append(contributions_shot)
-
-
-        # Create DataFrames for cumulative xG and contributions
-        df_cum_xG = pd.DataFrame(cumulative_xG_list, index=df_shots.index, columns=model_params)
-        df_contributions = pd.DataFrame(contributions_list, index=df_shots.index, columns=model_params)
-        df_contributions['shot_id'] = shot_ids
-
-        # Output the tables with an introduction
-        #st.markdown("### Cumulative Expected Goals (xG) for Each Feature")
-        #st.write(df_cum_xG)
-        #st.markdown("### Contributions of Each Feature to xG")
-        #st.write(df_contributions)
-
-        return df_cum_xG, df_contributions
-
-
-
-
- 
     @staticmethod
     def load_model():
 

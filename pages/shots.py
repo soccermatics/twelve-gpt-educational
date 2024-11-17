@@ -63,10 +63,19 @@ st.divider()
 st.markdown("# This is the shots and xG explanation page")
 
 st.markdown("### Shots and xG")
-shots = Shots()
-shots_df= shots.df_shots
+parser = Sbopen()
+df_match = parser.match(competition_id=55, season_id=282)
+match_ids = df_match['match_id'].unique()
+st.sidebar.markdown("### Match Selection")
+selected_match_id = st.sidebar.selectbox("Select Match ID", match_ids)
 
+shots = Shots(selected_match_id)
+shots_df= shots.df_shots
 df_contributions = shots.df_contributions
+
+# Filter data based on selected match
+#shots.filter_by_match(selected_match_id)
+
 
 # Create a dropdown to select a shot ID from the available shot IDs in shots.df_shots['id']
 shot_id = st.sidebar.selectbox("Select Shot ID", shots_df['id'].unique())
