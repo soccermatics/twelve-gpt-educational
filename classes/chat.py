@@ -1,9 +1,9 @@
 import streamlit as st
-import json
 import openai
 from itertools import groupby
 from types import GeneratorType
 import pandas as pd
+import json
 
 from settings import USE_GEMINI
 

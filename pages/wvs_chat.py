@@ -1,8 +1,18 @@
-# Library imports
+from classes.data_source import CountryStats
+
+countries = CountryStats()
+
+metrics = [m for m in countries.df.columns if m not in ["country"]]
+
+countries.calculate_statistics(metrics=metrics)
+
+# # save countries.df to csv
+# countries.df.to_csv("data/wvs/countries.csv", index=False)
+
+
 import streamlit as st
 from utils.utils import select_country, create_chat
 
-from classes.data_source import CountryStats
 
 from classes.chat import WVSChat
 from classes.visual import DistributionPlot
@@ -28,22 +38,9 @@ sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
 sidebar_container = st.sidebar.container()
 
-st.divider()
-
-countries = CountryStats()
-
-metrics = [m for m in countries.df.columns if m not in ["country"]]
-
-countries.calculate_statistics(metrics=metrics)
-
-# save countries.df to csv
-# countries.df.to_csv("data/wvs/countries.csv", index=False)
-
 country = select_country(sidebar_container, countries)
 
-# st.markdown(
-#     "Drill down on:  \n" + "  \n".join([x for x in country.drill_down_metrics.keys()])
-# )
+st.divider()
 
 st.write(
     "This app can only handle three or four users at a time. Please [download](https://github.com/soccermatics/twelve-gpt-educational) and run on your own computer with your own Gemini key."
@@ -53,13 +50,53 @@ st.write(
 with open("model cards/model-card-wvs-chat.md", "r", encoding="utf8") as file:
     # Read the contents of the file
     model_card_text = file.read()
-# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\model cards\style\python-code.css
-# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\pages\wvs_chat.py
-# C:\Users\beimn\Documents\workdir\wvs\wvs-chat\pages\python-code.css
+
+####
+import base64
+import re
+
+
+# Function to convert local images to base64
+def convert_to_base64(image_path):
+    with open(image_path, "rb") as img_file:
+        img_data = img_file.read()
+    return base64.b64encode(img_data).decode("utf-8")
+
+
+# Pattern for Markdown image links
+image_pattern = r"!\[(.*?)\]\((.*?)\)"
+
+
+# Replace image links in text
+def replace_images_in_text(text):
+    def replacer(match):
+        alt_text = match.group(1)
+        link = match.group(2)
+
+        if link.startswith("http"):
+            # If it's a URL, return markdown for web image
+            return f"![{alt_text}]({link})"
+        else:
+            # If it's a local file, convert to base64 and use HTML <img>
+            try:
+                data_url = convert_to_base64(link)
+                return f'<img src="data:image/gif;base64,{data_url}" alt="{alt_text}" style="width:100%; max-width:900px;">'
+            except FileNotFoundError:
+                return f"![{alt_text}](Image not found: {link})"
+
+    # Replace all image links with the appropriate HTML or markdown
+    return re.sub(image_pattern, replacer, text)
+
+
+# Process the text with image replacements
+processed_text = replace_images_in_text(model_card_text)
+
+####
 
 load_css("model cards/style/python-code.css")
 st.expander("Model card", expanded=False).markdown(
-    model_card_text, unsafe_allow_html=True
+    processed_text,  # model_card_text,
+    unsafe_allow_html=True,
 )
 
 st.expander("Dataframe used", expanded=False).write(countries.df)
@@ -71,12 +108,10 @@ thresholds_dict = dict(
     (
         metric,
         [
-            2.5,
-            1.5,
-            0.5,
-            -0.5,
-            -1.5,
-            -2.5,
+            2,
+            1,
+            -1,
+            -2,
         ],
     )
     for metric in metrics
@@ -133,5 +168,3 @@ chat.get_input()
 
 chat.display_messages()
 chat.save_state()
-
-# st.write("Under construction")

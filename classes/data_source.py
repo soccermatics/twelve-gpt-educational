@@ -14,6 +14,7 @@ from pathlib import Path
 import sys
 import pyarrow.parquet as pq
 
+from math import floor, ceil
 
 import classes.data_point as data_point
 
@@ -167,35 +168,41 @@ class CountryStats(Stats):
 
     def __init__(self):
 
-        self.core_value_dict = pd.read_csv("data/wvs/values.csv")
-        # convert to dictionary using the value and name columns
-        self.core_value_dict = self.core_value_dict.set_index("value")["name"].to_dict()
-
         self.drill_down = self.get_drill_down_dict()
+        self.drill_down_threshold = 1
 
         super().__init__()
 
     def get_drill_down_data(self, file_path):
-        df = self.process_data(
-            self.get_z_scores(pd.read_csv(file_path).drop(columns=["score"]))
-        )
+        df = self.process_data(self.get_z_scores(pd.read_csv(file_path)))
 
         return dict(zip(df.country.values, df.drill_down_metric.values))
 
     def get_drill_down_data_values(self, file_path, metric_name):
 
-        df = self.process_data(pd.read_csv(file_path).drop(columns=["score"]))
+        df = self.process_data(pd.read_csv(file_path))
 
         # create a value column that has the values from the columns is given by the dict self.drill_down_metric_country_question
         # where the dict has format {country: question}
-        df["value"] = df.apply(
+        df["value_low"] = df.apply(
             lambda x: x[
-                self.drill_down_metric_country_question[metric_name][x["country"]]
+                self.drill_down_metric_country_question[metric_name][x["country"]][0]
             ],
             axis=1,
         )
 
-        return dict(zip(df.country.values, df.value.values))
+        df["value_high"] = df.apply(
+            lambda x: x[
+                self.drill_down_metric_country_question[metric_name][x["country"]][1]
+            ],
+            axis=1,
+        )
+
+        values = [
+            (floor(l), ceil(h)) for l, h in zip(df["value_low"], df["value_high"])
+        ]
+
+        return dict(zip(df.country.values, values))
 
     def get_drill_down_dict(
         self,
@@ -241,7 +248,7 @@ class CountryStats(Stats):
                                 self.drill_down_metric_country_question[metric][
                                     country
                                 ],
-                                round(drill_down_data_raw[metric][country]),
+                                drill_down_data_raw[metric][country],
                             ),
                         )
                         for metric in metrics
@@ -258,9 +265,6 @@ class CountryStats(Stats):
         if metrics is None:
             metrics = [m for m in df.columns if m not in ["country"]]
 
-        # drill_down_metrics = df[metrics].abs().idxmax(axis=1)
-        # df["drill_down_metric"] = drill_down_metrics
-
         df_z = df[metrics].apply(zscore, nan_policy="omit")
 
         # Rename every column to include "Z" at the end
@@ -270,13 +274,29 @@ class CountryStats(Stats):
         for metric in set(negative_metrics).intersection(metrics):
             df_z[metric] = df_z[metric] * -1
 
-        # find the columns that end with "_Z" and has greatest magnitude
-        drill_down_metrics = (
-            df_z[df_z.columns[df_z.columns.str.endswith("_Z")]]
-            .abs()
-            .idxmax(axis=1)
-            .apply(lambda x: "_".join(x.split("_")[:-1]))
-        )
+        # find the columns that has greatest magnitude
+        drill_down_metrics_high = df[metrics].idxmax(axis=1)
+        drill_down_metrics_low = df[metrics].idxmin(axis=1)
+
+        drill_down_metrics = [
+            (l, h) for l, h in zip(drill_down_metrics_low, drill_down_metrics_high)
+        ]
+
+        ### Using the question with the greatest raw magnitude vs using the question with the greatest z-score magnitude
+
+        # # find the columns that has greatest magnitude
+        # drill_down_metrics = df[metrics].abs().idxmax(axis=1)
+
+        # # find the columns that end with "_Z" and has greatest magnitude
+        # drill_down_metrics = (
+        #     df_z[df_z.columns[df_z.columns.str.endswith("_Z")]]
+        #     .abs()
+        #     .idxmax(axis=1)
+        #     .apply(lambda x: "_".join(x.split("_")[:-1]))
+        # )
+
+        ###
+
         df_z["drill_down_metric"] = drill_down_metrics
 
         # # Here we want to use df_metric_zscores to get the ranks and pct_ranks due to negative metrics
@@ -300,224 +320,24 @@ class CountryStats(Stats):
         return df
 
     def process_data(self, df_raw):
-        df_raw = df_raw.rename(columns=self.core_value_dict)
 
-        country_codes_dict = {
-            "AFG": "Afghanistan",
-            "ALB": "Albania",
-            "DZA": "Algeria",
-            "AND": "Andorra",
-            "AGO": "Angola",
-            "ATG": "Antigua and Barbuda",
-            "ARG": "Argentina",
-            "ARM": "Armenia",
-            "AUS": "Australia",
-            "AUT": "Austria",
-            "AZE": "Azerbaijan",
-            "BHS": "Bahamas",
-            "BHR": "Bahrain",
-            "BGD": "Bangladesh",
-            "BRB": "Barbados",
-            "BLR": "Belarus",
-            "BEL": "Belgium",
-            "BLZ": "Belize",
-            "BEN": "Benin",
-            "BTN": "Bhutan",
-            "BOL": "Bolivia",
-            "BIH": "Bosnia and Herzegovina",
-            "BWA": "Botswana",
-            "BRA": "Brazil",
-            "BRN": "Brunei",
-            "BGR": "Bulgaria",
-            "BFA": "Burkina Faso",
-            "BDI": "Burundi",
-            "CPV": "Cabo Verde",
-            "KHM": "Cambodia",
-            "CMR": "Cameroon",
-            "CAN": "Canada",
-            "CAF": "Central African Republic",
-            "TCD": "Chad",
-            "CHL": "Chile",
-            "CHN": "China",
-            "COL": "Colombia",
-            "COM": "Comoros",
-            "COG": "Congo",
-            "CRI": "Costa Rica",
-            "HRV": "Croatia",
-            "CUB": "Cuba",
-            "CYP": "Cyprus",
-            "CZE": "Czechia",
-            "DNK": "Denmark",
-            "DJI": "Djibouti",
-            "DMA": "Dominica",
-            "DOM": "Dominican Republic",
-            "ECU": "Ecuador",
-            "EGY": "Egypt",
-            "SLV": "El Salvador",
-            "GNQ": "Equatorial Guinea",
-            "ERI": "Eritrea",
-            "EST": "Estonia",
-            "SWZ": "Eswatini",
-            "ETH": "Ethiopia",
-            "FJI": "Fiji",
-            "FIN": "Finland",
-            "FRA": "France",
-            "GAB": "Gabon",
-            "GMB": "Gambia",
-            "GEO": "Georgia",
-            "DEU": "Germany",
-            "GHA": "Ghana",
-            "GRC": "Greece",
-            "GRD": "Grenada",
-            "GTM": "Guatemala",
-            "GIN": "Guinea",
-            "GNB": "Guinea-Bissau",
-            "GUY": "Guyana",
-            "HTI": "Haiti",
-            "HND": "Honduras",
-            "HUN": "Hungary",
-            "ISL": "Iceland",
-            "IND": "India",
-            "IDN": "Indonesia",
-            "IRN": "Iran",
-            "IRQ": "Iraq",
-            "IRL": "Ireland",
-            "ISR": "Israel",
-            "ITA": "Italy",
-            "JAM": "Jamaica",
-            "JPN": "Japan",
-            "JOR": "Jordan",
-            "KAZ": "Kazakhstan",
-            "KEN": "Kenya",
-            "KIR": "Kiribati",
-            "PRK": "Korea, North",
-            "KOR": "Korea, South",
-            "KWT": "Kuwait",
-            "KGZ": "Kyrgyzstan",
-            "LAO": "Laos",
-            "LVA": "Latvia",
-            "LBN": "Lebanon",
-            "LSO": "Lesotho",
-            "LBR": "Liberia",
-            "LBY": "Libya",
-            "LIE": "Liechtenstein",
-            "LTU": "Lithuania",
-            "LUX": "Luxembourg",
-            "MDG": "Madagascar",
-            "MWI": "Malawi",
-            "MYS": "Malaysia",
-            "MDV": "Maldives",
-            "MLI": "Mali",
-            "MLT": "Malta",
-            "MHL": "Marshall Islands",
-            "MRT": "Mauritania",
-            "MUS": "Mauritius",
-            "MEX": "Mexico",
-            "FSM": "Micronesia",
-            "MDA": "Moldova",
-            "MCO": "Monaco",
-            "MNG": "Mongolia",
-            "MNE": "Montenegro",
-            "MAR": "Morocco",
-            "MOZ": "Mozambique",
-            "MMR": "Myanmar",
-            "NAM": "Namibia",
-            "NRU": "Nauru",
-            "NPL": "Nepal",
-            "NLD": "Netherlands",
-            "NZL": "New Zealand",
-            "NIC": "Nicaragua",
-            "NER": "Niger",
-            "NGA": "Nigeria",
-            "MKD": "North Macedonia",
-            "NOR": "Norway",
-            "OMN": "Oman",
-            "PAK": "Pakistan",
-            "PLW": "Palau",
-            "PAN": "Panama",
-            "PNG": "Papua New Guinea",
-            "PRY": "Paraguay",
-            "PER": "Peru",
-            "PHL": "Philippines",
-            "POL": "Poland",
-            "PRT": "Portugal",
-            "QAT": "Qatar",
-            "ROU": "Romania",
-            "RUS": "Russia",
-            "RWA": "Rwanda",
-            "KNA": "Saint Kitts and Nevis",
-            "LCA": "Saint Lucia",
-            "VCT": "Saint Vincent and the Grenadines",
-            "WSM": "Samoa",
-            "SMR": "San Marino",
-            "STP": "Sao Tome and Principe",
-            "SAU": "Saudi Arabia",
-            "SEN": "Senegal",
-            "SRB": "Serbia",
-            "SYC": "Seychelles",
-            "SLE": "Sierra Leone",
-            "SGP": "Singapore",
-            "SVK": "Slovakia",
-            "SVN": "Slovenia",
-            "SLB": "Solomon Islands",
-            "SOM": "Somalia",
-            "ZAF": "South Africa",
-            "SSD": "South Sudan",
-            "ESP": "Spain",
-            "LKA": "Sri Lanka",
-            "SDN": "Sudan",
-            "SUR": "Suriname",
-            "SWE": "Sweden",
-            "CHE": "Switzerland",
-            "SYR": "Syria",
-            "TWN": "Taiwan",
-            "TJK": "Tajikistan",
-            "TZA": "Tanzania",
-            "THA": "Thailand",
-            "TLS": "Timor-Leste",
-            "TGO": "Togo",
-            "TON": "Tonga",
-            "TTO": "Trinidad and Tobago",
-            "TUN": "Tunisia",
-            "TUR": "Turkey",
-            "TKM": "Turkmenistan",
-            "TUV": "Tuvalu",
-            "UGA": "Uganda",
-            "UKR": "Ukraine",
-            "ARE": "United Arab Emirates",
-            "GBR": "United Kingdom",
-            "USA": "United States",
-            "URY": "Uruguay",
-            "UZB": "Uzbekistan",
-            "VUT": "Vanuatu",
-            "VEN": "Venezuela",
-            "VNM": "Vietnam",
-            "YEM": "Yemen",
-            "ZMB": "Zambia",
-            "ZWE": "Zimbabwe",
-            "HKG": "Hong Kong",
-            "MAC": "Macau",
-            "PRI": "Puerto Rico",
-            "NIR": "Northern Ireland",
-            "GRL": "Greenland",
-            "CIV": "Ivory Coast",
-            "COD": "Congo, Democratic Republic of the",
-            "SWZ": "Eswatini",
-        }
+        # raise error if df_raw["country"] contains any NaN values
+        if df_raw["country"].isnull().values.any():
+            raise ValueError("Country column contains NaN values")
+        # raise error if df_raw["country"] contains any empty strings
+        if (df_raw["country"] == "").values.any():
+            raise ValueError("Country column contains empty strings")
 
-        country_names = df_raw["country"].values.tolist()
-        # check if the country names are in the country_codes_dict
-        if not set(country_names).issubset(set(country_codes_dict.keys())):
-            # print the country names that are not in the country_codes_dict
-            print(set(country_names) - set(country_codes_dict.keys()))
-            raise ValueError("Country names do not match the country codes")
+        # raise error if df_raw["country"] contains any duplicates
+        if df_raw["country"].duplicated().any():
+            raise ValueError("Country column contains duplicates")
 
-        df_raw["country"] = df_raw["country"].map(country_codes_dict)
-
-        # df_raw = df_raw.replace({-1: np.nan})
+        # # raise warning is any nan values are present in the dataframe
+        # if df_raw.isnull().values.any():
+        #     st.warning("Data contains NaN values")
 
         if len(df_raw) < 10:  # Or else plots won't work
-            raise Exception("Not enough players with enough minutes")
+            raise Exception("Not enough data points")
 
         return df_raw
 
@@ -536,15 +356,18 @@ class CountryStats(Stats):
 
         # get the names of columns in ser_metrics than end in "_Z" with abs value greater than 1.5
         drill_down_metrics = ser_metrics[
-            ser_metrics.index.str.endswith("_Z") & (ser_metrics.abs() > 1.0)
+            ser_metrics.index.str.endswith("_Z")
+            & (ser_metrics.abs() >= self.drill_down_threshold)
         ].index.tolist()
-        drill_down_metrics = ["_".join(x.split("_")[:-1]) for x in drill_down_metrics]
+        drill_down_metrics = [
+            "_".join(x.split("_")[:-1]).lower() for x in drill_down_metrics
+        ]
 
         drill_down_values = dict(
             [
                 (key, value)
                 for key, value in self.drill_down[name].items()
-                if key in drill_down_metrics
+                if key.lower() in drill_down_metrics
             ]
         )
 

@@ -1,56 +1,44 @@
 {
     "Traditional vs Secular Values": [
-        "have extremely secular values",
-        "have very secular values",
-        "have above averagely secular values",
-        "have neither strongly traditional nor strongly secular values",
-        "have above averagely traditional values",
-        "have very traditional values",
-        "have extremely traditional values"
+        "have far above average Traditional vs Secular Values score (e.i. far more secular compared to the average)",
+        "have above average Traditional vs Secular Values score (e.i. more secular compared to the average)",
+        "have neither an above nor a below average Traditional vs Secular Values score",
+        "have below average Traditional vs Secular Values score (e.i. more traditional compared to the average)",
+        "have far below average Traditional vs Secular Values score (e.i. far more traditional compared to the average)"
     ],
     "Survival vs Self-expression Values": [
-        "value self-expression extremely highly",
-        "value self-expression very highly",
-        "have an above average value of self-expression",
-        "have neither survival orientated nor self-expression orientated values",
-        "have above average survival orientated values",
-        "be very survival orientated",
-        "be extremely survival orientated"
+        "have far above average Survival vs Self-expression values score (e.i. value self-expression far more compared to the average)",
+        "have above average Survival vs Self-expression Values score (e.i. value self-expression more compared to the average)",
+        "have neither an above nor a below average Survival vs Self-expression Values score",
+        "have below average Survival vs Self-expression Values score (e.i. value survival more compared to the average)",
+        "have far below average Survival vs Self-expression Values score (e.i. value survival far more compared to the average)"
     ],
     "Neutrality": [
-        "be extremely neutral",
-        "be very neutral",
+        "be far above averagely neutral",
         "be above averagely neutral",
         "be averagely neutral",
         "be below averagely neutral",
-        "score very low on neutrality",
-        "score extremely low on neutrality"
+        "be far below averagely neutrality"
     ],
     "Fairness": [
-        "value fairness extremely highly",
-        "value fairness very highly",
-        "value fairness above averagely",
-        "value fairness averagely",
-        "have a bellow average value of fairness",
-        "have a very low value of fairness",
-        "have an extremely low value of fairness"
+        "have a far above average value of fairness",
+        "have an above average value of fairness",
+        "have an average value of fairness",
+        "have a below average value of fairness",
+        "have a far below average value of fairness"
     ],
-    "Skeptisism": [
-        "be extremely skeptical",
-        "be very skeptical",
+    "Skepticism": [
+        "be far averagely skeptical",
         "be above averagely skeptical",
-        "be neither skeptical nor trusting",
-        "have a below average score on skepticism",
-        "have a very low score on skepticism",
-        "have an extremely low score on skepticism"
+        "be neither above nor below averagely skeptical",
+        "be below averagely skeptical",
+        "be far below averagely skeptical"
     ],
     "Societal Tranquility": [
-        "be extremely tranquil",
-        "be very tranquil",
+        "be far above averagely tranquil",
         "be above averagely tranquil",
-        "be averagely tranquil",
-        "be bellow averagely tranquil",
-        "score very low on tranquility",
-        "score extremely low on tranquility"
+        "be neither above nor below averagely tranquil",
+        "be below averagely tranquil",
+        "be far below averagely tranquil"
     ]
 }

@@ -188,7 +188,6 @@ class Description(ABC):
             converted_msgs = convert_messages_format(self.messages)
 
             # # save converted messages to json
-            # import json
             # with open("data/wvs/msgs_0.json", "w") as f:
             #     json.dump(converted_msgs, f)
 
@@ -338,28 +337,16 @@ class CountryDescription(Description):
                 "role": "system",
                 "content": (
                     "You are a data analyst and a social scientist. "
-                    "You provide succinct and to the point explanations about countries using metrics derived from data collected in the World Value Survey. "
-                    "You use the information given to you from the data and answers to earlier questions to give summaries of how countries score in various metrics that attempt to measure the social values held by the population of that country."
+                    "You provide succinct and to the point explanations about countries using social factors derived from the World Value Survey. "
+                    "You use the information given to you to answer questions about how countries score in various social factors that attempt to measure the social values held by the population of a country."
                 ),
             },
-            # {
-            #     "role": "user",
-            #     "content": "Do you refer to the game you are an expert in as soccer or football?",
-            # },
-            # {
-            #     "role": "assistant",
-            #     "content": (
-            #         "I refer to the game as football. "
-            #         "When I say football, I don't mean American football, I mean what Americans call soccer. "
-            #         "But I always talk about football, as people do in the United Kingdom."
-            #     ),
-            # },
         ]
         if len(self.describe_paths) > 0:
             intro += [
                 {
                     "role": "user",
-                    "content": "First, could you answer some questions about a the World Value Survey for me?",
+                    "content": "First, could you answer some questions about the World Value Survey for me?",
                 },
                 {"role": "assistant", "content": "Sure!"},
             ]
@@ -368,33 +355,29 @@ class CountryDescription(Description):
 
     def synthesize_text(self):
 
-        description = f"Here is a statistical description of the core values of {self.country.name.capitalize()}. \n\n"
+        description = f"Here is a statistical description of the societal values of {self.country.name.capitalize()}."
 
         # subject_p, object_p, possessive_p = sentences.pronouns(country.gender)
 
         for metric in self.country.relevant_metrics:
 
-            # # TODO: customize this text?
-            # description += f"{country.name.capitalize()} was found to be "
-            # description += sentences.describe_level(
-            #     country.ser_metrics[metric + "_Z"],
-            #     thresholds=self.thresholds_dict[metric],
-            #     words=self.description_dict[metric],
-            # )
-            # description += " in " + metric.lower()  # .replace("_", " ")
-            # description += " compared to other countries in the same survey. "
-
-            description += f"{self.country.name.capitalize()} was found to "
+            description += f"\n\nAccording to the WVS, {self.country.name.capitalize()} was found to "
             description += sentences.describe_level(
                 self.country.ser_metrics[metric + "_Z"],
                 thresholds=self.thresholds_dict[metric],
                 words=self.description_dict[metric],
             )
-            description += " compared to other countries in the same survey. "
+            description += " compared to other countries in the same wave. "
 
             if metric in self.country.drill_down_metrics:
 
+                if self.country.ser_metrics[metric + "_Z"] > 0:
+                    index = 1
+                else:
+                    index = 0
+
                 question, value = self.country.drill_down_metrics[metric]
+                question, value = question[index], value[index]
                 description += "In response to the question '"
                 description += self.relevant_questions[metric][question][0]
                 description += "', on average participants "
@@ -405,18 +388,15 @@ class CountryDescription(Description):
                 description += self.relevant_questions[metric][question][3]
                 description += ". "
 
-            description += "\n\n"
         # st.write(description)
 
         return description
 
     def get_prompt_messages(self):
         prompt = (
-            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the social values held by population of the country. "
-            # f"The first sentence should use varied language to give an overview of the player. "
-            # "The second sentence should describe the player's specific strengths based on the metrics. "
-            # "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
-            # "Finally, summarise exactly how the player compares to others in the same position. "
+            f"Please use the statistical description enclosed with ``` to give a concise, 2 short paragraph summary of the social values held by population of the country. "
+            f"The first paragraph should focus on any factors or values for which the country is above or bellow average. If the country is neither above nor below average in any values, mention that. "
+            f"The remaining paragraph should mention any specific values or factors that are neither high nor low compared to the average. "
         )
         return [{"role": "user", "content": prompt}]
 
@@ -448,7 +428,7 @@ class PersonDescription(Description):
                 "role": "system",
                 "content": (
                     "You are a recruiter. "
-                    "You provide succinct and to the point explanations about a candiate using data.  "
+                    "You provide succinct and to the point explanations about a candidate using data.  "
                     "You use the information given to you from the data and answers"
                     "to earlier user/assistant pairs to give summaries of candidates."
                 ),
