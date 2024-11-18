@@ -448,7 +448,7 @@ class LessonChat(Chat):
             },
             {"role": "user", "content": (
                 f"After these messages you will be interacting with the user who will tell you what they know about for loops. "
-                f"Your task is to gauge the understading of the use on the topic of for loops and then ask them a question that will help fill the knowledge gaps they have. "
+                f"Your task is to gauge the understading of the user on the topic of for loops as use in C and then ask them a question that will help fill the knowledge gaps they have. "
                 f"You will receive relevant information to answer a user's questions. The relevant information has different options for which is the preffered option. "
                 f"You can respond using the number 1 preffered way but if the user responds with the same answer as the previous response, you can number 2 preffered way. "
                 f"All user messages will be prefixed with 'user:' and enclosed with ```. "
