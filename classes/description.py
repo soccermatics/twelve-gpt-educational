@@ -367,15 +367,12 @@ class ShotDescription(Description):
         distance_to_nearest_opponent = shot_data['distance to nearest opponent'].iloc[0]
         gk_dist_to_goal = shot_data['gk distance to goal'].iloc[0]
 
-
-
         # Give a detailed description of the contributions to the shot
         shot_contributions = self.shots.df_contributions[self.shots.df_contributions['id'] == self.shot_id]
 
         shot_description = (
-            f"Player {player_name} from {team_name} took the shot starting from {start_x}, {start_y} with an xG value of {xG} resulted in a {goal_status_text}."
-            f"The angle to goal was {angle_to_goal} degrees, the distance to goal was {distance_to_goal} meters, the distance to the nearest opponent was {distance_to_nearest_opponent} meters, and the distance of the goalkeeper to goal was {gk_dist_to_goal} meters."
-            f"The xG of this shot is {xG} meaning that we expect this shot to result in goal with {xG} chance."
+            f"Player {player_name} from {team_name} shot had an xG value of {xG:.2f} resulted in a {goal_status_text}."
+            f"The distance to goal was {distance_to_goal:.1f} meters and the distance to the nearest opponent was {distance_to_nearest_opponent:.1f} meters."
         )
         shot_description += sentences.describe_shot_contributions(shot_contributions)
 
