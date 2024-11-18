@@ -51,47 +51,54 @@ def setup_model(train=False):
         feature_file = st.file_uploader("Choose a CSV file", type="csv", key="feature_file")
         if feature_file is not None:
             feature_data = pd.read_csv(feature_file)
-            if not train:
-                st.write("Upload a CSV file of the weights (coefficients) found in your model")
-                weights_file = st.file_uploader("Choose a CSV file", type="csv", key="weight_file")
-                if weights_file is not None:
-                    weights_data = pd.read_csv(weights_file)
-                    parameter_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
-                    weights_data['Explanation'] = weights_data['Parameter'].map(parameter_explanations)
-                    st.write("Feature Explanation:", weights_data)
-                    return (data, weights_data)
-            else:
-                categorical_interpretations=None
-                has_categorical = st.radio("Does your data have categorical features?", ("Yes", "No"))
-                if has_categorical == "Yes":
-                    st.write("Upload a JSON file detailing the interpretations of the categorical data.")
-                    json_file = st.file_uploader("Choose a JSON file", type="json", key="category_json_file")
-                    if json_file is not None:
-                        categorical_interpretations = json.load(json_file)
-                        # st.write("Categorical Interpretations:", categorical_interpretations)
-                if has_categorical == "No" or categorical_interpretations is not None:
-                    st.write("Choose target column")
-                    target = st.radio("Target column", data.columns)
-                    features = [col for col in data.columns if col != target]
-                    # model=TrainModel(data, target, features)
-                    try:
-                        model=TrainModel(data, target, features)
-                    except Exception as e:
-                        st.error(f"An error occurred while training the model: {e} Pick a traget column that is binary.")
-                        return
-                    # model.selectFeatures()
-                    # merge explantions with coef_df on matching feature names
-                    coef_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
-                    model.coef_df['Explanation'] = model.coef_df['Parameter'].map(coef_explanations)
-                    st.write("Training Output:", model.coef_df)
-                    # Keep only the Intercept, target, and parameters in model.coef_df in data
-                    columns_to_keep = [target] + [param for param in model.coef_df['Parameter'].tolist() if param in data.columns]
-                    data = data[columns_to_keep]
-                    data = data.head(200)
-                    if categorical_interpretations is not None:
-                        return (data, model.coef_df, categorical_interpretations, target)
-                    else:
-                        return (data, model.coef_df)
+            categorical_interpretations=None
+            has_categorical = st.radio("Does your data have categorical features?", ("Yes", "No"))
+            if has_categorical == "Yes":
+                st.write("Upload a JSON file detailing the interpretations of the categorical data.")
+                json_file = st.file_uploader("Choose a JSON file", type="json", key="category_json_file")
+                if json_file is not None:
+                    categorical_interpretations = json.load(json_file)
+                    # st.write("Categorical Interpretations:", categorical_interpretations)
+            # either they've said they don't have any categorical features or they've uploaded the interpretations 
+            if has_categorical == "No" or categorical_interpretations is not None:
+                # is there is a pre-trained model, upload the weights
+                if not train:
+                    st.write("Upload a CSV file of the weights (coefficients) found in your model")
+                    weights_file = st.file_uploader("Choose a CSV file", type="csv", key="weight_file")
+                    if weights_file is not None:
+                        weights_data = pd.read_csv(weights_file)
+                        parameter_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
+                        weights_data['Explanation'] = weights_data['Parameter'].map(parameter_explanations)
+                        st.write("Feature Explanation:", weights_data)
+                        target= list(set(data.columns) - set(weights_data['Parameter']))[0]
+                        if categorical_interpretations is not None:
+                            return (data, weights_data, target, categorical_interpretations)
+                        else:
+                            return (data, weights_data, target)
+                # if training a new model, ask for target column and features 
+                else:
+                        st.write("Choose target column")
+                        target = st.radio("Target column", data.columns)
+                        features = [col for col in data.columns if col != target]
+                        # model=TrainModel(data, target, features)
+                        try:
+                            model=TrainModel(data, target, features)
+                        except Exception as e:
+                            st.error(f"An error occurred while training the model: {e} Pick a traget column that is binary.")
+                            return
+                        # model.selectFeatures()
+                        # merge explantions with coef_df on matching feature names
+                        coef_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
+                        model.coef_df['Explanation'] = model.coef_df['Parameter'].map(coef_explanations)
+                        st.write("Training Output:", model.coef_df)
+                        # Keep only the Intercept, target, and parameters in model.coef_df in data
+                        columns_to_keep = [target] + [param for param in model.coef_df['Parameter'].tolist() if param in data.columns]
+                        data = data[columns_to_keep]
+                        data = data.head(200)
+                        if categorical_interpretations is not None:
+                            return (data, model.coef_df, target,categorical_interpretations)
+                        else:
+                            return (data, model.coef_df, target)
     
 def setup_chat(data, model_features, categorical_interpretations=None, target=None):
     model=Model()
@@ -128,7 +135,7 @@ def setup_chat(data, model_features, categorical_interpretations=None, target=No
         visual.add_individual(individual, len(model.df), metrics=metrics)
 
         # Now call the description class to get the summary of the player
-        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, categorical_interpretations= categorical_interpretations , thresholds = [10, 5, 2, -2,-5,-10])
+        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, categorical_interpretations= categorical_interpretations , thresholds = [10, 5, 2, -2,-5,-10], target=target)
         summary = description.stream_gpt()
 
         # Add the visual and summary to the chat
@@ -156,14 +163,14 @@ if model_option == "Train a new model":
     # trainModel()
     result = setup_model(train=True)
     if result is not None:
-        data, model_features, categorical_interpretations, target = result
-        setup_chat(data, model_features, categorical_interpretations, target)
+        data, model_features, target, categorical_interpretations = result
+        setup_chat(data=data, model_features=model_features, categorical_interpretations=categorical_interpretations,target= target)
     
 else:
     result = setup_model(train=False)
     if result is not None:
-        data, model_features = result
-        setup_chat(data, model_features)
+        data, model_features, target, categorical_interpretations= result
+        setup_chat(data=data, target=target, model_features=model_features, categorical_interpretations=categorical_interpretations)
     # data, model_features= setup_model(train=False)
     # setup_chat(data, model_features)
 
