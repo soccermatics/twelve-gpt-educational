@@ -705,11 +705,8 @@ class Model(Data):
 
         #Reindexing dataframe
         self.df.reset_index(drop=True, inplace=True)
-        self.df=self.df.drop(columns=columns)
+        self.df = self.df.drop(columns=[col for col in columns if col in self.df.columns])
         
-
-
         # Convert to series
         ser_metrics = self.df.squeeze()
-
         return self.data_point_class(id=id,ser_metrics=ser_metrics)

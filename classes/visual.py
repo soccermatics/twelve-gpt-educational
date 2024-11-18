@@ -251,7 +251,7 @@ class DistributionPlot(Visual):
             temp_hover_string = hover_string
 
             # metric_name = format_metric(col)
-            if self.model_features:
+            if self.model_features is not None:
                 metric_name = lookup_metric(col, self.model_features)
             else:
                 metric_name = format_metric(col)

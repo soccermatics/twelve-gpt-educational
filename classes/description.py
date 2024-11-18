@@ -687,12 +687,13 @@ class IndividualDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/Anuerysm.xlsx"]
 
-    def __init__(self, individual: Individual,metrics,parameter_explanation, categorical_interpretations , thresholds):
+    def __init__(self, individual: Individual,metrics,parameter_explanation, categorical_interpretations , thresholds, target):
         self.metrics = metrics
         self.individual = individual
         self.parameter_explanation = parameter_explanation
         self.categorical_interpretations = categorical_interpretations
         self.thresholds = thresholds
+        self.target = target
         super().__init__()
 
 
@@ -738,15 +739,15 @@ class IndividualDescription(Description):
         # subject_p, object_p, possessive_p = sentences.pronouns(gender)
         
         for metric in metrics:
-            if metric in self.categorical_interpretations:
+            if self.categorical_interpretations and metric in self.categorical_interpretations:
                 # if categorical interpretation is available, look up the value in the interpretation dictionary
                 value = self.categorical_interpretations[metric].get(str(int(individual.ser_metrics[metric])), individual.ser_metrics[metric])
                 description+= f" {value} "
             else:
                 # if no interpretation is available, just use the value
-                description+= sentences.article(self.parameter_explanation[metric].lower()) + f" {self.parameter_explanation[metric].lower()} of {individual.ser_metrics[metric]} "
+                description+= sentences.article(self.parameter_explanation[metric].lower()) + f" {self.parameter_explanation[metric].lower()} of {sentences.format_numbers(individual.ser_metrics[metric])} "
             description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"], thresholds=self.thresholds)
-            description += " of developing cardio vascular issues compared to other patients that come into the clinic. "
+            description += f" of developing {self.target} issues compared to other patients that come into the clinic. "
             
 
         st.write(description)

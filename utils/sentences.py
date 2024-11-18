@@ -62,3 +62,10 @@ def write_out_metric(metric):
 def describe_contributions(value,  thresholds = [10, 5, 2, -2,-5,-10], words = ["implies a seriously increased risk", "implies an increased risk", "implies a small increase in risk", "does not significantly effect the risk", "implies slightly smaller risk", "implies a decreased risk", "implies a greatly decreased risk"]):
 
     return describe(thresholds, words, value)
+
+def format_numbers(value):
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    else:
+        return round(value, 2)
+    
