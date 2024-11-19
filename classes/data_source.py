@@ -393,6 +393,9 @@ class CountryStats(Stats):
 
 
 class Shots(Data):
+
+    data_point_class = data_point.Individual
+
     def __init__(self, match_id):
         self.df_shots = self.get_processed_data(match_id)  # Process the raw data directly
         self.xG_Model = self.load_model()  # Load the model once
@@ -710,6 +713,16 @@ class Shots(Data):
         st.write(model.summary())   
         #predictions = model.predict(df_shots)
         return model
+    
+
+    def to_data_point(self) -> data_point.Individual:
+        
+        id = self.df_shots['id'].iloc[0]
+        self.df_shots.reset_index(drop=True, inplace=True)
+        self.df_shots=self.df_shots.drop(columns=["id","xG"])
+        ser_metrics = self.df_shots.squeeze()
+
+        return self.data_point_class(id=id,ser_metrics=ser_metrics)
 
         
 

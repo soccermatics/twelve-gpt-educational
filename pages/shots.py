@@ -37,7 +37,7 @@ from utils.utils import normalize_text
 #from classes.data_source import PlayerStats
 #from classes.data_point import Player
 from classes.data_source import Shots
-from classes.visual import ShotVisual
+from classes.visual import ShotVisual, DistributionPlot, ShotContributionPlot
 from classes.chat import Chat
 from classes.description import ShotDescription
 
@@ -73,6 +73,19 @@ shots = Shots(selected_match_id)
 shots_df= shots.df_shots
 df_contributions = shots.df_contributions
 
+#df_contributions.rename(columns={'distance from touchline_contribution': 'distance from touchline', 'distance to goal_contribution': 'distance to goal'}, inplace=True)
+st.write(shots_df)
+st.write(df_contributions)
+
+
+excluded_columns = ['xG', 'id', 'match_id']
+metrics = [col for col in df_contributions.columns if col not in excluded_columns]
+
+
+
+
+#plotter = ShotContributionPlot(df_contributions=df_contributions, metrics=metrics)
+#plotter.plot_shot_contributions()
 # Filter data based on selected match
 #shots.filter_by_match(selected_match_id)
 
@@ -80,12 +93,18 @@ df_contributions = shots.df_contributions
 # Create a dropdown to select a shot ID from the available shot IDs in shots.df_shots['id']
 shot_id = st.sidebar.selectbox("Select Shot ID", shots_df['id'].unique())
 st.markdown("#### Selected Shot Data")
-st.write(shots_df[shots_df['id']== shot_id]) 
+shot = shots_df[shots_df['id']== shot_id]
+st.write(shot) 
 st.markdown("#### Feature Contributions")
 st.write(df_contributions[df_contributions['id']== shot_id])
 
 visuals = ShotVisual(metric=None)
 visuals.add_shot(shots, shot_id)
+visuals2= ShotContributionPlot(df_contributions=df_contributions, metrics=metrics)
+visuals2.add_individuals(shots_df, metrics)
+visuals2.add_individual(contribution_df=df_contributions, shot_id=shot_id, metrics=metrics)
+
+
 descriptions = ShotDescription(shots, shot_id)
 with st.expander("Messages"):
     st.write(descriptions.messages)
@@ -95,6 +114,7 @@ summaries = descriptions.stream_gpt()
 chat = create_chat(tuple(shots_df['id'].unique()), Chat)
 
 chat.add_message(visuals)
+chat.add_message(visuals2)
 if summaries:
     chat.add_message(summaries)
 

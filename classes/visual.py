@@ -371,6 +371,71 @@ class DistributionPlot(Visual):
 
         self.add_title(title, subtitle)
 
+class ShotContributionPlot(DistributionPlot):
+    def __init__(self, df_contributions, metrics, **kwargs):
+        """
+        Parameters:
+        - df_contributions: DataFrame of contributions (rows: shots, columns: contributions).
+        - metrics: List of metrics (columns in df_contributions) to plot.
+        """
+        self.df_contributions = df_contributions
+        self.metrics = metrics
+
+        # Validate inputs
+        for metric in metrics:
+            if metric not in df_contributions.columns:
+                raise ValueError(f"Metric '{metric}' is not a column in df_contributions.")
+
+        super().__init__(columns=metrics, **kwargs)
+
+    def _setup_axes(self):
+        """Set up axes for the distribution plot."""
+        self.fig.update_yaxes(
+            tickmode="array",
+            tickvals=list(range(len(self.columns))),  # One tick per feature
+            ticktext=[format_metric(col) for col in self.columns],  # Use formatted metric names
+            title="Features",
+            showgrid=False,
+        )
+
+        self.fig.update_xaxes(
+            title="Contribution Value",
+            showgrid=False,
+        )
+
+    def add_individual(self, contribution_df, shot_id, metrics):
+        """
+        Add a single individual's contributions to the plot.
+        """
+        filtered_df = contribution_df[contribution_df["id"] == shot_id]
+        if filtered_df.empty:
+            raise ValueError(f"Shot ID {shot_id} not found in the contribution DataFrame.")
+        if len(filtered_df) > 1:
+            raise ValueError(f"Multiple rows found for Shot ID {shot_id}. Ensure IDs are unique.")
+        contributions = filtered_df.iloc[0][metrics]
+        
+
+        self.add_data_point(
+            ser_plot=contributions,  # This should now be a Series with contributions for the metrics
+            plots="",
+            name=str(shot_id),  # Use the shot ID as the label
+            hover="",
+            hover_string="Value: %{customdata:.2f}",
+        )
+
+    def add_individuals(self, df_shots, metrics):
+        """
+        Add contributions for all shots to the plot.
+        """
+        self.add_group_data(
+            df_plot=self.df_contributions,
+            plots="",  # Use the original column names
+            names=df_shots["id"].astype(str),  # Shot IDs for hover text
+            hover="",
+            hover_string="Value: %{customdata:.2f}",
+            legend="All Shots",
+        )
+
 
 
 
