@@ -383,10 +383,6 @@ class ShotDescription(Description):
         return shot_description 
 
     def get_prompt_messages(self):
-        # Generate synthesized text first
-        shot_description = self.synthesize_text()
-
-        # Include the synthesized shot description in the message to be sent to the language model
         prompt = (
             f"Explain the goal probability of this shot based on its features, highlighting the contributions of the most important features you have been given to the xG value."
             "Provide a detailed analysis of this shot's goal probability. Highlight each feature's contribution and explain why it increases or decreases the chance of scoring."

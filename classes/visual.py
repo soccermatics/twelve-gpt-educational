@@ -75,7 +75,7 @@ class Visual:
 
         if plot_type == "scout":
             self.annotation_text = (
-                "<span style=''>{metric_name}: {data:.2f} per 90</span>"
+                "<span style=''>{metric_name}: {data:.2f}</span>"
             )
         else:
             self.annotation_text = "<span style=''>{metric_name}: {data:.2f}</span>"
