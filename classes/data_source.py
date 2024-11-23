@@ -560,8 +560,9 @@ class Shots(Data):
             test_shot_id = test_shot["id"]
             #check goalkeeper position
             gk_pos = track_df.loc[track_df["id"] == test_shot_id].loc[track_df["teammate"] == False].loc[track_df["position_name"] == "Goalkeeper"][["x", "y"]]
-            angle = np.degrees(np.arctan2(gk_pos["y"] - test_shot["y"], gk_pos["x"] - test_shot["x"]))
-            angle = angle % 360
+            if gk_pos.empty:
+                return np.nan
+            angle = -np.degrees(np.arctan2(gk_pos["y"] - test_shot["y"], gk_pos["x"] - test_shot["x"]))
             return angle.iloc[0]
 
 
@@ -613,11 +614,13 @@ class Shots(Data):
             return {**teammate_coords, **opponent_coords}
         
         model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y"]].copy()
+        
         model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars["left_foot"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Left Foot" else 0)
         model_vars["throw in"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Throw In" else 0)
         model_vars["corner"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Corner" else 0)
-        model_vars["free_kich"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Free Kick" else 0)
+        model_vars["regular_play"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "Regular Play" else 0)
+        model_vars["free_kick"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Free Kick" else 0)
         model_vars["goal"] = test_shot.outcome_name.apply(lambda cell: 1 if cell == "Goal" else 0)
 
         # Add necessary features and correct transformations
@@ -663,51 +666,84 @@ class Shots(Data):
         #model_vars.rename(columns={'const': 'Intercept'}, inplace=True)  # Rename 'const' to 'Intercept'
 
         # model_vars.dropna(inplace=True)
+        variable_names = {
+                        #'x': 'horizontal_distance_to_goal',
+                        'c': 'vertical_distance_to_center',
+                        'distance to goal': 'euclidean_distance_to_goal',
+                        'close_players': 'nearby_opponents_in_3_meters',
+                        'triangle zone': 'opponents_in_triangle',
+                        'gk distance to goal': 'goalkeeper_distance_to_goal',
+                        'header': 'header',
+                        'distance to nearest opponent': 'distance_to_nearest_opponent',
+                        'angle_to_gk': 'angle_to_goalkeeper',
+                        'left_foot': 'shot_with_left_foot',
+                        'throw in': 'shot_after_throw_in',
+                        'corner': 'shot_after_corner',
+                        'free_kick': 'shot_after_free_kick',
+                        'regular_play': 'shot_during_regular_play'
+                    }
+        model_vars = model_vars.rename(columns=variable_names)
+
 
         return model_vars
     
 
     def read_model_params(self):
-        parameters = pd.read_excel("data/model_params.xlsx")
+        parameters = pd.read_excel("data/model_params1.xlsx")
         return parameters
 
 
     def weight_contributions(self):
-        
-        df_shots = self.df_shots
+        df_shots = self.df_shots  # Work with a copy to avoid altering the original dataframe
         parameters = self.parameters
         self.intercept = parameters[parameters['Parameter'] == 'Intercept']['Value'].values[0]
-        # Drop intercept
+        
+        # Exclude intercept from parameter calculations
         self.parameters = parameters[parameters['Parameter'] != 'Intercept']
 
-        for i,row in self.parameters.iterrows():
-            df_shots[row['Parameter']+'_contribution'] = df_shots[row['Parameter']] * row['Value']
-            #Remove the mean
-            df_shots[row['Parameter']+'_contribution'] = df_shots[row['Parameter']+'_contribution'] - df_shots[row['Parameter']+'_contribution'].mean()
-        
-        df_contribution = df_shots[['id'] + ['match_id'] + [col for col in df_shots.columns if 'contribution' in col]]
+        # Calculate contributions for all shots (mean-centering requires all data)
+        for _, row in self.parameters.iterrows():
+            param_name = row['Parameter']
+            param_value = row['Value']
+            contribution_col = f"{param_name}_contribution"
 
-        # Calculate linear combination directly from original feature values and their coefficients
-        linear_combination = self.intercept + sum(
-            df_shots[param['Parameter']] * param['Value']
-            for _, param in self.parameters.iterrows()
-        )
-        
-        # Apply logistic function to get xG values
-        df_contribution['xG'] = 1 / (1 + np.exp(-linear_combination))
-        df_shots['xG'] = 1 / (1 + np.exp(-linear_combination))
+            # Calculate the contribution
+            df_shots[contribution_col] = df_shots[param_name] * param_value
 
-        #self.parameter_explanation = parameters.set_index('Parameter')['Explanation'].to_dict()
-        #st.write(self.parameter_explanation)
+            # Mean-center the contributions
+            df_shots[contribution_col] -= df_shots[contribution_col].mean()
+
+        # Prepare contributions dataframe
+        df_contribution = df_shots[['id', 'match_id'] + [col for col in df_shots.columns if 'contribution' in col]]
+
+        # Calculate xG for each shot individually
+        xG_values = []
+        for _, shot in df_shots.iterrows():
+            linear_combination = self.intercept
+
+            # Add contributions from all parameters for this shot
+            for _, param in self.parameters.iterrows():
+                param_name = param['Parameter']
+                param_value = param['Value']
+                linear_combination += shot[param_name] * param_value
+            # Apply logistic function to calculate xG
+            xG = 1 / (1 + np.exp(-linear_combination))
+            xG_values.append(xG)
+
+        # Add xG values to df_shots and df_contribution
+        df_shots['xG'] = xG_values
+        df_contribution['xG'] = xG_values
 
         return df_contribution
+    
+
 
 
     @staticmethod
     def load_model():
 
         # Load model from data/...
-        saved_model_path = "data/xG_model.sav"
+        saved_model_path = "data/xG_model1.sav"
         model = load(saved_model_path)
         st.markdown("### Model Summary")
         st.write(model.summary())   

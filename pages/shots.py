@@ -9,6 +9,7 @@ import sys
 from mplsoccer import Sbopen
 import pandas as pd
 import numpy as np
+import json
 import warnings
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
@@ -67,36 +68,60 @@ parser = Sbopen()
 df_match = parser.match(competition_id=55, season_id=282)
 match_ids = df_match['match_id'].unique()
 st.sidebar.markdown("### Match Selection")
-selected_match_id = st.sidebar.selectbox("Select Match ID", match_ids)
+
+with open('data/match_id_to_name.json', 'r') as f:
+    id_to_match_name = json.load(f)
+
+selected_match_name = st.sidebar.selectbox(
+    "Select a Match", 
+    options=id_to_match_name.values())
+
+match_name_to_id = {v: k for k, v in id_to_match_name.items()}
+selected_match_id = match_name_to_id[selected_match_name]
 
 shots = Shots(selected_match_id)
 shots_df= shots.df_shots
 df_contributions = shots.df_contributions
-
+st.write(shots_df)  
+st.write(df_contributions)  
 
 excluded_columns = ['xG', 'id', 'match_id']
 metrics = [col for col in df_contributions.columns if col not in excluded_columns]
 
 # Create a dropdown to select a shot ID from the available shot IDs in shots.df_shots['id']
-shot_id = st.sidebar.selectbox("Select Shot ID", shots_df['id'].unique())
+
+id_to_number = {shot_id: idx + 1 for idx, shot_id in enumerate(shots_df['id'])}
+number_to_id = {v: k for k, v in id_to_number.items()}
+
+
+selected_number= st.sidebar.selectbox("Select a Shot:",
+    options=list(number_to_id.keys()),  
+    format_func=lambda x: f"Shot #{x}")
+
+shot_id = number_to_id[selected_number]
+
 st.markdown("#### Selected Shot Data")
 shot = shots_df[shots_df['id']== shot_id]
 st.write(shot) 
 st.markdown("#### Feature Contributions")
 st.write(df_contributions[df_contributions['id']== shot_id])
 
+to_hash = (selected_match_id, shot_id)
+
+
 visuals = ShotVisual(metric=None)
 visuals.add_shot(shots, shot_id)
-visuals2= ShotContributionPlot(df_contributions=df_contributions, metrics=metrics)
-visuals2.add_individuals(shots_df, metrics)
-visuals2.add_individual(contribution_df=df_contributions, shot_id=shot_id, metrics=metrics)
+visuals2= ShotContributionPlot(df_contributions=df_contributions, df_shots= shots_df, metrics=metrics)
+visuals2.add_shots(shots_df, metrics)
+visuals2.add_shot(contribution_df=df_contributions, shots_df= shots_df, shot_id=shot_id, metrics=metrics, id_to_number= id_to_number)
 
 
 descriptions = ShotDescription(shots, shot_id)
 
 summaries = descriptions.stream_gpt()
+chat = create_chat(to_hash, Chat)
 
-chat = create_chat(tuple(shots_df['id'].unique()), Chat)
+#chat = create_chat(tuple(shots_df['id'].unique()), Chat)
 
 chat.add_message(visuals2)
 chat.add_message(visuals)

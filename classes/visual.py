@@ -160,9 +160,11 @@ class Visual:
 
 
 class DistributionPlot(Visual):
-    def __init__(self, columns, labels=None, *args, **kwargs):
+    def __init__(self, columns, labels=None, annotate=True, row_distance=1., *args, **kwargs):
         self.empty = True
         self.columns = columns
+        self.annotate = annotate
+        self.row_distance = row_distance
         self.marker_color = (
             c for c in [Visual.white, Visual.bright_yellow, Visual.bright_blue]
         )
@@ -173,7 +175,7 @@ class DistributionPlot(Visual):
         else:
             self._setup_axes()
 
-    def _setup_axes(self, labels=["Worse", "Average", "Better"]):
+    def _setup_axes(self, labels=["More Negative Contribution to xG", "Average Contribution to xG", "More Positive Contribution to xG"]):
         self.fig.update_xaxes(
             range=[-4, 4],
             fixedrange=True,
@@ -233,10 +235,12 @@ class DistributionPlot(Visual):
 
             metric_name = format_metric(col)
 
+            y_pos = i * self.row_distance
+
             self.fig.add_trace(
                 go.Scatter(
                     x=[ser_plot[col + plots]],
-                    y=[i],
+                    y=[y_pos],
                     mode="markers",
                     marker={
                         "color": rgb_to_color(color, opacity=0.5),
@@ -254,19 +258,22 @@ class DistributionPlot(Visual):
             )
             legend = False
 
-            self.fig.add_annotation(
-                x=0,
-                y=i + 0.4,
-                text=self.annotation_text.format(
-                    metric_name=metric_name, data=ser_plot[col]
-                ),
-                showarrow=False,
-                font={
-                    "color": rgb_to_color(self.white),
-                    "family": "Gilroy-Light",
-                    "size": 12 * self.font_size_multiplier,
-                },
-            )
+            # Add annotations only if the flag is enabled
+            if self.annotate:
+
+                self.fig.add_annotation(
+                    x=0,
+                    y= y_pos + 0.4,
+                    text=self.annotation_text.format(
+                        metric_name=metric_name, data=ser_plot[col]
+                    ),
+                    showarrow=False,
+                    font={
+                        "color": rgb_to_color(self.white),
+                        "family": "Gilroy-Light",
+                        "size": 12 * self.font_size_multiplier,
+                    },
+                )
 
     # def add_player(self, player: Player, n_group,metrics):
 
@@ -371,7 +378,7 @@ class DistributionPlot(Visual):
 
         self.add_title(title, subtitle)
 
-class ShotContributionPlot(DistributionPlot):
+class ShotContributionPlot1(DistributionPlot):
     def __init__(self, df_contributions, metrics, **kwargs):
         """
         Parameters:
@@ -399,11 +406,12 @@ class ShotContributionPlot(DistributionPlot):
         )
 
         self.fig.update_xaxes(
-            title="Contribution Value",
+            #title="Contribution Value",
+            title="",
             showgrid=False,
         )
 
-    def add_individual(self, contribution_df, shot_id, metrics):
+    def add_shot(self, contribution_df, shot_id, metrics , id_to_number):
         """
         Add a single individual's contributions to the plot.
         """
@@ -418,12 +426,12 @@ class ShotContributionPlot(DistributionPlot):
         self.add_data_point(
             ser_plot=contributions,  # This should now be a Series with contributions for the metrics
             plots="",
-            name=str(shot_id),  # Use the shot ID as the label
+            name=f"Shot #{id_to_number[shot_id]}",  # Use the shot ID as the label
             hover="",
             hover_string="Value: %{customdata:.2f}",
         )
 
-    def add_individuals(self, df_shots, metrics):
+    def add_shots(self, df_shots, metrics):
         """
         Add contributions for all shots to the plot.
         """
@@ -437,6 +445,111 @@ class ShotContributionPlot(DistributionPlot):
         )
 
 
+class ShotContributionPlot(DistributionPlot):
+    def __init__(self, df_contributions, df_shots, metrics, **kwargs):
+        """
+        Parameters:
+        - df_contributions: DataFrame of contributions (rows: shots, columns: contributions).
+        - metrics: List of metrics (columns in df_contributions) to plot.
+        """
+        self.df_contributions = df_contributions
+        self.df_shots = df_shots
+        self.metrics = metrics
+
+        # Validate inputs
+        for metric in metrics:
+            if metric not in df_contributions.columns:
+                raise ValueError(f"Metric '{metric}' is not a column in df_contributions.")
+
+        super().__init__(columns=metrics, annotate=False, **kwargs)
+
+    
+
+    def add_shot(self, contribution_df, shots_df, shot_id, metrics, id_to_number):
+        """
+        Add a single shot's contributions and annotate with feature names and values.
+
+        Parameters:
+        - contribution_df: DataFrame with contributions for all shots.
+        - shots_df: DataFrame with feature values for all shots.
+        - shot_id: ID of the selected shot to visualize.
+        - metrics: List of metrics to plot.
+        - id_to_number: Dictionary mapping shot IDs to shot numbers.
+        """
+        # Filter contributions and features for the selected shot
+        filtered_contrib = contribution_df[contribution_df["id"] == shot_id]
+        filtered_shot = shots_df[shots_df["id"] == shot_id]
+
+        if filtered_contrib.empty or filtered_shot.empty:
+            raise ValueError(f"Shot ID {shot_id} not found in the provided DataFrames.")
+        if len(filtered_contrib) > 1 or len(filtered_shot) > 1:
+            raise ValueError(f"Multiple rows found for Shot ID {shot_id}. Ensure IDs are unique.")
+
+        contributions = filtered_contrib.iloc[0][metrics]
+        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
+        feature_values = filtered_shot.iloc[0][feature_columns]
+
+        # Add contributions to the plot
+        self.add_data_point(
+            ser_plot=contributions,
+            plots="",
+            name=f"Shot #{id_to_number[shot_id]}",
+            hover="",
+            hover_string="",
+        )
+
+
+
+        binary_features = [
+                            "shot_during_regular_play", 
+                            "shot_with_left_foot", 
+                            "shot_after_throw_in", 
+                            "shot_after_corner", 
+                            "shot_after_free_kick",
+                            "header"
+                        ]
+        # Annotate with feature names and values
+        for i, (metric, feature_column) in enumerate(zip(metrics, feature_columns)):
+            feature_value = feature_values[feature_column]  # Use feature_column to avoid KeyError
+            # Check if feature value is binary (0 or 1) and modify annotation accordingly
+            if feature_column in binary_features:
+                if feature_value == 0:
+                    feature_text = "No"
+                elif feature_value == 1:
+                    feature_text = "Yes"
+                else:
+                    feature_text = f"{feature_value:.2f}"
+            else:
+                feature_text = f"{feature_value:.2f}"  
+
+
+
+            self.fig.add_annotation(
+                x=contributions[metric],
+                y=i*1. + 0.5,
+                xanchor="center",
+                text=f"{format_metric(feature_column)}: {feature_text}",
+                showarrow=False,
+                font={
+                        "color": rgb_to_color(self.white),
+                        "family": "Gilroy-Light",
+                        "size": 12 * self.font_size_multiplier,
+                    },
+                align="center",
+            )
+
+    def add_shots(self, df_shots, metrics):
+
+        
+            
+        self.add_group_data(
+            df_plot=self.df_contributions,
+            plots="",  # Use the original column names
+            names=df_shots["id"].astype(str),  # Shot IDs for hover text
+            hover="",
+            hover_string="",  # No hover text
+            legend="All Shots",
+        )
 
 
 

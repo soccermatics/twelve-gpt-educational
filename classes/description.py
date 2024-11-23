@@ -362,10 +362,10 @@ class ShotDescription(Description):
         # Map goal boolean to readable category
         labels = {False: 'No Goal', True: 'Goal'}
         goal_status_text = labels[goal_status]
-        angle_to_goal = shot_data['angle_to_goal'].iloc[0]
-        distance_to_goal = shot_data['distance to goal'].iloc[0]
-        distance_to_nearest_opponent = shot_data['distance to nearest opponent'].iloc[0]
-        gk_dist_to_goal = shot_data['gk distance to goal'].iloc[0]
+        #angle_to_goal = shot_data['angle_to_goal'].iloc[0]
+        distance_to_goal = shot_data['euclidean_distance_to_goal'].iloc[0]
+        distance_to_nearest_opponent = shot_data['distance_to_nearest_opponent'].iloc[0]
+        gk_dist_to_goal = shot_data['goalkeeper_distance_to_goal'].iloc[0]
 
         # Give a detailed description of the contributions to the shot
         shot_contributions = self.shots.df_contributions[self.shots.df_contributions['id'] == self.shot_id]

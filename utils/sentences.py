@@ -53,21 +53,27 @@ def write_out_metric(metric):
     return metric.replace("_"," ").replace("adjusted","adjusted for possession").replace("per90","per 90").replace("npxG","non-penalty expected goals") + " minutes"
 
 feature_name_mapping = {
-    'distance to goal_contribution': 'distance to goal',
-    'distance from touchline_contribution': 'distance from touchline',
-    'triangle zone_contribution': 'number of opponents in triangle fromed by the shot point and goal posts',
-    'distance to nearest opponent_contribution': 'distance to the nearest opponent',
+    'vertical_distance_to_center_contribution': 'vertical distance to center',
+    'euclidean_distance_to_goal_contribution': 'euclidean distance to goal',
+    'nearby_opponents_in_3_meters_contribution': 'nearby opponents within 3 meters',
+    'opponents_in_triangle_contribution': 'number of opponents in triangle formed by shot location and goalposts',
+    'goalkeeper_distance_to_goal_contribution': 'distance to goal of the goalkeeper',
     'header_contribution': 'header',
-    'angle to gk and opponent_contribution': 'angle to the goal, goal keeper, and the nearest opponent',
-    'throw in_contribution': 'throw-in',
-    'gk distance to goal_contribution': 'goal keeper distance to goal',
+    'distance_to_nearest_opponent_contribution': 'distance to nearest opponent',
+    'angle_to_goalkeeper_contribution': 'angle to goalkeepr',
+    'shot_with_left_foot_contribution': 'shot taken with left foot',
+    'shot_after_throw_in_contribution': 'shot after throw in',
+    'shot_after_corner_contribution': 'shot after corner',
+    'shot_after_free_kick_contribution': 'shot after free kick',
+    'shot_during_regular_play_contribution': 'shot during regular play'
+
 }
 
 
 
 
 def describe_shot_contributions(shot_contributions, feature_name_mapping=feature_name_mapping, thresholds=None):
-    text = "The contributions of the features to the xG of the shot sorted by their magnitude from largest to smallest are as follows:\n"
+    text = "The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:\n"
 
     # Default thresholds if none are provided
     thresholds = thresholds or {
@@ -86,7 +92,11 @@ def describe_shot_contributions(shot_contributions, feature_name_mapping=feature
             valid_contributions[feature] = contribution
 
     # Convert to Series and sort by absolute values in descending order
-    sorted_contributions = pd.Series(valid_contributions).apply(lambda x: abs(x)).sort_values(ascending=False)
+    sorted_contributions = (
+        pd.Series(valid_contributions)
+        .apply(lambda x: abs(x))
+        .sort_values(ascending=False)
+    )
 
     # Loop through the sorted contributions and categorize them based on thresholds
     for feature, contribution in sorted_contributions.items():
@@ -94,8 +104,8 @@ def describe_shot_contributions(shot_contributions, feature_name_mapping=feature
         original_contribution = valid_contributions[feature]
 
         # Use the feature_name_mapping dictionary to get the display name for the feature
-        feature_display_name = feature_name_mapping.get(feature, feature) if feature_name_mapping else feature
-        
+        feature_display_name = feature_name_mapping.get(feature, feature)
+
         # Determine the contribution level
         if abs(contribution) > thresholds['very_large']:
             level = 'very large'
