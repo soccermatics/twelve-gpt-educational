@@ -416,6 +416,8 @@ class Shots(Data):
         shots = df_event.loc[df_event["type_name"] == "Shot"]
         shots.x = shots.x.apply(lambda cell: cell*105/120)
         shots.y = shots.y.apply(lambda cell: cell*68/80)
+        shots.end_x = shots.x.apply(lambda cell: cell*105/120)
+        shots.end_y = shots.y.apply(lambda cell: cell*68/80)
         df_track.x = df_track.x.apply(lambda cell: cell*105/120)
         df_track.y = df_track.y.apply(lambda cell: cell*68/80)
             #append event and trackings to a dataframe
@@ -613,7 +615,7 @@ class Shots(Data):
             # Combine both dictionaries into a single row dictionary
             return {**teammate_coords, **opponent_coords}
         
-        model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y"]].copy()
+        model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y", "end_x", "end_y"]].copy()
         
         model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars["left_foot"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Left Foot" else 0)
@@ -629,6 +631,7 @@ class Shots(Data):
         model_vars['start_y'] = model_vars.y
         model_vars["x"] = model_vars.x.apply(lambda cell: 105 - cell)  # Adjust x for goal location
         model_vars["c"] = model_vars.y.apply(lambda cell: abs(34 - cell))
+        model_vars["end_x"] = model_vars.end_x.apply(lambda cell: 105 - cell)
 
         # Calculate angle and distance
         model_vars["angle_to_goal"] = np.where(np.arctan(7.32 * model_vars["x"] / (model_vars["x"]**2 + model_vars["c"]**2 - (7.32/2)**2)) >= 0,

@@ -82,8 +82,8 @@ selected_match_id = match_name_to_id[selected_match_name]
 shots = Shots(selected_match_id)
 shots_df= shots.df_shots
 df_contributions = shots.df_contributions
-st.write(shots_df)  
-st.write(df_contributions)  
+#st.write(shots_df)  
+#st.write(df_contributions)  
 
 excluded_columns = ['xG', 'id', 'match_id']
 metrics = [col for col in df_contributions.columns if col not in excluded_columns]
@@ -112,7 +112,7 @@ to_hash = (selected_match_id, shot_id)
 visuals = ShotVisual(metric=None)
 visuals.add_shot(shots, shot_id)
 visuals2= ShotContributionPlot(df_contributions=df_contributions, df_shots= shots_df, metrics=metrics)
-visuals2.add_shots(shots_df, metrics)
+visuals2.add_shots(shots_df, metrics, id_to_number= id_to_number)
 visuals2.add_shot(contribution_df=df_contributions, shots_df= shots_df, shot_id=shot_id, metrics=metrics, id_to_number= id_to_number)
 
 

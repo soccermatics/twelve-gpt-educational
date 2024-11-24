@@ -467,14 +467,7 @@ class ShotContributionPlot(DistributionPlot):
 
     def add_shot(self, contribution_df, shots_df, shot_id, metrics, id_to_number):
         """
-        Add a single shot's contributions and annotate with feature names and values.
-
-        Parameters:
-        - contribution_df: DataFrame with contributions for all shots.
-        - shots_df: DataFrame with feature values for all shots.
-        - shot_id: ID of the selected shot to visualize.
-        - metrics: List of metrics to plot.
-        - id_to_number: Dictionary mapping shot IDs to shot numbers.
+        Add a single shot to the plot with hover text displaying all feature values.
         """
         # Filter contributions and features for the selected shot
         filtered_contrib = contribution_df[contribution_df["id"] == shot_id]
@@ -489,67 +482,106 @@ class ShotContributionPlot(DistributionPlot):
         feature_columns = [metric.replace("_contribution", "") for metric in metrics]
         feature_values = filtered_shot.iloc[0][feature_columns]
 
+        # Generate hover text
+        hover_text = [f"Shot ID: {shot_id}"]
+        binary_features = [
+            "shot_during_regular_play",
+            "shot_with_left_foot",
+            "shot_after_throw_in",
+            "shot_after_corner",
+            "shot_after_free_kick",
+            "header",
+        ]
+        for feature_column in feature_columns:
+            feature_value = feature_values[feature_column]  # Use feature_column to avoid KeyError
+            # Check if feature value is binary (0 or 1) and modify hover text accordingly
+            if feature_column in binary_features:
+                feature_text = "Yes" if feature_value == 1 else "No" if feature_value == 0 else f"{feature_value:.2f}"
+            else:
+                feature_text = f"{feature_value:.2f}"
+            hover_text.append(f"{format_metric(feature_column)}: {feature_text}")
+
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
             name=f"Shot #{id_to_number[shot_id]}",
-            hover="",
-            hover_string="",
+            hover="",  # Not using an additional column for hover values
+            hover_string="<br>".join(hover_text),  # Combine hover text into a single string
         )
 
-
-
-        binary_features = [
-                            "shot_during_regular_play", 
-                            "shot_with_left_foot", 
-                            "shot_after_throw_in", 
-                            "shot_after_corner", 
-                            "shot_after_free_kick",
-                            "header"
-                        ]
         # Annotate with feature names and values
         for i, (metric, feature_column) in enumerate(zip(metrics, feature_columns)):
             feature_value = feature_values[feature_column]  # Use feature_column to avoid KeyError
             # Check if feature value is binary (0 or 1) and modify annotation accordingly
             if feature_column in binary_features:
-                if feature_value == 0:
-                    feature_text = "No"
-                elif feature_value == 1:
-                    feature_text = "Yes"
-                else:
-                    feature_text = f"{feature_value:.2f}"
+                feature_text = "Yes" if feature_value == 1 else "No" if feature_value == 0 else f"{feature_value:.2f}"
             else:
-                feature_text = f"{feature_value:.2f}"  
-
-
+                feature_text = f"{feature_value:.2f}"
 
             self.fig.add_annotation(
                 x=contributions[metric],
-                y=i*1. + 0.5,
+                y=i * 1.0 + 0.5,
                 xanchor="center",
                 text=f"{format_metric(feature_column)}: {feature_text}",
                 showarrow=False,
                 font={
-                        "color": rgb_to_color(self.white),
-                        "family": "Gilroy-Light",
-                        "size": 12 * self.font_size_multiplier,
-                    },
+                    "color": rgb_to_color(self.white),
+                    "family": "Gilroy-Light",
+                    "size": 12 * self.font_size_multiplier,
+                },
                 align="center",
             )
 
-    def add_shots(self, df_shots, metrics):
 
+    def add_shots(self, df_shots, metrics, id_to_number):
+        """
+        Add a distribution plot for all shots, with hover text showing feature values for each metric.
+        """
+        # Prepare hover text for all metrics
+        hover_texts = []
         
-            
+        for _, row in self.df_contributions.iterrows():
+            hover_text = []
+            shot_id = row["id"]  # Assuming 'id' is a shared identifier in both DataFrames
+            shot_number = id_to_number.get(shot_id, "Unknown")
+            hover_text.append(f"Shot #{shot_number}")
+
+            # Retrieve the matching shot features
+            shot_features = df_shots[df_shots["id"] == shot_id]
+
+            if not shot_features.empty:
+                shot_features = shot_features.iloc[0]
+                for metric in metrics:
+                    # Get the corresponding feature name
+                    feature_column = metric.replace("_contribution", "")
+
+                    if feature_column in shot_features:
+                        # Format hover text for each feature
+                        feature_value = shot_features[feature_column]
+                        feature_text = (
+                            "Yes" if feature_value == 1 else
+                            "No" if feature_value == 0 else
+                            f"{feature_value:.2f}"
+                        )
+                        hover_text.append(f"{format_metric(feature_column)}: {feature_text}")
+                    else:
+                        hover_text.append(f"{format_metric(feature_column)}: N/A")
+            else:
+                hover_text.append("No matching shot data")
+
+            hover_texts.append("<br>".join(hover_text))
+
+        # Add the group data to the plot
         self.add_group_data(
             df_plot=self.df_contributions,
             plots="",  # Use the original column names
-            names=df_shots["id"].astype(str),  # Shot IDs for hover text
-            hover="",
-            hover_string="",  # No hover text
+            names=hover_texts,  # Include hover text for each metric
+            hover="",  # No extra hover column suffix
+            hover_string="",  # Hover text format already included
             legend="All Shots",
         )
+
 
 
 
@@ -970,6 +1002,8 @@ class ShotVisual(VerticalPitchVisual):
         shot_y = shot_data['start_y'].values[0]
         goal_status = shot_data['goal'].values[0]  # True if goal, False if no goal
         xG_value = shot_data['xG'].values[0]  # Get the xG value
+        player = shot_data['player_name'].values[0]
+        team = shot_data['team_name'].values[0]
         # Add existing logic to plot shots here...
         shot_data['category'] = shot_data['goal']
         labels = {False: 'Shot', True: 'Goal'}
@@ -1029,7 +1063,7 @@ class ShotVisual(VerticalPitchVisual):
 
         self.fig.update_layout(
             title={
-                'text': f"Shot Visualization | Outcome: {'Goal' if goal_status else 'No Goal'} | xG: {xG_value:.2f}",
+                'text': f"Shot by {player} from {team} | Outcome: {'Goal' if goal_status else 'No Goal'} | xG: {xG_value:.2f}",
                 'font': {'color': 'white'}  # Set the title color to white
             },
             legend=dict(y=-0.05),

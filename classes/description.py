@@ -370,11 +370,37 @@ class ShotDescription(Description):
         # Give a detailed description of the contributions to the shot
         shot_contributions = self.shots.df_contributions[self.shots.df_contributions['id'] == self.shot_id]
 
+        shot_features = {
+            'vertical_distance_to_center': shot_data['vertical_distance_to_center'].iloc[0],
+            'euclidean_distance_to_goal': distance_to_goal,
+            'nearby_opponents_in_3_meters': shot_data['nearby_opponents_in_3_meters'].iloc[0],
+            'opponents_in_triangle': shot_data['opponents_in_triangle'].iloc[0],
+            'goalkeeper_distance_to_goal': gk_dist_to_goal,
+            'header': shot_data['header'].iloc[0],
+            'distance_to_nearest_opponent': distance_to_nearest_opponent,
+            'angle_to_goalkeeper': shot_data['angle_to_goalkeeper'].iloc[0],
+            'shot_with_left_foot': shot_data['shot_with_left_foot'].iloc[0],
+            'shot_after_throw_in': shot_data['shot_after_throw_in'].iloc[0],
+            'shot_after_corner': shot_data['shot_after_corner'].iloc[0],
+            'shot_after_free_kick': shot_data['shot_after_free_kick'].iloc[0],
+            'shot_during_regular_play': shot_data['shot_during_regular_play'].iloc[0]
+        }
+
+        feature_descriptions = sentences.describe_shot_features(shot_features)
+
+
         shot_description = (
-            f"Player {player_name} from {team_name} shot had an xG value of {xG:.2f} resulted in a {goal_status_text}."
-            f"The distance to goal was {distance_to_goal:.1f} meters and the distance to the nearest opponent was {distance_to_nearest_opponent:.1f} meters."
+            f"{player_name}'s shot from {team_name} resulted in a {goal_status_text}. "
+            f"This shot had an xG value of {xG:.2f}, which means the chance of scoring from this situation is {xG * 100:.0f}%. "
+            f"{sentences.describe_xg(xG)} "
+            #f"The distance to goal was {distance_to_goal:.1f} meters and the distance to the nearest opponent was {distance_to_nearest_opponent:.1f} meters."
         )
-        shot_description += sentences.describe_shot_contributions(shot_contributions)
+        shot_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
+
+
+        shot_description += '\n' + sentences.describe_shot_contributions(shot_contributions, shot_features)
+
+
 
 
         with st.expander("Synthesized Text"):
