@@ -416,8 +416,8 @@ class Shots(Data):
         shots = df_event.loc[df_event["type_name"] == "Shot"]
         shots.x = shots.x.apply(lambda cell: cell*105/120)
         shots.y = shots.y.apply(lambda cell: cell*68/80)
-        shots.end_x = shots.x.apply(lambda cell: cell*105/120)
-        shots.end_y = shots.y.apply(lambda cell: cell*68/80)
+        shots.end_x = shots.end_x.apply(lambda cell: cell*105/120)
+        shots.end_y = shots.end_y.apply(lambda cell: cell*68/80)
         df_track.x = df_track.x.apply(lambda cell: cell*105/120)
         df_track.y = df_track.y.apply(lambda cell: cell*68/80)
             #append event and trackings to a dataframe

@@ -903,22 +903,7 @@ class ShotVisual(VerticalPitchVisual):
         shots_df['category'] = shots_df['goal']
         labels = {False: 'Shot', True: 'Goal'}
         shots_df['category'] = shots_df['category'].replace(labels)
-        arrays_to_stack = [
-                            #shots_df.player_name, shots_df.minute+1, 
-                            shots_df.xG
-                            #, shots_df.category,
-                            #shot_contribution.angle.to_numpy(),
-                            #shot_contribution.head_shot.to_numpy(),
-                            #shot_contribution.match_state.to_numpy(),
-                            #shot_contribution.strong_foot.to_numpy(),
-                            #shot_contribution.assist_smart_pass.to_numpy(),
-                            #shot_contribution.assist_cross.to_numpy(),
-                            #shot_contribution.possession_counterattack.to_numpy(),
-                            #shot_contribution.clear_header.to_numpy(),
-                            #shot_contribution.rebound.to_numpy(),
-                            #shot_contribution.assist_key_pass.to_numpy(),
-                            #shot_contribution.self_created_shot.to_numpy()
-                        ]
+        arrays_to_stack = [shots_df.xG]
 
         # Stack the arrays
         customdata = np.stack(arrays_to_stack, axis=-1)
@@ -980,17 +965,6 @@ class ShotVisual(VerticalPitchVisual):
             )
         )
 
-    # def add_title_from_match(self, match):
-    #     title = f"How were {match.team_name}'s shots against {match.opp_team_name}?"
-    #     subtitle = f"{match.competition.get_plot_subtitle()} | {match.date.split(' ')[0]}"
-    #     self.add_title(title, subtitle)
-    
-    # def add_title_from_match_player(self, match, player):
-    #     title = f"How were {player}'s shots in a match of {match.team_name} against {match.opp_team_name}?"
-    #     subtitle = f"{match.competition.get_plot_subtitle()} | {match.date.split(' ')[0]}"
-    #     self.add_title(title, subtitle)
-
-
     def add_shot(self, shots, shot_id):
         # Filter for the specific shot using the shot_id
         shot_data = shots.df_shots[shots.df_shots['id'] == shot_id]
@@ -1000,6 +974,8 @@ class ShotVisual(VerticalPitchVisual):
         # Extract the shot coordinates (start_x, start_y)
         shot_x = shot_data['start_x'].values[0]
         shot_y = shot_data['start_y'].values[0]
+        end_x = shot_data['end_x'].values[0]
+        end_y = shot_data['end_y'].values[0]
         goal_status = shot_data['goal'].values[0]  # True if goal, False if no goal
         xG_value = shot_data['xG'].values[0]  # Get the xG value
         player = shot_data['player_name'].values[0]
@@ -1008,6 +984,12 @@ class ShotVisual(VerticalPitchVisual):
         shot_data['category'] = shot_data['goal']
         labels = {False: 'Shot', True: 'Goal'}
         shot_data['category'] = shot_data['category'].replace(labels)
+
+        start_x_norm = shot_x * 100 / 105
+        start_y_norm = (68 - shot_y) * 100 / 68
+        end_x_norm = 100 - (end_x * 100 / 105)
+        end_y_norm = (68 - end_y) * 100 / 68
+
 
         # Extract teammate coordinates (e.g., teammate_1_x, teammate_1_y, etc.)
         teammate_x_cols = [col for col in shot_data.columns if 'teammate' in col and '_x' in col]
@@ -1025,17 +1007,48 @@ class ShotVisual(VerticalPitchVisual):
 
         # Plot the shot location (start_x, start_y)
         self.fig.add_trace(
+                            go.Scatter(
+                                x=[start_y_norm],
+                                y=[start_x_norm],
+                                mode="markers",
+                                marker=dict(size=12, color=self.shot_color, symbol="circle"),
+                                name="Shot Start",
+                                showlegend=True
+                            )
+                        )
+        
+        # Add an invisible scatter trace for the legend
+        self.fig.add_trace(
             go.Scatter(
-                x=[(68 - shot_y) * 100 / 68],
-                y=[shot_x * 100 / 105],
-                mode="markers",
-                marker=dict(size=12, color=self.shot_color, symbol="circle"),
-                #text=[f"Goal: {goal_status}<br>xG: {xG_value:.2f}"],
-                textposition='top center',
-                name="Shot",
+                x=[None],  # Invisible marker
+                y=[None],
+                mode="lines+markers",
+                line=dict(color="white", width=2),  # Line matching the arrow style
+                marker=dict(size=10, color="white", symbol="arrow-bar-up"),  # Arrow symbol
+                name="Shot Direction",  # Legend label
                 showlegend=True
             )
         )
+
+        # Add shot arrow
+
+        self.fig.add_annotation(
+            x=end_y_norm,
+            y=end_x_norm,
+            ax=start_y_norm,
+            ay=start_x_norm,
+            xref="x",
+            yref="y",
+            axref="x",
+            ayref="y",
+            arrowhead=2,  # Type of arrowhead
+            arrowsize=1.5,  # Scale of the arrow
+            arrowwidth=2,  # Width of the arrow line
+            arrowcolor="white",  # Color of the arrow
+            showarrow=True
+        )
+
+
 
         # Plot teammates' locations
         self.fig.add_trace(
