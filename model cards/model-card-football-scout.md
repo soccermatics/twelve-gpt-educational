@@ -51,7 +51,11 @@ def describe_level(value):
 ```
 There are three positive terms and two negative terms in the words used, with no negative equivalent of "outstanding" defined. 
 
-In the *tell it how to answer* step, two examples were created, based on data from Pedro and Giroud. This somewhat compromises how the texts for these two players are constructed. These examples and the prompt used emphasise highlighting positive and negative aspects of the players' performance, and ignoring aspects which are average or typical.
+In the *tell it how to answer* step, two examples were created, based on data from Pedro and Giroud based on the following prompt:
+            
+"Please use the statistical description to give a concise, 4 sentence summary of the player's playing style, strengths and weaknesses. The first sentence should use varied language to give an overview of the player. The second sentence should describe the player's specific strengths based on the metrics. The third sentence should describe aspects in which the player is average and/or weak based on the statistics. Finally, summarise exactly how the player compares to others in the same position. "
+
+These examples and the prompt used emphasise highlighting positive and negative aspects of the players' performance, and ignoring aspects which are average or typical. 
 
 ### Language model
 
