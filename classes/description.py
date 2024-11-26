@@ -391,18 +391,14 @@ class ShotDescription(Description):
 
 
         shot_description = (
-            f"{player_name}'s shot from {team_name} in minute {minute} of the game resulted in a {goal_status_text}. "
-            f"This shot had an xG value of {xG:.2f}, which means the chance of scoring from this situation is {xG * 100:.0f}%. "
+            f"{player_name}'s shot from {team_name} resulted in a {goal_status_text}. "
+            f"This shot had an xG value of {xG:.2f}, which means that we estimate the chance of scoring from this situation as {xG * 100:.0f}%. "
             f"{sentences.describe_xg(xG)} "
             #f"The distance to goal was {distance_to_goal:.1f} meters and the distance to the nearest opponent was {distance_to_nearest_opponent:.1f} meters."
         )
         shot_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
 
-
         shot_description += '\n' + sentences.describe_shot_contributions(shot_contributions, shot_features)
-
-
-
 
         with st.expander("Synthesized Text"):
             st.write(shot_description)

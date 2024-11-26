@@ -57,15 +57,15 @@ def write_out_metric(metric):
 def describe_xg(xG):
 
     if xG < 0.028723: # 25% percentile
-        description = "This was a very low probability shot with a very slim chance of scoring."
+        description = "This was a slim chance of scoring."
     elif xG < 0.056474: # 50% percentile
-        description = "This shot had a low chance of scoring but was still within the realm of possibility, possibly from a challenging position."
+        description = "This was a low chance of scoring."
     elif xG < 0.096197: # 75% percentile
-        description = "This was an average chance, with a decent likelihood of resulting in a goal, from a typical shooting situation."
-    elif xG < 0.482736: # max
-        description = "A high-quality chance, with a good probability of scoring, often resulting from a close-range or well-placed shot."
+        description = "This was a decent chance."
+    elif xG < 0.3: # very high
+        description = "This was a high-quality chance, with a good probability of scoring."
     else:
-        description = "An excellent chance, one of the best in the game, with a very high likelihood of leading to a goal, often from point-blank range."
+        description = "This was an excellent chance."
     
     return description
 
@@ -84,7 +84,7 @@ def describe_shot_features(features):
         descriptions.append("The shot was with the right foot.")
 
     if features['shot_during_regular_play'] == 1:
-        descriptions.append("The shot was taken during regular play.")
+        descriptions.append("The shot was taken during open play.")
     else:
         if features['shot_after_throw_in'] == 1:
             descriptions.append("The shot was taken after a throw-in.")
@@ -97,32 +97,32 @@ def describe_shot_features(features):
 
     # Continuous features description
     if features['vertical_distance_to_center'] < 2.805:
-        descriptions.append("It was taken from closer to the center of the pitch (less vertical distance).")
+        descriptions.append("It was taken from very close to the center of the pitch.")
     elif features['vertical_distance_to_center'] < 9.647:
-        descriptions.append("It was taken from an intermediate vertical distance.")
+        descriptions.append("It was taken reasonably centrally.")
     else:
-        descriptions.append("It was taken from a far vertical distance, closer to the touchline.")
+        descriptions.append("It was taken quite a long way from the centre of the pitch.")
 
     if features['euclidean_distance_to_goal'] < 10.278:
         descriptions.append("It was taken from a close range, near the goal.")
     elif features['euclidean_distance_to_goal'] < 21.116:
-        descriptions.append("It was taken from a moderate distance to the goal.")
+        descriptions.append("It was taken from a moderate distance from the goal.")
     else:
-        descriptions.append("It was taken from a long range, far from the goal.")
+        descriptions.append("It was taken from long range, far from the goal.")
 
     if features['nearby_opponents_in_3_meters'] < 1:
-        descriptions.append("It was taken with little to no pressure from opponents within 3 meters.")
+        descriptions.append("It was taken with little or no pressure from opponents.")
     elif features['nearby_opponents_in_3_meters'] < 2:
-        descriptions.append("It was taken with moderate pressure, with some opponents nearby within 3 meters.")
+        descriptions.append("It was taken with moderate pressure, with one opponent within 3 meters.")
     else:
-        descriptions.append("It was taken under heavy pressure, with several opponents close by within 3 meters.")
+        descriptions.append("It was taken under heavy pressure, with several opponents within 3 meters.")
 
     if features['opponents_in_triangle'] < 1:
-        descriptions.append("it was taken with minimal opposition in the shooting triangle.")
+        descriptions.append("it was taken with no oppositions between the shooter and the goals.")
     elif features['opponents_in_triangle'] < 2:
-        descriptions.append("It was taken with some opposition blocking the path, but not heavily contested.")
+        descriptions.append("There were some opposition players blocking the path, but there was spac for a well-placed shot.")
     else:
-        descriptions.append("it was heavily contested, with multiple opponents blocking the path.")
+        descriptions.append("There we multiple opponents blocking the path.")
 
     if features['goalkeeper_distance_to_goal'] < 1.649:
         descriptions.append("The goalkeeper was very close to the goal.")
@@ -289,8 +289,7 @@ def describe_shot_contributions(shot_contributions, shot_features, feature_name_
 
 
 def describe_shot_contributions1(shot_contributions, feature_name_mapping=feature_name_mapping, thresholds=None):
-    text = "The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:\n"
-
+    
     # Default thresholds if none are provided
     thresholds = thresholds or {
         'very_large': 0.75,
