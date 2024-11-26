@@ -46,7 +46,16 @@ Table 1: Description of the questions and their weights
 | Conscientiousness | They are always prepared  <br>They leave their belongings around  <br>They pay attention to details  <br>They make a mess of things  <br>They get chores done right away  <br>They often forget to put things back in their proper place  <br>They like order  <br>They shirk their duties  <br>They follow a schedule  <br>They are exacting in their work   | 1 <br>-1  <br>1 <br>-1 <br>1  <br>-1 <br>1 <br>-1 <br>1 <br>1        |
 | Openness          | They have a rich vocabulary  <br>They have difficulty understanding abstract ideas <br>They have a vivid imagination  <br>They are not interested in abstract ideas <br>They have excellent ideas  <br>They do not have a good imagination  <br>They are quick to understand things <br>They use difficult words  <br>They spend time reflecting on things <br>They are full of ideas| 1 <br>-1 <br>1 <br>-1 <br>1 <br>-1 <br>1 <br>1 <br>1 <br>1           |
 
-For each personality category, the score is calculated by summing the responses to the 10 questions in that category. An additional scoring adjustment is applied, resulting in a final score that ranges from 0 to 40 for each category. Subsequently, we compute the z-score for each category's final score, normalizing the results to allow for comparisons across individuals and categories.
+Table 2: Additional points for each traits 
+| Metric | Additional points |
+| :---: |  :---: | 
+| Extraversion      | 20 |
+| Neuroticism       | 38 |
+| Agreeableness     | 14 |
+| Conscientiousness | 14 |
+| Openness          | 8 |
+
+For each personality category, the score is calculated by summing the responses to the 10 questions in that category. An additional scoring adjustment is applied, see Table 2, resulting in a final score that ranges from 0 to 40 for each category. Subsequently, we compute the z-score for each category's final score, normalizing the results to allow for comparisons across individuals and categories.
 
 ## Model
 
@@ -78,9 +87,9 @@ In this example, we created question-answer pairs to represent each personality 
 
  _"Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. People who are open to experience are intellectually curious, open to emotion, sensitive to beauty, and willing to try new things. They tend to be, when compared to closed people, more creative and more aware of their feelings. They are also more likely to hold unconventional beliefs. Open people can be perceived as unpredictable or lacking focus, and more likely to engage in risky behaviour or drug-taking. Moreover, individuals with high openness are said to pursue self-actualisation specifically by seeking out intense, euphoric experiences. Conversely, those with low openness want to be fulfilled by persevering and are characterised as pragmatic and data-driven – sometimes even perceived to be dogmatic and closed-minded. Some disagreement remains about how to interpret and contextualise the openness factor as there is a lack of biological support for this particular trait. Openness has not shown a significant association with any brain regions as opposed to the other four traits which did when using brain imaging to detect changes in volume associated with each trait."_ [https://en.wikipedia.org/wiki/Big\_Five\_personality\_traits]
 
- We create an excel document with two columns one *Users*, with the questions, and one *Assistant* with the corresponding answers. We obtain the example Table 2. In the case of the personality tests, we reiterate the process for the four others traits. It enables the system to acquire insights into each personality trait. At this stage, we can equip the chat with professional expertise.
+ We create an excel document with two columns one *Users*, with the questions, and one *Assistant* with the corresponding answers. We obtain the example Table 3. In the case of the personality tests, we reiterate the process for the four others traits. It enables the system to acquire insights into each personality trait. At this stage, we can equip the chat with professional expertise.
 
-Table 2: Example of a pairs of questions and answers for the personality test chatbot construction.
+Table 3: Example of a pairs of questions and answers for the personality test chatbot construction.
 | **User** | **Assistant** |
 |----------|---------------|
 | What is openness to experience? | Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. |
