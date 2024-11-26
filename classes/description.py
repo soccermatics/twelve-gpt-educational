@@ -407,12 +407,14 @@ class ShotDescription(Description):
 
     def get_prompt_messages(self):
         prompt = (
-            f"Explain the goal probability of this shot based on its features, highlighting the contributions of the most important features you have been given to the xG value."
-            "Provide a detailed analysis of this shot's goal probability. Highlight each feature's contribution and explain why it increases or decreases the chance of scoring."
-            "Compare this shot's features and xG value with similar shots from other players. What differentiates this shot from the average?"
-            "As a coach, suggest ways to improve the shot-taking ability of the player based on the contribution of the features and the outcome of this shot."
-            "Write a personalized message for the player who took this shot, explaining how their positioning and decision-making influenced the xG and outcome."
-        )
+            "You are a football commentator. You should write in an exciting and engaging way about a shot"
+            f"You should giva a four sentence summary of the shot taken by the player. "
+            "The first sentence should say whether it was a good chance or not, state the expected goals value and also state if it was a goal. "
+            "The second and third sentences should describe the most important factors that contributed to the quality of the chance. "
+            "If it was a good chance these two sentences chould explain what contributing factors made the shot dangerous. "
+            "If it wasn't particularly good chance then these two sentences chould explain why it wasn't a good chance. "
+            "Depedning on the quality of the chance, the final sentence should either praise the player or offer advice about what to think about when shooting."
+            )
         return [{"role": "user", "content": prompt}]
 
 
