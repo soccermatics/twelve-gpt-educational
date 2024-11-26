@@ -615,7 +615,7 @@ class Shots(Data):
             # Combine both dictionaries into a single row dictionary
             return {**teammate_coords, **opponent_coords}
         
-        model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y", "end_x", "end_y"]].copy()
+        model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y", "end_x", "end_y", "minute"]].copy()
         
         model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars["left_foot"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Left Foot" else 0)

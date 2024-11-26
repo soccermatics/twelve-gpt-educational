@@ -366,6 +366,7 @@ class ShotDescription(Description):
         distance_to_goal = shot_data['euclidean_distance_to_goal'].iloc[0]
         distance_to_nearest_opponent = shot_data['distance_to_nearest_opponent'].iloc[0]
         gk_dist_to_goal = shot_data['goalkeeper_distance_to_goal'].iloc[0]
+        minute= shot_data['minute'].iloc[0]
 
         # Give a detailed description of the contributions to the shot
         shot_contributions = self.shots.df_contributions[self.shots.df_contributions['id'] == self.shot_id]
@@ -383,14 +384,14 @@ class ShotDescription(Description):
             'shot_after_throw_in': shot_data['shot_after_throw_in'].iloc[0],
             'shot_after_corner': shot_data['shot_after_corner'].iloc[0],
             'shot_after_free_kick': shot_data['shot_after_free_kick'].iloc[0],
-            'shot_during_regular_play': shot_data['shot_during_regular_play'].iloc[0]
+            'shot_during_regular_play': shot_data['shot_during_regular_play'].iloc[0],
         }
 
         feature_descriptions = sentences.describe_shot_features(shot_features)
 
 
         shot_description = (
-            f"{player_name}'s shot from {team_name} resulted in a {goal_status_text}. "
+            f"{player_name}'s shot from {team_name} in minute {minute} of the game resulted in a {goal_status_text}. "
             f"This shot had an xG value of {xG:.2f}, which means the chance of scoring from this situation is {xG * 100:.0f}%. "
             f"{sentences.describe_xg(xG)} "
             #f"The distance to goal was {distance_to_goal:.1f} meters and the distance to the nearest opponent was {distance_to_nearest_opponent:.1f} meters."

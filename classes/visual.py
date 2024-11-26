@@ -481,9 +481,11 @@ class ShotContributionPlot(DistributionPlot):
         contributions = filtered_contrib.iloc[0][metrics]
         feature_columns = [metric.replace("_contribution", "") for metric in metrics]
         feature_values = filtered_shot.iloc[0][feature_columns]
+        player= filtered_shot['player_name'].values[0]
 
         # Generate hover text
-        hover_text = [f"Shot ID: {shot_id}"]
+        hover_text = [f"Player: {player}"]
+        hover_text.append(f"Shot ID: {shot_id}")
         binary_features = [
             "shot_during_regular_play",
             "shot_with_left_foot",
@@ -545,6 +547,8 @@ class ShotContributionPlot(DistributionPlot):
             hover_text = []
             shot_id = row["id"]  # Assuming 'id' is a shared identifier in both DataFrames
             shot_number = id_to_number.get(shot_id, "Unknown")
+            player= df_shots[df_shots['id']==shot_id]['player_name'].values[0]
+            hover_text.append(f"Player: {player}")
             hover_text.append(f"Shot #{shot_number}")
 
             # Retrieve the matching shot features

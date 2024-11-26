@@ -94,11 +94,24 @@ id_to_number = {shot_id: idx + 1 for idx, shot_id in enumerate(shots_df['id'])}
 number_to_id = {v: k for k, v in id_to_number.items()}
 
 
-selected_number= st.sidebar.selectbox("Select a Shot:",
-    options=list(number_to_id.keys()),  
-    format_func=lambda x: f"Shot #{x}")
+# selected_number= st.sidebar.selectbox("Select a Shot:",
+#     options=list(number_to_id.keys()),  
+#     format_func=lambda x: f"Shot #{x}")
 
-shot_id = number_to_id[selected_number]
+# shot_id = number_to_id[selected_number]
+
+shots_df['player_minute'] = shots_df['player_name'] + " - " + shots_df['minute'].astype(str)
+selected_player_minute = st.sidebar.selectbox(
+    "Select a Shot (Player - Minute):",
+    options=shots_df['player_minute'].unique())
+selected_shot = shots_df[shots_df['player_minute'] == selected_player_minute]
+
+if not selected_shot.empty:
+    shot_id = selected_shot.iloc[0]['id']  # Retrieve the shot_id for the selection
+    st.write(f"Selected Shot ID: {shot_id}")
+else:
+    st.warning("No matching shot found.")
+
 
 st.markdown("#### Selected Shot Data")
 shot = shots_df[shots_df['id']== shot_id]
