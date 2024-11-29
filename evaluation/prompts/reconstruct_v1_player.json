@@ -1,0 +1,29 @@
+{
+    "system_instruction": "You are a data analyst that reconstructs dictionaries from text.",
+    "history": [
+        {
+            "role": "user",
+            "parts": "For each of the following 9 categories [\n'non-penalty expected goals',\n        'goals',\n        'assists',\n        'key passes',\n        'smart passes',\n        'final third passes',\n        'final third receptions',\n        'ground duels',\n        'air duels'\n    ]\nhere are the possible options: [\n        'outstanding',\n        'excellent',\n        'good',\n        'average',\n        'bellow average',\n        'poor'\n    ]"
+        },
+        {
+            "role": "user",
+            "parts": "From the text below, reconstruct the data dictionary.\nBony is a forward who relies on winning aerial duels to have an impact in the final third. He is an excellent header of the ball and he wins a lot of the aerial duels he competes in. However, he struggles in other areas of the game and he doesn’t find himself in great positions or manage to create chances for himself or teammates. He also isn’t a particularly technical footballer as his stats for smart passes, key passes, and passes in the final third are below average. Compared to other strikers, he is not a reliable forward."
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'non-penalty expected goals':'bellow average',\n'goals':'average',\n'assists':'poor',\n'key passes':'bellow average',\n'smart passes':'average',\n'final third passes':'poor',\n'final third receptions':'poor',\n'ground duels':'average',\n'air duels':'excellent'\n}```"
+        },
+        {
+            "role": "user",
+            "parts": "From the text below, reconstruct the data dictionary.\nPlease provide the statistical description for T. Hemed. I need the data to give you a summary of his playing style and strengths and weaknesses."
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n}```"
+        }
+    ],
+    "content": {
+        "role": "user",
+        "parts": ""
+    }
+}

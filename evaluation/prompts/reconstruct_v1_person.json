@@ -1,0 +1,29 @@
+{
+    "system_instruction": "You are a data analyst that reconstructs dictionaries from text.",
+    "history": [
+        {
+            "role": "user",
+            "parts": "Each of the following 5 categories have two possible categories:\n[\n'extraversion':['solitary and reserved','outgoing and energetic']\n        'neuroticism':['sensitive and nervous','resilient and confident']\n        'agreeableness':['critical and rational','friendly and compassionate']\n        'conscientiousness':['extravagant and careless','efficient and organized']\n        'openness':['inventive and curious','consistent and cautious']\n    ]"
+        },
+        {
+            "role": "user",
+            "parts": "From the text below, reconstruct the data dictionary.\nThis candidate is a highly energetic and outgoing individual who takes initiative in social settings. They are known for starting conversations and engaging with others. While they can be sensitive and prone to nervousness, particularly when it comes to anxiety and negative emotions, they consistently demonstrate a strong sense of compassion and friendliness. Their cooperative, polite, and kind nature complements their efficiency and organizational skills, as they are always meticulous and pay close attention to detail. While they demonstrate a strong sense of reliability and consistency, they tend to be less open to new or unfamiliar concepts and ideas."
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'extraversion':'outgoing and energetic',\n'neuroticism':'sensitive and nervous',\n'agreeableness':'friendly and compassionate',\n'conscientiousness':'efficient and organized',\n'openness':'consistent and cautious'\n}```"
+        },
+        {
+            "role": "user",
+            "parts": "From the text below, reconstruct the data dictionary.\nPlease provide the statistical description for the candidate. I need the relevant data to give you a summary."
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n}```"
+        }
+    ],
+    "content": {
+        "role": "user",
+        "parts": " "
+    }
+}

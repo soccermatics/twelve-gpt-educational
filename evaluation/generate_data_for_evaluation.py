@@ -1,42 +1,42 @@
 # %%
-# Debug the data loading and processing
+# # Debug the data loading and processing
 
-from classes.data_source import CountryStats
-import copy
-from classes.description import (
-    CountryDescription,
-)
-import json
+# from classes.data_source import CountryStats
+# import copy
+# from classes.description import (
+#     CountryDescription,
+# )
+# import json
 
-countries = CountryStats()
-metrics = [m for m in countries.df.columns if m not in ["country"]]
+# countries = CountryStats()
+# metrics = [m for m in countries.df.columns if m not in ["country"]]
 
-countries.calculate_statistics(metrics=metrics)
-country_names = countries.df["country"].values.tolist()
+# countries.calculate_statistics(metrics=metrics)
+# country_names = countries.df["country"].values.tolist()
 
-country = copy.deepcopy(countries)
-country.df = country.df[country.df["country"] == "United States of America"]
-country = country.to_data_point()
+# country = copy.deepcopy(countries)
+# country.df = country.df[country.df["country"] == "United States of America"]
+# country = country.to_data_point()
 
 
-with open("data/wvs/description_dict.json", "r") as f:
-    description_dict = json.load(f)
+# with open("../data/wvs/description_dict.json", "r") as f:
+#     description_dict = json.load(f)
 
-thresholds_dict = dict(
-    (
-        metric,
-        [
-            2,
-            1,
-            -1,
-            -2,
-        ],
-    )
-    for metric in metrics
-)
-description = CountryDescription(
-    country, description_dict=description_dict, thresholds_dict=thresholds_dict
-)
+# thresholds_dict = dict(
+#     (
+#         metric,
+#         [
+#             2,
+#             1,
+#             -1,
+#             -2,
+#         ],
+#     )
+#     for metric in metrics
+# )
+# description = CountryDescription(
+#     country, description_dict=description_dict, thresholds_dict=thresholds_dict
+# )
 
 
 # %%
@@ -56,7 +56,7 @@ countries.calculate_statistics(metrics=metrics)
 
 country_names = countries.df["country"].values.tolist()
 
-with open("data/wvs/description_dict.json", "r") as f:
+with open("../data/wvs/description_dict.json", "r") as f:
     description_dict = json.load(f)
 
 thresholds_dict = dict(
@@ -114,7 +114,7 @@ for country_name in country_names:
 
 # zip country names and texts into a dataframe and save
 df = pd.DataFrame({"country": country_names, "text": texts, "text_empty": texts_empty})
-df.to_csv("data/wvs/country_texts.csv", index=False)
+df.to_csv("data/country_texts.csv", index=False)
 # %%
 
 # Generate country specific ground truth
@@ -200,7 +200,7 @@ for country_name in country_names:
 
 # create a dataframe with columns 'country' and and each factor from tmp_country.relevant_metrics
 df = pd.DataFrame(factors, columns=["country"] + tmp_country.relevant_metrics)
-df.to_csv("data/wvs/country_ground_truth.csv", index=False)
+df.to_csv("data/country_ground_truth.csv", index=False)
 # %%
 # %%
 # Generate player specific data for evaluation
@@ -277,7 +277,7 @@ for player_name in player_names:
 
 # zip country names and texts into a dataframe and save
 df = pd.DataFrame({"player": player_names, "text": texts, "text_empty": texts_empty})
-df.to_csv("data/wvs/player_texts.csv", index=False)
+df.to_csv("data/player_texts.csv", index=False)
 
 factors = []
 for name in player_names:
@@ -299,7 +299,7 @@ for name in player_names:
 
 # create a dataframe with columns 'player' and and each factor from tmp_player.relevant_metrics
 df = pd.DataFrame(factors, columns=["player"] + tmp_player.relevant_metrics)
-df.to_csv("data/wvs/player_ground_truth.csv", index=False)
+df.to_csv("data/player_ground_truth.csv", index=False)
 # %%
 
 # Generate player specific data for evaluation
@@ -357,7 +357,7 @@ for player_name in people_names:
 
 # zip country names and texts into a dataframe and save
 df = pd.DataFrame({"person": people_names, "text": texts, "text_empty": texts_empty})
-df.to_csv("data/wvs/personality_texts.csv", index=False)
+df.to_csv("data/personality_texts.csv", index=False)
 
 
 factors = []
@@ -420,6 +420,6 @@ df = pd.DataFrame(
     columns=["person"]
     + ["extraversion", "neuroticism", "agreeableness", "conscientiousness", "openness"],
 )
-df.to_csv("data/wvs/personality_ground_truth.csv", index=False)
+df.to_csv("data/personality_ground_truth.csv", index=False)
 
 # %%

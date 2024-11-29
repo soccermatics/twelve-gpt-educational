@@ -1,0 +1,29 @@
+{
+    "system_instruction": "You are a data analyst that reconstructs dictionaries from text.",
+    "history": [
+        {
+            "role": "user",
+            "parts": "For each of the following 6 categories [\n'Traditional vs Secular Values',\n        'Survival vs Self-expression Values',\n        'Neutrality',\n        'Fairness',\n        'Skepticism'\n        'Societal Tranquility'\n    ]\nhere are the possible options: [\n        'far above average',\n        'above average',\n        'average',\n        'below average',\n        'far below average'\n    ]"
+        },
+        {
+            "role": "user",
+            "parts": "From the text below, reconstruct the data dictionary.\nPeru was found to have below average Survival vs Self-expression Values score, suggesting that participants were more survival orientated. One contributing factor was that on average participants indicated that work was very important to them. Further, Peru was found to be above averagely skeptical, with participant on average indicating that they have no trust at all in parliament.\n\nAccording to the WVS, Peru was found to have neither an above nor a below average Traditional vs Secular Values score, to be averagely neutral, to have an average value of fairness, and to be neither above nor below averagely tranquil compared to other countries in the same wave."
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'Traditional vs Secular Values': 'average',\n'Survival vs Self-expression Values': 'below average',\n'Neutrality': 'average', \n'Fairness': 'average',\n'Skepticism': 'above average',\n'Societal Tranquility': 'average'\n}```"
+        },
+        {
+            "role": "user",
+            "parts": "From the text below, reconstruct the data dictionary.\nPlease provide the statistical description for the country. I need the relevant data to give you a summary."
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n}```"
+        }
+    ],
+    "content": {
+        "role": "user",
+        "parts": " "
+    }
+}
