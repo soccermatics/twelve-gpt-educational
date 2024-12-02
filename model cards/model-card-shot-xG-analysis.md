@@ -6,7 +6,7 @@
 - **Name:** Football Shot Analyst (xG Prediction + Language Model)
 - **Version:** 1.0
 - **Developers:** The football Shot Analyst is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational), customized by Pegah Rahimian and David Sumpter as a part of Uppsala University research, and
-is intended as an illustration of the methods. 
+is intended as an illustration of the methods. This work is a derivative of the full [Twelve GPT product](https://twelve.football).
 - **Date of Creation:** [Autumn 2024]
 - **Purpose:** 
   - Here we detail the specific application to analyze shots. It is thus intended as an example to help others building wordalisations. The wordalisations describe shots attempted by players with different outcomes (goal or not) in EURO 2024.
@@ -93,7 +93,8 @@ is intended as an illustration of the methods.
 
 ### **Evaluation**
 - **xG Prediction Model:**
-  - **Accuracy:** [ROC AUC = 0.85].
+  - **Accuracy:** The model was validated using 10-fold cross-validation, ensuring robustness across different data subsets. Performance was assessed using the Area Under the Receiver Operating Characteristic Curve (AUC-ROC), which evaluates the model's ability to distinguish between goals and non-goals. An AUC-ROC score of 0.85 was achieved, indicating strong predictive performance and effective discrimination between the two classes. Additionally, we report the **Brier score** and **log-loss** metrics, which provide further insights into the model's probabilistic predictions. The Brier score of **0.06** indicates that the model's predictions are well-calibrated and close to the actual outcomes, showing excellent accuracy in its probability estimates. The **log-loss** of **0.2** reflects the model's confidence in its predictions, with values closer to 0 indicating better performance. Both metrics complement the AUC-ROC score by providing a more comprehensive evaluation of the model's effectiveness in predicting shot outcomes, ensuring both accuracy and reliability in its probabilistic outputs. These metrics are especially relevant for our application, as they assess not just classification accuracy but also the quality of the model's probability estimates in a context where uncertainty plays a key role.
+
   - **Performance across subgroups:** Tested for different leagues and playing styles to ensure robustness.
 
 - **Language Model:**
@@ -134,6 +135,7 @@ is intended as an illustration of the methods.
 ### **Example Visualization and Output**
 
 **Figure 1:** Visualization of shot situations and generated text output.
+![Figure 1: Visualization of shot situations and generated text output.](https://github.com/soccermatics/twelve-gpt-educational/blob/main/model%20cards/out+vis.png)
 
 - **Description:** 
   - The figure includes a graphical representation of shot scenarios overlaid on a football pitch, highlighting critical features such as shot location, nearest opponents, and event context. 

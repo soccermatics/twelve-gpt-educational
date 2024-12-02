@@ -66,12 +66,28 @@ st.divider()
 
 st.markdown("## Shot commentator")
 
-parser = Sbopen()
-df_match = parser.match(competition_id=55, season_id=282)
-match_ids = df_match['match_id'].unique()
+#parser = Sbopen()
+#df_match = parser.match(competition_id=55, season_id=282)
+#match_ids = df_match['match_id'].unique()
+competitions = {
+    "EURO Men 2024": "data/match_id_to_name_EURO_Men_2024.json",
+    "National Women's Soccer League (NWSL) 2018": "data/match_id_to_name_NWSL.json",
+    "FIFA 2022": "data/match_id_to_name_FIFA_2022.json",
+    "Women's Super League (FAWSL) 2017-18": "data/match_id_to_name_FAWSL.json",
+    "EURO Men 2022": "data/match_id_to_name_EURO_Men_2022.json",
+    "Africa Cup of Nations (AFCON) 2023": "data/match_id_to_name_AFCON_2023.json"
+}
 
-with open('data/match_id_to_name.json', 'r') as f:
+# Select a competition
+selected_competition = st.sidebar.selectbox("Select a Competition", options=competitions.keys())
+
+# Load the JSON file corresponding to the selected competition
+file_path = competitions[selected_competition]
+
+with open(file_path, 'r') as f:
     id_to_match_name = json.load(f)
+
+
 
 selected_match_name = st.sidebar.selectbox(
     "Select a Match", 
