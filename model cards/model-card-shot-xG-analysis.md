@@ -6,7 +6,7 @@
 - **Name:** Football Shot Analyst (xG Prediction + Language Model)
 - **Version:** 1.0
 - **Developers:** The football Shot Analyst is implemented within the [TwelveGPT Education framework](https://github.com/soccermatics/twelve-gpt-educational), customized by Pegah Rahimian and David Sumpter as a part of Uppsala University research, and
-is intended as an illustration of the methods. This work is a derivative of the full [Twelve GPT product](https://twelve.football).
+is intended as an illustration of the methods. 
 - **Date of Creation:** [Autumn 2024]
 - **Purpose:** 
   - Here we detail the specific application to analyze shots. It is thus intended as an example to help others building wordalisations. The wordalisations describe shots attempted by players with different outcomes (goal or not) in EURO 2024.

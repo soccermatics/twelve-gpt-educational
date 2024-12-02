@@ -42,6 +42,10 @@ from classes.visual import ShotVisual, DistributionPlot, ShotContributionPlot
 from classes.chat import Chat
 from classes.description import ShotDescription
 
+# Function to load and inject custom CSS from an external file
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
 from utils.page_components import (
@@ -60,14 +64,11 @@ sidebar_container = st.sidebar.container()
 
 st.divider()
 
+st.markdown("## Shot commentator")
 
-st.markdown("# This is the shots and xG explanation page")
-
-st.markdown("### Shots and xG")
 parser = Sbopen()
 df_match = parser.match(competition_id=55, season_id=282)
 match_ids = df_match['match_id'].unique()
-st.sidebar.markdown("### Match Selection")
 
 with open('data/match_id_to_name.json', 'r') as f:
     id_to_match_name = json.load(f)
@@ -82,8 +83,7 @@ selected_match_id = match_name_to_id[selected_match_name]
 shots = Shots(selected_match_id)
 shots_df= shots.df_shots
 df_contributions = shots.df_contributions
-#st.write(shots_df)  
-#st.write(df_contributions)  
+
 
 excluded_columns = ['xG', 'id', 'match_id']
 metrics = [col for col in df_contributions.columns if col not in excluded_columns]
@@ -108,19 +108,24 @@ selected_shot = shots_df[shots_df['player_minute'] == selected_player_minute]
 
 if not selected_shot.empty:
     shot_id = selected_shot.iloc[0]['id']  # Retrieve the shot_id for the selection
-    st.write(f"Selected Shot ID: {shot_id}")
 else:
     st.warning("No matching shot found.")
 
+# Read in model card text
+with open("model cards/model-card-shot-xG-analysis.md", "r") as file:
+     # Read the contents of the file
+    model_card_text = file.read()
 
-st.markdown("#### Selected Shot Data")
-shot = shots_df[shots_df['id']== shot_id]
-st.write(shot) 
-st.markdown("#### Feature Contributions")
-st.write(df_contributions[df_contributions['id']== shot_id])
+load_css("model cards/style/python-code.css")
+st.expander("Model card", expanded=False).markdown(model_card_text)
+
+#st.markdown("#### Selected Shot Data")
+#shot = shots_df[shots_df['id']== shot_id]
+#st.write(shot) 
+#st.markdown("#### Feature Contributions")
+#st.write(df_contributions[df_contributions['id']== shot_id])
 
 to_hash = (selected_match_id, shot_id)
-
 
 visuals = ShotVisual(metric=None)
 visuals.add_shot(shots, shot_id)

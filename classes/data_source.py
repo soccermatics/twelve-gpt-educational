@@ -748,8 +748,8 @@ class Shots(Data):
         # Load model from data/...
         saved_model_path = "data/xG_model1.sav"
         model = load(saved_model_path)
-        st.markdown("### Model Summary")
-        st.write(model.summary())   
+        with st.expander("Model Summary"):
+            st.write(model.summary())   
         #predictions = model.predict(df_shots)
         return model
     
