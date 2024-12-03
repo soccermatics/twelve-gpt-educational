@@ -396,10 +396,10 @@ class Shots(Data):
 
     data_point_class = data_point.Individual
 
-    def __init__(self, match_id):
+    def __init__(self, competition, match_id):
         self.df_shots = self.get_processed_data(match_id)  # Process the raw data directly
-        self.xG_Model = self.load_model()  # Load the model once
-        self.parameters = self.read_model_params()
+        self.xG_Model = self.load_model(competition)  # Load the model once
+        self.parameters = self.read_model_params(competition)
         self.df_contributions = self.weight_contributions()
     #@st.cache_data(hash_funcs={"classes.data_source.Shots": lambda self: hash(self.raw_hash_attrs)}, ttl=5*60)
 
@@ -429,6 +429,8 @@ class Shots(Data):
         track_df.reset_index(drop=True, inplace=True)
         #filter out non open-play shots
         shot_df = shot_df.loc[shot_df["sub_type_name"] == "Open Play"]
+        shot_df = shot_df.loc[shot_df["body_part_name"] != "Head"]
+
         #filter out shots where goalkeeper was not tracked
         gks_tracked = track_df.loc[track_df["teammate"] == False].loc[track_df["position_name"] == "Goalkeeper"]['id'].unique()
         shot_df = shot_df.loc[shot_df["id"].isin(gks_tracked)]
@@ -617,7 +619,7 @@ class Shots(Data):
         
         model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y", "end_x", "end_y", "minute"]].copy()
         
-        model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
+        #model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars["left_foot"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Left Foot" else 0)
         model_vars["throw in"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Throw In" else 0)
         model_vars["corner"] = test_shot.play_pattern_name.apply(lambda cell: 1 if cell == "From Corner" else 0)
@@ -662,7 +664,7 @@ class Shots(Data):
 
         # Binary features
         model_vars["is_closer"] = np.where(model_vars["gk distance to goal"] > model_vars["distance to goal"], 1, 0)
-        model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
+        #model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars['goal'] = test_shot.outcome_name.apply(lambda cell: 1 if cell == "Goal" else 0)
         model_vars['Intercept'] = 1
         #model_vars = sm.add_constant(model_vars)
@@ -691,9 +693,31 @@ class Shots(Data):
         return model_vars
     
 
-    def read_model_params(self):
-        parameters = pd.read_excel("data/model_params1.xlsx")
-        return parameters
+    def read_model_params(self, competition):
+        competitions_dict_prams = {
+        "EURO Men 2024": "data/model_params_EURO_Men_2024.xlsx",
+        "National Women's Soccer League (NWSL) 2018": "data/model_params_NWSL.xlsx",
+        "FIFA 2022": "data/model_params_FIFA_2022.xlsx",
+        "Women's Super League (FAWSL) 2017-18": "data/model_params_FAWSL.xlsx",
+        "EURO Men 2022": "data/model_params_EURO_Men_2022.xlsx",
+        "Africa Cup of Nations (AFCON) 2023": "data/model_params_AFCON_2023.xlsx",}
+
+        file_path = competitions_dict_prams.get(competition)
+
+        if not file_path:
+            st.error("Parameter file not found for the selected competition.")
+            return None
+        try:
+            parameters = pd.read_excel(file_path)
+            return parameters
+
+        except FileNotFoundError:
+            st.error(f"File not found: {file_path}")
+            return None
+        except Exception as e:
+            st.error(f"Error reading parameter file: {e}")
+            return None
+
 
 
     def weight_contributions(self):
@@ -740,19 +764,43 @@ class Shots(Data):
         return df_contribution
     
 
+    
+    
+
 
 
     @staticmethod
-    def load_model():
+    def load_model(competition):
 
-        # Load model from data/...
-        saved_model_path = "data/xG_model1.sav"
-        model = load(saved_model_path)
-        with st.expander("Model Summary"):
-            st.write(model.summary())   
-        #predictions = model.predict(df_shots)
-        return model
+        competitions_dict = {
+        "EURO Men 2024": "data/xg_model_EURO_Men_2024.sav",
+        "National Women's Soccer League (NWSL) 2018": "data/xg_model_NWSL.sav",
+        "FIFA 2022": "data/xg_model_FIFA_2022.sav",
+        "Women's Super League (FAWSL) 2017-18": "data/xg_model_FAWSL.sav",
+        "EURO Men 2022": "data/xg_model_EURO_Men_2022.sav",
+        "Africa Cup of Nations (AFCON) 2023": "data/xg_model_AFCON_2023.sav",}
+        
+        saved_model_path = competitions_dict.get(competition)
     
+        if not saved_model_path:
+            st.error("Model file not found for the selected competition.")
+            return None
+        
+        try:
+            model = load(saved_model_path)
+            with st.expander(f"Model Summary for {competition}"):
+                st.write(model.summary())  
+            
+            return model
+        
+        except FileNotFoundError:
+            st.error(f"Model file not found at: {saved_model_path}")
+            return None
+        except Exception as e:
+            st.error(f"Error loading model: {e}")
+            return None
+
+
 
     def to_data_point(self) -> data_point.Individual:
         

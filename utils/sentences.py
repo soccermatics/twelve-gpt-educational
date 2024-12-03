@@ -76,9 +76,9 @@ def describe_shot_features(features):
     descriptions = []
 
     # Binary features description
-    if features['header'] == 1:
-        descriptions.append("The shot was a header.")
-    elif features['shot_with_left_foot'] == 1:
+    #if features['header'] == 1:
+        #descriptions.append("The shot was a header.")
+    if features['shot_with_left_foot'] == 1:
             descriptions.append("The shot was with the left foot.")    
     else:
         descriptions.append("The shot was with the right foot.")

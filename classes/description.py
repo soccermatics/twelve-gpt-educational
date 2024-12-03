@@ -377,7 +377,7 @@ class ShotDescription(Description):
             'nearby_opponents_in_3_meters': shot_data['nearby_opponents_in_3_meters'].iloc[0],
             'opponents_in_triangle': shot_data['opponents_in_triangle'].iloc[0],
             'goalkeeper_distance_to_goal': gk_dist_to_goal,
-            'header': shot_data['header'].iloc[0],
+            #'header': shot_data['header'].iloc[0],
             'distance_to_nearest_opponent': distance_to_nearest_opponent,
             'angle_to_goalkeeper': shot_data['angle_to_goalkeeper'].iloc[0],
             'shot_with_left_foot': shot_data['shot_with_left_foot'].iloc[0],
