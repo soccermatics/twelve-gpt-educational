@@ -360,7 +360,7 @@ class ShotDescription(Description):
         goal_status = shot_data['goal'].iloc[0]
         
         # Map goal boolean to readable category
-        labels = {False: 'No Goal', True: 'Goal'}
+        labels = {False: "didn't result in a goal.", True: 'was a goal!'}
         goal_status_text = labels[goal_status]
         #angle_to_goal = shot_data['angle_to_goal'].iloc[0]
         distance_to_goal = shot_data['euclidean_distance_to_goal'].iloc[0]
@@ -391,7 +391,7 @@ class ShotDescription(Description):
 
 
         shot_description = (
-            f"{player_name}'s shot from {team_name} resulted in a {goal_status_text}. "
+            f"{player_name}'s shot from {team_name} {goal_status_text} "
             f"This shot had an xG value of {xG:.2f}, which means that we estimate the chance of scoring from this situation as {xG * 100:.0f}%. "
             f"{sentences.describe_xg(xG)} "
             #f"The distance to goal was {distance_to_goal:.1f} meters and the distance to the nearest opponent was {distance_to_nearest_opponent:.1f} meters."
