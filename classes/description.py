@@ -533,7 +533,7 @@ class PersonDescription(Description):
             text_t = (
                 self.categorie_description(neuroticism)
                 + cat_1
-                + "The candidate tends to feel more negative emotions, anxiety. "
+                + "The candidate tends to feel more negative emotions and anxiety. "
             )
             if neuroticism > 1:
                 index_max = person_metrics[10:20].idxmax()
@@ -546,7 +546,7 @@ class PersonDescription(Description):
             text_t = (
                 self.categorie_description(neuroticism)
                 + cat_0
-                + "The candidate tends to feel less negative emotions, anxiety. "
+                + "The candidate tends to feel less negative emotions and anxiety. "
             )
             if neuroticism < -1:
                 index_min = person_metrics[10:20].idxmin()
@@ -625,7 +625,7 @@ class PersonDescription(Description):
             text_t = (
                 self.categorie_description(openness)
                 + cat_1
-                + "The candidate tends to be more open. "
+                + "The candidate tends to be more open to new ideas and experiences. "
             )
             if openness > 1:
                 index_max = person_metrics[40:50].idxmax()
@@ -637,7 +637,7 @@ class PersonDescription(Description):
             text_t = (
                 self.categorie_description(openness)
                 + cat_0
-                + "The candidate tends to be less open. "
+                + "The candidate tends to be less open to new ideas and experiences. "
             )
             if openness < -1:
                 index_min = person_metrics[40:50].idxmin()
