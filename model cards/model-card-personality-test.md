@@ -101,13 +101,16 @@ Table 3: Example of a pairs of questions and answers for the personality test ch
 
 #### Tell it what data to use
 
-The creation of personality descriptions is handled by the `description.py` script. Using the z-score results, the script generates a personalized paragraph for each individual. Each paragraph includes at least one phrase corresponding to each of the five personality traits. Each phrase will have an adjective depending on the z-score. This is done by the function `categorie_description` as we can see in the following table (refer to Table 3).
+The creation of personality descriptions is handled by the `description.py` script. Using the z-score results, the script generates a personalized paragraph for each individual. Each paragraph contains at least two phrases reflecting each of the five personality traits. The phrasing is determined by the z-score, where one phrase is influenced by the direction of the z-score (positive or negative) and the other incorporates an adjective based on its magnitude. The positive or negative sign of the z-score dictates the tone, while the magnitude of the z-score is used to assign an adjective that characterizes the trait. This is done by the function `categorie_description` as we can see in the following table (refer to Table 3). 
 
-The description is followed by two adjectives for each category, determined by the z-score's direction—positive or negative. Extraversion will be described as *outgoing and energetic* if the z-score is positive, and as *solitary and reserved* if the z-score is negative.  
-Neuroticism will be characterized by *sensitive and nervous* for a positive z-score, and *resilient and confident* for a negative z-score.  
-Agreeableness will include *friendly and compassionate* if the z-score is positive, while *critical and rational* will apply if it is negative.  
-Conscientiousness will be described as *efficient and organized* for a positive z-score, and *extravagant and careless* for a negative one.  
-Openness will have the adjectives *inventive and curious* if the z-score is positive, and *consistent and cautious* otherwise.
+The description is followed by two adjectives for each category, determined by the z-score's direction—positive or negative. 
+
+Extraversion will be described as *outgoing and energetic* when the z-score is positive, accompanied by the phrase, "The candidate tends to be more social.". For a negative z-score, extraversion will be characterized as *solitary and reserved*, with the phrase, "The candidate tends to be less social.".
+Neuroticism will be described as *sensitive and nervous* for a positive z-score, with the additional phrase, "The candidate tends to experience more negative emotions and anxiety.". For a negative z-score, it will be characterized as *resilient and confident*, and we add, "The candidate tends to experience fewer negative emotions and less anxiety.".
+Agreeableness will be framed as *friendly and compassionate* when the z-score is positive, with the phrase, "The candidate tends to be more cooperative, polite, kind, and friendly.". For a negative z-score, it will be described as *critical and rational*, along with the phrase, "The candidate tends to be less cooperative, polite, kind, and friendly.".
+Conscientiousness will be described as *efficient and organized* for a positive z-score, with the phrase, "The candidate tends to be more careful and diligent.". For a negative z-score, it will be characterized as *extravagant and careless*, with the phrase, "The candidate tends to be less careful and diligent.".
+Openness will be described as *inventive and curious* for a positive z-score, with the phrase, "The candidate tends to be more open to new ideas and experiences.". For a negative z-score, it will be characterized as *consistent and cautious*, with the phrase, "The candidate tends to be less open to new ideas and experiences.".
+
 
 Table 3: The thresholds and text descriptions are used to interpret the Z-score values, translating them into words to effectively describe the candidate.
 | **Z-score value**      | **Text description**                   |
@@ -120,8 +123,7 @@ Table 3: The thresholds and text descriptions are used to interpret the Z-score 
 | Between 1 and 2        | 'The candidate is very '               |
 | Higher than 2          | 'The candidate is extremely '          |
 
-
-Highlighting it as a key characteristic of the individual. This ensures that more extreme scores are The goal is to highlight key characteristics by drawing attention to extreme scores, ensuring that these traits stand out in the final description. If the z-score for a particular trait exceeds 1 or falls below -1, we add a specific phrase to emphasize this trait. We first review the 10 questions within the category to find the question with the highest score for z-scores above 1. The added phrase will begin with "In particular, they said that" followed by the question text. Similarly, for z-scores below -1, we identify the question with the lowest score and apply the same phrasing to underline that trait. This ensures that significant traits are properly highlighted in the description.
+Highlighting it as a key characteristic of the individual. This ensures that more extreme scores highlight key characteristics by drawing attention to extreme scores, ensuring that these traits stand out in the final description. If the z-score for a particular trait exceeds 1 or falls below -1, we add a specific phrase to emphasize this trait. We first review the 10 questions within the category to find the question with the highest score for z-scores above 1. The added phrase will begin with "In particular, they said that" followed by the question text. Similarly, for z-scores below -1, we identify the question with the lowest score and apply the same phrasing to underline that trait. This ensures that significant traits are properly highlighted in the description.
 
 #### Tell is how to answer
 
