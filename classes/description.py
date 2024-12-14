@@ -502,7 +502,10 @@ class PersonDescription(Description):
         cat_1 = "outgoing and energetic. "
 
         if extraversion > 0:
-            text_t = self.categorie_description(extraversion) + cat_1
+            text_t = (self.categorie_description(extraversion) 
+            + cat_1
+            + "The candidate tends to be more social. "
+                     )
             if extraversion > 1:
                 index_max = person_metrics[0:10].idxmax()
                 text_2 = (
@@ -510,7 +513,10 @@ class PersonDescription(Description):
                 )
                 text_t += text_2
         else:
-            text_t = self.categorie_description(extraversion) + cat_0
+            text_t = (self.categorie_description(extraversion) 
+            + cat_0
+            + "The candidate tends to be less social. "
+                     )
             if extraversion < -1:
                 index_min = person_metrics[0:10].idxmin()
                 text_2 = (
