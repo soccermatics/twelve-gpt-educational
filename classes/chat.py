@@ -456,6 +456,7 @@ class LessonChat(Chat):
                 f"When responding to the user query, if there is no relevant information provided, consider the entire conversation with the user and ask them a related question based on the conversation. "
                 #f"At the end of the conversation give the user a programming task to practice their knowledge of the for loop in C programming langauge. "
                 f"Do not deviate from this information or provide additional information that is not in the text returned by the functions."
+                f"At the end of your interaction with the user, provide the user with links to relevant reading material that will enhance their understading of the concepts learnt."
                 )
             },
         ]
@@ -478,7 +479,7 @@ class LessonChat(Chat):
         results = self.embeddings.search(query, top_n=3)
         results = results.sort_values('similarities', ascending=False)
         sorted_results =results.reset_index(drop=True)
-        st.write(sorted_results)
+        #st.write(sorted_results)
         #If there are more than one row which gretor than the sililarity threshold, reccomend the most prefered and the second most preffered
         if len(sorted_results)>0:
             greator_similarities=sorted_results['similarities'] >= similaritythreshold

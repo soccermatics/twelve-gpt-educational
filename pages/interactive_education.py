@@ -6,8 +6,19 @@ import argparse
 import tiktoken
 import os
 import numpy as np
-
+import json
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+import time
+from io import BytesIO
+import uuid
+from dotenv import load_dotenv,find_dotenv
+from dotenv import dotenv_values
+import sys
+import dropbox
+from dropbox import DropboxOAuth2FlowNoRedirect
 from utils.utils import normalize_text
+from io import BytesIO
 
 from classes.data_source import Arguments
 
@@ -83,7 +94,6 @@ if 'gameOver' not in st.session_state:
 
 to_hash = (overall)
 chat = create_chat(to_hash, LessonChat, overallThesis, lesson, gameOver=st.session_state.gameOver)
-#st.write(currentState)
 # Now we want to add basic content to chat if it's empty
 if chat.state == "empty":
 
@@ -100,10 +110,98 @@ if chat.state == "empty":
 
 # Now we want to get the user input, display the messages and save the state
 #st.write(chat.state)
+
 chat.get_input()
 chat.display_messages()
-#st.session_state.totalscore =  chat.totalscore
 st.session_state.arguments = chat.arguments
 st.session_state.gameOver = chat.gameOver
 chat.save_state()
+#conn = st.connection("gsheets", type=GSheetsConnection)
+#st.write(st.session_state)
+#______________________________________________________________________________
+load_dotenv(find_dotenv())
+#tesu=load_dotenv()
+#st.write(tesu)
+path = "a.env"  #try .path[0] if 1 doesn't work
+load_dotenv(path)
+#config = dotenv_values(".env")
+#st.write(config)
+app_key= os.getenv("APP_KEY")
+app_secret = os.getenv("APP_SECRET")
+access_token=os.getenv("ACCESS_TOKEN")
+# Dropbox API credentials
+
+try:
+    dbx = dropbox.Dropbox(access_token)
+    st.write("Successfully connected ")
+except Exception as e:
+    st.error(f"Failed to connect to Dropbox: {e}")
+#dbx = dropbox.Dropbox(access_token)
+
+dropbox_file_path = "/uploaded_dataframe.csv"
+
+
+if "messages" not in st.session_state:
+    st.session_state["messages"] = st.session_state["messages_to_display"],
+
+# Function to upload file to Dropbox
+
+
+def upload_dataframe_to_dropbox(df, dropbox_path):
+    
+    # Convert DataFrame to CSV in-memory
+    csv_buffer = BytesIO()
+    df.to_csv(csv_buffer, index=False)
+    csv_buffer.seek(0)  # Reset buffer pointer to the beginning
+
+    try:
+        # Upload CSV content to Dropbox
+        dbx.files_upload(
+            csv_buffer.read(),
+            dropbox_path,
+            mode=dropbox.files.WriteMode.overwrite,
+        )
+        return True, f"File successfully uploaded to Dropbox at {dropbox_path}"
+    except dropbox.exceptions.ApiError as e:
+        return False, f"Dropbox API error: {e}"
+    except Exception as e:
+        return False, f"Unexpected error: {e}"
+
+def save_chat_history():
+    # Create the filename using the session ID
+    if "session_id" not in st.session_state:
+        st.session_state["session_id"] = str(uuid.uuid4())
+    filename = f"chat_{st.session_state['session_id']}.csv"
+    dropbox_file_path=f"/{filename}.csv"
+    
+    # Convert chat history to a DataFrame
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = []  # Initialize with an empty list
+    chat_df = pd.DataFrame(st.session_state["chat_history"])
+    
+    # Save the DataFrame to a CSV file
+    #file_content=chat_df.to_csv(filename, index=False)
+    
+    #upload_to_dropbox(st.session_state["chat_history"], filename)
+    success, message = upload_dataframe_to_dropbox(chat_df, dropbox_file_path)
+    if success:
+        #st.success(message)
+        st.write("Saved")
+    else:
+        st.error(message)
+
+    return filename
+
+
+if st.button("Finish"):
+    if st.session_state["messages"]:
+        # Append user input to chat history
+        if "chat_history" not in st.session_state:
+            st.session_state["chat_history"] = [] 
+        st.session_state["chat_history"].append({"role": "user", "content":st.session_state["messages"]})
+        
+        # Save chat history after every interaction
+    save_chat_history()
+    st.write("Congratulations on finishing the for loop lesson")
+
 

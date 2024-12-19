@@ -421,7 +421,7 @@ class LessonDescription(Description):
         for i,argument in self.topic.iterrows():
             
             description += argument['user'] + ". "
-        #st.write(description)
+        
 
         return description
 

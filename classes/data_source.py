@@ -259,29 +259,26 @@ class Lesson(Data):
         overall = []
 
         for _, row in df.iterrows():
-            parts = row['step']
+            parts = row[['step']]
             category = row['topic']
-
-                #opposite_dict={'Pro':'Con','Con':'Pro'}
-
             current_view =''
             for i in range(int(len(parts)/2)):
                 prefix = parts[:i*2+2]
                 prefix=prefix.rstrip('')
                 df['step'] = df['step'].astype(str)
                 new_view=df[df['step']==prefix]['topic'].values[0]
-                if new_view == 'defination':
+                if new_view == 'Start':
                     current_view = new_view
-                if current_view == 'defination':
+                if current_view == 'Start':
                     current_view = new_view
-                elif current_view == 'defination' and new_view == 'implementation':
-                    current_view = 'implementation'
-                elif current_view == 'implementation' and new_view == 'defination':
-                    current_view = 'defination'
-                elif current_view == 'implementation' and new_view == 'condtion':
-                    current_view = 'condition'
-                elif current_view == 'imlementation' and new_view == 'increment':
-                    current_view = 'increment'
+                elif current_view == 'Defination' and new_view == 'Syntax':
+                    current_view = 'Syntax'
+                elif current_view == 'Syntax' and new_view == 'Defination':
+                    current_view = 'Defination'
+                elif current_view == 'Syntax' and new_view == 'Basic Implementation':
+                    current_view = 'Basic Implementation'
+                elif current_view == 'Basic Implementation' and new_view == 'loops with array':
+                    current_view = 'loops with array'
                     #elif current_view == 'Pro' and new_view == 'Pro':
                        # current_view = 'Pro'
 
@@ -289,6 +286,7 @@ class Lesson(Data):
             overall.append(current_view)  
 
         df['overall'] = overall
+        #st.write(df)
 
         return df
 
@@ -297,8 +295,8 @@ class Lesson(Data):
             
         df = self.df
             
-        # df['assistant'] contains the tree structure.
-        # df['category'] contains the stance.
+        #df['step'] #contains the tree structure.
+        #df['topic'] contains the topics.
             
         # Find all rows of dateframe where df['assistant'] starts with 'topic'
         argument_df = df[df['step'].str.startswith(argument)]
@@ -314,7 +312,7 @@ class Lesson(Data):
             argument_df2 = df[df['step'].str.startswith(subargument)]
             argument_df2 = argument_df2[argument_df2['step'].str.len() <= len(argument)+4]
             argument_df2 = argument_df2[argument_df2['step'].str.len() > len(argument) + 2 ]
-            argument_df2 = argument_df2[argument_df2['topic']=='for loops']
+            argument_df2 = argument_df2[argument_df2['topic']=='defination']
             # Add these to the arguments.
             argument_df = pd.concat([argument_df,argument_df2])
         #st.write(argument_df)
