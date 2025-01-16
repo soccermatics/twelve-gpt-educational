@@ -338,9 +338,10 @@ class ShotDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/action/shots.xlsx"]
     
-    def __init__(self, shots, shot_id):
+    def __init__(self, shots, shot_id, competition):
         self.shots = shots
         self.shot_id = shot_id
+        self.competition = competition
         super().__init__()
 
     def synthesize_text(self):
@@ -357,7 +358,7 @@ class ShotDescription(Description):
         start_x = shot_data['start_x'].iloc[0]
         start_y = shot_data['start_y'].iloc[0]
         xG = shot_data['xG'].iloc[0]
-        goal_status = shot_data['goal'].iloc[0]
+        goal_status = shot_data['goal'].fillna(False).iloc[0]
         
         # Map goal boolean to readable category
         labels = {False: "didn't result in a goal.", True: 'was a goal!'}
@@ -385,9 +386,10 @@ class ShotDescription(Description):
             'shot_after_corner': shot_data['shot_after_corner'].iloc[0],
             'shot_after_free_kick': shot_data['shot_after_free_kick'].iloc[0],
             'shot_during_regular_play': shot_data['shot_during_regular_play'].iloc[0],
+            'pattern': shot_data['play_pattern_name'].iloc[0],
         }
 
-        feature_descriptions = sentences.describe_shot_features(shot_features)
+        feature_descriptions = sentences.describe_shot_features(shot_features, self.competition)
 
 
         shot_description = (
@@ -404,6 +406,7 @@ class ShotDescription(Description):
             st.write(shot_description)
         
         return shot_description 
+    
 
     def get_prompt_messages(self):
         prompt = (

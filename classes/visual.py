@@ -175,9 +175,11 @@ class DistributionPlot(Visual):
         else:
             self._setup_axes()
 
-    def _setup_axes(self, labels=["More Negative Contribution to xG", "Average Contribution to xG", "More Positive Contribution to xG"]):
+    def _setup_axes(self, labels=["Negative", "Average Contribution to xG", "Positive"]):
+
+        self.fig.update_layout(width=400)
         self.fig.update_xaxes(
-            range=[-4, 4],
+            range=[-7, 7],
             fixedrange=True,
             tickmode="array",
             tickvals=[-3, 0, 3],
@@ -315,20 +317,6 @@ class DistributionPlot(Visual):
             hover_string="Rank: %{customdata}/" + str(n_group),
         )
 
-    # def add_players(self, players: PlayerStats, metrics):
-
-    #     # Make list of all metrics with _Z and _Rank added at end
-    #     metrics_Z = [metric + "_Z" for metric in metrics]
-    #     metrics_Ranks = [metric + "_Ranks" for metric in metrics]
-
-    #     self.add_group_data(
-    #         df_plot=players.df,
-    #         plots="_Z",
-    #         names=players.df["player_name"],
-    #         hover="_Ranks",
-    #         hover_string="Rank: %{customdata}/" + str(len(players.df)),
-    #         legend=f"Other players  ",  # space at end is important
-    #     )
 
     def add_players(self, players: Union[PlayerStats, CountryStats], metrics):
 

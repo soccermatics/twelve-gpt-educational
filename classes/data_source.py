@@ -617,7 +617,7 @@ class Shots(Data):
             # Combine both dictionaries into a single row dictionary
             return {**teammate_coords, **opponent_coords}
         
-        model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y", "end_x", "end_y", "minute"]].copy()
+        model_vars = test_shot[["match_id", "id", "player_name", "team_name", "index", "x", "y", "end_x", "end_y", "minute", "play_pattern_name"]].copy()
         
         #model_vars["header"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Head" else 0)
         model_vars["left_foot"] = test_shot.body_part_name.apply(lambda cell: 1 if cell == "Left Foot" else 0)
@@ -695,11 +695,11 @@ class Shots(Data):
 
     def read_model_params(self, competition):
         competitions_dict_prams = {
-        "EURO Men 2024": "data/model_params_EURO_Men_2024.xlsx",
+        "EURO Men 2024": "data/model_params_EURO_2024.xlsx",
         "National Women's Soccer League (NWSL) 2018": "data/model_params_NWSL.xlsx",
         "FIFA 2022": "data/model_params_FIFA_2022.xlsx",
         "Women's Super League (FAWSL) 2017-18": "data/model_params_FAWSL.xlsx",
-        "EURO Men 2022": "data/model_params_EURO_Men_2022.xlsx",
+        "EURO Men 2020": "data/model_params_EURO_2020.xlsx",
         "Africa Cup of Nations (AFCON) 2023": "data/model_params_AFCON_2023.xlsx",}
 
         file_path = competitions_dict_prams.get(competition)
@@ -773,11 +773,11 @@ class Shots(Data):
     def load_model(competition):
 
         competitions_dict = {
-        "EURO Men 2024": "data/xg_model_EURO_Men_2024.sav",
+        "EURO Men 2024": "data/xg_model_EURO_2024.sav",
         "National Women's Soccer League (NWSL) 2018": "data/xg_model_NWSL.sav",
         "FIFA 2022": "data/xg_model_FIFA_2022.sav",
         "Women's Super League (FAWSL) 2017-18": "data/xg_model_FAWSL.sav",
-        "EURO Men 2022": "data/xg_model_EURO_Men_2022.sav",
+        "EURO Men 2020": "data/xg_model_EURO_2020.sav",
         "Africa Cup of Nations (AFCON) 2023": "data/xg_model_AFCON_2023.sav",}
         
         saved_model_path = competitions_dict.get(competition)

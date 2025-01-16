@@ -1,6 +1,7 @@
 # Give the correct gnder words
 import numpy as np
 import pandas as pd
+import streamlit as st
 def pronouns(gender):
     if gender.lower() == "male":
         subject_p, object_p, possessive_p = "he", "him", "his"
@@ -72,8 +73,34 @@ def describe_xg(xG):
 
 # In sentences.py or wherever you manage your sentences module
 
-def describe_shot_features(features):
+def read_feature_thresholds(competition):
+        competitions_dict_prams = {
+        "EURO Men 2024": "data/feature_description_EURO_Men_2024.xlsx",
+        "National Women's Soccer League (NWSL) 2018": "data/feature_description_NWSL.xlsx",
+        "FIFA 2022": "data/feature_description_FIFA_2022.xlsx",
+        "Women's Super League (FAWSL) 2017-18": "data/feature_description_FAWSL.xlsx",
+        "EURO Men 2020": "data/feature_description_EURO_Men_2020.xlsx",
+        "Africa Cup of Nations (AFCON) 2023": "data/feature_description_AFCON_2023.xlsx",}
+
+        file_path = competitions_dict_prams.get(competition)
+        thresh_file = pd.read_excel(file_path)
+        return thresh_file
+
+        
+
+def describe_shot_features(features, competition):
     descriptions = []
+
+    thresholds= read_feature_thresholds(competition)
+    #st.write(thresholds)    
+    # Get the thresholds for each feature
+    vertical_distance_thresholds = thresholds['c']
+    euclidean_distance_thresholds = thresholds['distance']
+    nearby_opponents_thresholds = thresholds['close_players']
+    opponents_triangle_thresholds = thresholds['triangle']
+    goalkeeper_distance_thresholds = thresholds['gk_distance']
+    nearest_opponent_distance_thresholds = thresholds['dist_to_nearest_opponent']
+    angle_to_goalkeeper_thresholds = thresholds['angle_to_gk']
 
     # Binary features description
     #if features['header'] == 1:
@@ -93,59 +120,111 @@ def describe_shot_features(features):
         elif features['shot_after_free_kick'] == 1:
             descriptions.append("The shot was taken after a free-kick.")
         else:    
-            descriptions.append("The shot was taken from a set-piece.")    
+            descriptions.append(f"The shot was taken from a {features['pattern']}.")    
 
-    # Continuous features description
-    if features['vertical_distance_to_center'] < 2.805:
+    # Use the thresholds dynamically
+    if features['vertical_distance_to_center'] < vertical_distance_thresholds.iloc[4]:
         descriptions.append("It was taken from very close to the center of the pitch.")
-    elif features['vertical_distance_to_center'] < 9.647:
+    elif features['vertical_distance_to_center'] < vertical_distance_thresholds.iloc[6]:
         descriptions.append("It was taken reasonably centrally.")
     else:
         descriptions.append("It was taken quite a long way from the centre of the pitch.")
 
-    if features['euclidean_distance_to_goal'] < 10.278:
+    if features['euclidean_distance_to_goal'] < euclidean_distance_thresholds.iloc[4]:
         descriptions.append("It was taken from a close range, near the goal.")
-    elif features['euclidean_distance_to_goal'] < 21.116:
+    elif features['euclidean_distance_to_goal'] < euclidean_distance_thresholds.iloc[6]:
         descriptions.append("It was taken from a moderate distance from the goal.")
     else:
         descriptions.append("It was taken from long range, far from the goal.")
 
-    if features['nearby_opponents_in_3_meters'] < 1:
+    if features['nearby_opponents_in_3_meters'] < nearby_opponents_thresholds.iloc[4]:
         descriptions.append("It was taken with little or no pressure from opponents.")
-    elif features['nearby_opponents_in_3_meters'] < 2:
+    elif features['nearby_opponents_in_3_meters'] < nearby_opponents_thresholds.iloc[6]:
         descriptions.append("It was taken with moderate pressure, with one opponent within 3 meters.")
     else:
         descriptions.append("It was taken under heavy pressure, with several opponents within 3 meters.")
 
-    if features['opponents_in_triangle'] < 1:
-        descriptions.append("it was taken with no oppositions between the shooter and the goals.")
-    elif features['opponents_in_triangle'] < 2:
-        descriptions.append("There were some opposition players blocking the path, but there was spac for a well-placed shot.")
+    if features['opponents_in_triangle'] < opponents_triangle_thresholds.iloc[4]:
+        descriptions.append("It was taken with no opposition between the shooter and the goal.")
+    elif features['opponents_in_triangle'] < opponents_triangle_thresholds.iloc[6]:
+        descriptions.append("There were some opposition players blocking the path, but there was space for a well-placed shot.")
     else:
-        descriptions.append("There we multiple opponents blocking the path.")
+        descriptions.append("There were multiple opponents blocking the path.")
 
-    if features['goalkeeper_distance_to_goal'] < 1.649:
+    if features['goalkeeper_distance_to_goal'] < goalkeeper_distance_thresholds.iloc[4]:
         descriptions.append("The goalkeeper was very close to the goal.")
-    elif features['goalkeeper_distance_to_goal'] < 3.217:
+    elif features['goalkeeper_distance_to_goal'] < goalkeeper_distance_thresholds.iloc[6]:
         descriptions.append("The goalkeeper was at a moderate distance from the goal.")
     else:
         descriptions.append("The goalkeeper was positioned far from the goal.")
 
-    if features['distance_to_nearest_opponent'] < 1.119:
+    if features['distance_to_nearest_opponent'] < nearest_opponent_distance_thresholds.iloc[4]:
         descriptions.append("The shot was taken with strong pressure from a very close opponent.")
-    elif features['distance_to_nearest_opponent'] < 1.779:
+    elif features['distance_to_nearest_opponent'] < nearest_opponent_distance_thresholds.iloc[6]:
         descriptions.append("The shot was taken with moderate pressure from an opponent nearby.")
     else:
         descriptions.append("The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.")
 
-    if features['angle_to_goalkeeper'] < -23.36:
-        descriptions.append("The shot was taken from a broad angle towards goalkeeper being on left, making it difficult to score.")
-    elif features['angle_to_goalkeeper'] < 22.72:
+    if features['angle_to_goalkeeper'] < angle_to_goalkeeper_thresholds.iloc[4]:
+        descriptions.append("The shot was taken from a broad angle towards the goalkeeper being on the left, making it difficult to score.")
+    elif features['angle_to_goalkeeper'] < angle_to_goalkeeper_thresholds.iloc[6]:
         descriptions.append("The shot was taken from a relatively good angle, allowing for a decent chance.")
     else:
-        descriptions.append("The shot was taken from a broad angle towards the goalkeeper being on right.")
+        descriptions.append("The shot was taken from a broad angle towards the goalkeeper being on the right.")
 
     return descriptions
+
+    # # Continuous features description
+    # if features['vertical_distance_to_center'] < 2.805:
+    #     descriptions.append("It was taken from very close to the center of the pitch.")
+    # elif features['vertical_distance_to_center'] < 9.647:
+    #     descriptions.append("It was taken reasonably centrally.")
+    # else:
+    #     descriptions.append("It was taken quite a long way from the centre of the pitch.")
+
+    # if features['euclidean_distance_to_goal'] < 10.278:
+    #     descriptions.append("It was taken from a close range, near the goal.")
+    # elif features['euclidean_distance_to_goal'] < 21.116:
+    #     descriptions.append("It was taken from a moderate distance from the goal.")
+    # else:
+    #     descriptions.append("It was taken from long range, far from the goal.")
+
+    # if features['nearby_opponents_in_3_meters'] < 1:
+    #     descriptions.append("It was taken with little or no pressure from opponents.")
+    # elif features['nearby_opponents_in_3_meters'] < 2:
+    #     descriptions.append("It was taken with moderate pressure, with one opponent within 3 meters.")
+    # else:
+    #     descriptions.append("It was taken under heavy pressure, with several opponents within 3 meters.")
+
+    # if features['opponents_in_triangle'] < 1:
+    #     descriptions.append("it was taken with no oppositions between the shooter and the goals.")
+    # elif features['opponents_in_triangle'] < 2:
+    #     descriptions.append("There were some opposition players blocking the path, but there was spac for a well-placed shot.")
+    # else:
+    #     descriptions.append("There we multiple opponents blocking the path.")
+
+    # if features['goalkeeper_distance_to_goal'] < 1.649:
+    #     descriptions.append("The goalkeeper was very close to the goal.")
+    # elif features['goalkeeper_distance_to_goal'] < 3.217:
+    #     descriptions.append("The goalkeeper was at a moderate distance from the goal.")
+    # else:
+    #     descriptions.append("The goalkeeper was positioned far from the goal.")
+
+    # if features['distance_to_nearest_opponent'] < 1.119:
+    #     descriptions.append("The shot was taken with strong pressure from a very close opponent.")
+    # elif features['distance_to_nearest_opponent'] < 1.779:
+    #     descriptions.append("The shot was taken with moderate pressure from an opponent nearby.")
+    # else:
+    #     descriptions.append("The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.")
+
+    # if features['angle_to_goalkeeper'] < -23.36:
+    #     descriptions.append("The shot was taken from a broad angle towards goalkeeper being on left, making it difficult to score.")
+    # elif features['angle_to_goalkeeper'] < 22.72:
+    #     descriptions.append("The shot was taken from a relatively good angle, allowing for a decent chance.")
+    # else:
+    #     descriptions.append("The shot was taken from a broad angle towards the goalkeeper being on right.")
+
+    # return descriptions
 
 def describe_shot_single_feature(feature_name, feature_value):
     # Describe binary features
@@ -245,42 +324,45 @@ def describe_shot_contributions(shot_contributions, shot_features, feature_name_
     sorted_contributions = contributions.abs().sort_values(ascending=False)
     
     # Get the top 4 contributions
-    top_contributions = sorted_contributions.head(4)
+    #top_contributions = sorted_contributions.head(4)
+    top_contributions = sorted_contributions
     
     # Loop through the top contributions to generate descriptions
     for idx, (feature, contribution) in enumerate(top_contributions.items()):
 
         # Get the original sign of the contribution
         original_contribution = contributions[feature]
-        
-        # Remove "_contribution" suffix to match feature names in shot_features
-        feature_name = feature.replace('_contribution', '')
-        
-        # Use feature_name_mapping to get the display name for the feature (if available)
-        feature_display_name = feature_name_mapping.get(feature, feature)
-        
-        # Get the feature value from shot_features
-        feature_value = shot_features[feature_name]
-        
-        # Get the feature description
-        feature_value_description = describe_shot_single_feature(feature_name, feature_value)
-        
-        # Add the feature's contribution to the xG description
-        if original_contribution > 0:
-            impact = 'maximum positive contribution'
-            impact_text = "increased the xG of the shot."
-        elif original_contribution < 0:
-            impact = 'maximum negative contribution'
-            impact_text = "reduced the xG of the shot."
-        else:
-            impact = 'no contribution'
-            impact_text = "had no impact on the xG of the shot."
 
-        # Use appropriate phrasing for the first feature and subsequent features
-        if idx == 0:
-            text += f"\nThe most impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-        else:
-            text += f"\nAnother impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description} This feature {impact_text}"
+        if original_contribution >= 0.1 or original_contribution <= -0.1:
+        
+            # Remove "_contribution" suffix to match feature names in shot_features
+            feature_name = feature.replace('_contribution', '')
+            
+            # Use feature_name_mapping to get the display name for the feature (if available)
+            feature_display_name = feature_name_mapping.get(feature, feature)
+            
+            # Get the feature value from shot_features
+            feature_value = shot_features[feature_name]
+            
+            # Get the feature description
+            feature_value_description = describe_shot_single_feature(feature_name, feature_value)
+            
+            # Add the feature's contribution to the xG description
+            if original_contribution > 0:
+                impact = 'maximum positive contribution'
+                impact_text = "increased the xG of the shot."
+            elif original_contribution < 0:
+                impact = 'maximum negative contribution'
+                impact_text = "reduced the xG of the shot."
+            else:
+                impact = 'no contribution'
+                impact_text = "had no impact on the xG of the shot."
+
+            # Use appropriate phrasing for the first feature and subsequent features
+            if idx == 0:
+                text += f"\nThe most impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
+            else:
+                text += f"\nAnother impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description} This feature {impact_text}"
         
 
     return text

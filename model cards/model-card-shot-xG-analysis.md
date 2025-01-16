@@ -98,12 +98,12 @@ is intended as an illustration of the methods. This work is a derivative of the 
 
       | Tournament                              | ROC (%) | Brier Score | Log-Loss |
       |-----------------------------------------|---------|-------------|----------|
-      | EURO Men 2024                           | 82      | 0.05        | 0.19     |
+      | EURO Men 2024                           | 81      | 0.05        | 0.19     |
       | EURO Men 2022                           | 79      | 0.08        | 0.28     |
       | Women's Super League (FAWSL) 2017-18    | 76      | 0.09        | 0.30     |
       | National Women's Soccer League 2018     | 77      | 0.06        | 0.22     |
       | FIFA 2022                               | 77      | 0.08        | 0.29     |
-      | Africa Cup of Nations (AFCON) 2023      | 82      | 0.05        | 0.20     |
+      | Africa Cup of Nations (AFCON) 2023      | 84      | 0.05        | 0.20     |
 
   - **Performance across subgroups:** Tested for different leagues and playing styles to ensure robustness.
 

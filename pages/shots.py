@@ -70,11 +70,11 @@ st.markdown("## Shot commentator")
 #df_match = parser.match(competition_id=55, season_id=282)
 #match_ids = df_match['match_id'].unique()
 competitions = {
-    "EURO Men 2024": "data/match_id_to_name_EURO_Men_2024.json",
+    "EURO Men 2024": "data/match_id_to_name_EURO_2024.json",
+    "EURO Men 2020": "data/match_id_to_name_EURO_2020.json",
     "National Women's Soccer League (NWSL) 2018": "data/match_id_to_name_NWSL.json",
     "FIFA 2022": "data/match_id_to_name_FIFA_2022.json",
     "Women's Super League (FAWSL) 2017-18": "data/match_id_to_name_FAWSL.json",
-    "EURO Men 2022": "data/match_id_to_name_EURO_Men_2022.json",
     "Africa Cup of Nations (AFCON) 2023": "data/match_id_to_name_AFCON_2023.json"
 }
 
@@ -122,6 +122,9 @@ selected_player_minute = st.sidebar.selectbox(
     options=shots_df['player_minute'].unique())
 selected_shot = shots_df[shots_df['player_minute'] == selected_player_minute]
 
+#st.write(selected_shot)
+
+
 if not selected_shot.empty:
     shot_id = selected_shot.iloc[0]['id']  # Retrieve the shot_id for the selection
 else:
@@ -143,6 +146,8 @@ st.expander("Model card", expanded=False).markdown(model_card_text)
 
 to_hash = (selected_match_id, shot_id)
 
+
+
 visuals = ShotVisual(metric=None)
 visuals.add_shot(shots, shot_id)
 visuals2= ShotContributionPlot(df_contributions=df_contributions, df_shots= shots_df, metrics=metrics)
@@ -150,7 +155,7 @@ visuals2.add_shots(shots_df, metrics, id_to_number= id_to_number)
 visuals2.add_shot(contribution_df=df_contributions, shots_df= shots_df, shot_id=shot_id, metrics=metrics, id_to_number= id_to_number)
 
 
-descriptions = ShotDescription(shots, shot_id)
+descriptions = ShotDescription(shots, shot_id, selected_competition)
 
 summaries = descriptions.stream_gpt()
 chat = create_chat(to_hash, Chat)
