@@ -1,0 +1,173 @@
+{
+    "system_instruction": "You are a data analyst and a social scientist. You provide succinct and to the point explanations about countries using social factors derived from the World Value Survey. You use the information given to you to answer questions about how countries score in various social factors that attempt to measure the social values held by the population of a country.",
+    "history": [
+        {
+            "role": "user",
+            "parts": "First, could you answer some questions about the World Value Survey for me?"
+        },
+        {
+            "role": "model",
+            "parts": "Sure!"
+        },
+        {
+            "role": "user",
+            "parts": "What is the primary purpose of the World Values Survey (WVS)?"
+        },
+        {
+            "role": "model",
+            "parts": "The WVS aims to study social, political, economic, religious, and cultural values across different countries and examine how these values influence societal development over time."
+        },
+        {
+            "role": "user",
+            "parts": "Who uses the data from the World Values Survey?"
+        },
+        {
+            "role": "model",
+            "parts": "Researchers, policy makers, government officials, journalists, and organizations like the World Bank use WVS data for analysis in fields such as economic development, democratization, and social capital."
+        },
+        {
+            "role": "user",
+            "parts": "What are the two major dimensions of cultural variation identified by Inglehart and Welzel in the WVS?"
+        },
+        {
+            "role": "model",
+            "parts": "The two major dimensions of cultural variation identified by Inglehart and Welzel in the WVS are \"Traditional values versus Secular values\" and \"Survival values versus Self-expression values\"."
+        },
+        {
+            "role": "user",
+            "parts": "What do traditional values emphasize according to the WVS?"
+        },
+        {
+            "role": "model",
+            "parts": "Traditional values emphasize religion, authority, and a nationalistic outlook, while rejecting abortion."
+        },
+        {
+            "role": "user",
+            "parts": "How do secular values differ from traditional values?"
+        },
+        {
+            "role": "model",
+            "parts": "Secular values place less emphasis on religion, authority, independence and perseverance in children and are more accepting of abortion."
+        },
+        {
+            "role": "user",
+            "parts": "What do survival values prioritize?"
+        },
+        {
+            "role": "model",
+            "parts": "Survival values emphasize economic and physical security, with a focus on national identity and lower levels of trust and tolerance of homosexuality."
+        },
+        {
+            "role": "user",
+            "parts": " What are self-expression values in the context of the WVS?"
+        },
+        {
+            "role": "model",
+            "parts": "Self-expression values prioritize leisure over work, tolerance of homosexuality, freedom, and political participation. Levels of trust are higher as well as ratings of happiness and life-satisfaction."
+        },
+        {
+            "role": "user",
+            "parts": "Can you give four additional examples of social factors that can be measured using the WVS?"
+        },
+        {
+            "role": "model",
+            "parts": "Four additional examples of social factors that can be measured using the WVS are \"Neutrality\", \"Fairness\", \"Skepticism\" and \"Societal Tranquillity\"."
+        },
+        {
+            "role": "user",
+            "parts": "What does \u201cNeutrality\u201d measure in the context of the WVS?"
+        },
+        {
+            "role": "model",
+            "parts": "Neutrality measures a lack of engagement in civic, political, or social organizations. High-scoring countries having little participation in consumer organisations, charitable or humanitarian organizations, professional organizations or self-help or mutual aid groups."
+        },
+        {
+            "role": "user",
+            "parts": "How is \"Fairness\" assessed in the context of the WVS?"
+        },
+        {
+            "role": "model",
+            "parts": "Fairness is measured by attitudes toward whether the actions of stealing, bribery, cheating on taxes, and violence are ever justifiable. A high score in fairness is associated with these actions never being justifiable."
+        },
+        {
+            "role": "user",
+            "parts": "What does the \"Skepticism\" value represent in the context of the WVS?"
+        },
+        {
+            "role": "model",
+            "parts": "Skepticism represents distrust in government, civil services, political parties, and the justice system or courts. A high score in skepticism indicates a low confidence in these institutions."
+        },
+        {
+            "role": "user",
+            "parts": "What does \"Societal Tranquillity\" measure?"
+        },
+        {
+            "role": "model",
+            "parts": "Societal Tranquillity measures the level of worry felt about war, civil war, terrorism, and access to good education. Low scores in societal tranquillity indicate worry about these issues."
+        },
+        {
+            "role": "user",
+            "parts": "In the 7th wave of the WVS, which took place from 2017 to 2022, what results were found on average across the globe for the \"Traditional values versus Secular values\"?"
+        },
+        {
+            "role": "model",
+            "parts": "In the 7th wave of the WVS which took place from 2017 to 2022, the average score for the \"Traditional values versus Secular values\" factor was negative, indicating that on average the participants had traditional values. "
+        },
+        {
+            "role": "user",
+            "parts": "In the 7th wave of the WVS, what was the global average for \"Survival values versus Self-expression values\"?"
+        },
+        {
+            "role": "model",
+            "parts": "In the 7th wave of the WVS which took place from 2017 to 2022, the average score for the \"Survival values versus Self-expression values\" factor was zero, indicating that on average the participants were neither survival nor self-expression orientated. "
+        },
+        {
+            "role": "user",
+            "parts": "In the 7th wave of the WVS, what was the global average for \"Neutrality\"?"
+        },
+        {
+            "role": "model",
+            "parts": "In the 7th wave of the WVS which took place from 2017 to 2022, the average score in \"Neutrality\" was positive, indicating that on average the participants did not actively participate in civic, political, or social organizations. "
+        },
+        {
+            "role": "user",
+            "parts": "In the 7th wave of the WVS, what was the global average for \"Fairness\"?"
+        },
+        {
+            "role": "model",
+            "parts": "In the 7th wave of the WVS which took place from 2017 to 2022, the average score in \"Fairness\" was positive, indicating that on average the participants reported that the actions of stealing, bribery, cheating on taxes, and violence were not justifiable. "
+        },
+        {
+            "role": "user",
+            "parts": "In the 7th wave of the WVS, what was the global average for \"Skepticism\"?"
+        },
+        {
+            "role": "model",
+            "parts": "In the 7th wave of the WVS which took place from 2017 to 2022, the average score in \"Skepticism\" was slightly positive, indicating that on average the participants indicated some distrust in government, civil services, political parties, and the justice system or courts."
+        },
+        {
+            "role": "user",
+            "parts": "In the 7th wave of the WVS, what was the global average for \"Societal Tranquillity\"?"
+        },
+        {
+            "role": "model",
+            "parts": "In the 7th wave of the WVS which took place from 2017 to 2022, the average score in \"Societal Tranquillity\" was slightly negative, indicating that on average the participants reported some level of worry felt about war, civil war, terrorism, and access to good education. "
+        },
+        {
+            "role": "user",
+            "parts": "Please use the statistical description enclosed with ``` to give a concise, 2 short paragraph summary of the social values held by population of the country. The first paragraph should focus on any factors or values for which the country is above or bellow average. If the country is neither above nor below average in any values, mention that. The remaining paragraph should mention any specific values or factors that are neither high nor low compared to the average. "
+        },
+        {
+            "role": "user",
+            "parts": "Now do the same thing with the following: ```Here is a statistical description of the societal values of Peru. \n\n```\n If no data is provided answer anyway, using your prior statistical knowledge."
+        },
+        {
+            "role": "model",
+            "parts": "Peru was found to have below average Survival vs Self-expression Values score, suggesting that participants were more survival orientated. One contributing factor was that on average participants indicated that work was very important to them. Further, Peru was found to be above averagely skeptical, with participant on average indicating that they have no trust at all in parliament. \n\nAccording to the WVS, Peru was found to have neither an above nor a below average Traditional vs Secular Values score, to be averagely neutral, to have an average value of fairness, and to be neither above nor below averagely tranquil compared to other countries in the same wave."
+        }
+    ],
+    "content": {
+        "role": "user",
+        "parts": ""
+    }
+}
