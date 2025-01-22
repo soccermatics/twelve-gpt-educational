@@ -1,0 +1,304 @@
+shot_id,description,test_1_score,test_2_result,ground_truth_contribution_sign,correct_prediction
+30cfa4e6-8610-4341-a904-5728fa572a3e,"Florian Wirtz's shot from Germany was a goal! This shot had an xG value of 0.14, which means that we estimate the chance of scoring from this situation as 14%. This was a high-quality chance, with a good probability of scoring. The shot was with the right foot.
+The shot was taken after a throw-in.
+It was taken from very close to the center of the pitch.
+It was taken from a moderate distance from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken closer to the center of the pitch (less vertical distance).. This feature increased the xG of the shot.
+Another impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a moderate distance to the goal. This feature increased the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.",1.0,positive,positive,True
+8b2965f3-ef80-48c0-adf1-6e08460c93b8,"Jamal Musiala's shot from Germany was a goal! This shot had an xG value of 0.09, which means that we estimate the chance of scoring from this situation as 9%. This was a decent chance. The shot was with the right foot.
+The shot was taken after a throw-in.
+It was taken reasonably centrally.
+It was taken from a close range, near the goal.
+It was taken under heavy pressure, with several opponents within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a moderate distance to the goal.. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken from an intermediate vertical distance. This feature increased the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum negative contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature reduced the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature reduced the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum negative contribution because the goalkeeper was very close to the goal. This feature reduced the xG of the shot.
+Another impactful feature is nearby opponents within 3 meters, which had the maximum negative contribution because the shot was taken under heavy pressure, with several opponents close by within 3 meters. This feature reduced the xG of the shot.",1.0,positive,positive,True
+3163f35d-88f5-4bec-b41f-41bac95b23f2,"Kai Havertz's shot from Germany didn't result in a goal. This shot had an xG value of 0.01, which means that we estimate the chance of scoring from this situation as 1%. This was a slim chance of scoring. The shot was with the left foot.
+The shot was taken after a free-kick.
+It was taken from very close to the center of the pitch.
+It was taken from a moderate distance from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum negative contribution because the shot was heavily contested, with multiple opponents blocking the path.. This feature reduced the xG of the shot.
+Another impactful feature is shot after free kick, which had the maximum negative contribution because the shot was taken after a free-kick. This feature reduced the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken closer to the center of the pitch (less vertical distance). This feature increased the xG of the shot.
+Another impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a moderate distance to the goal. This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum positive contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum negative contribution because the goalkeeper was very close to the goal. This feature reduced the xG of the shot.",2.0,positive,positive,True
+a6b99de1-079b-46fd-9b33-215d5cf15623,"Antonio Rüdiger's shot from Germany didn't result in a goal. This shot had an xG value of 0.03, which means that we estimate the chance of scoring from this situation as 3%. This was a low chance of scoring. The shot was with the right foot.
+The shot was taken during open play.
+It was taken reasonably centrally.
+It was taken from long range, far from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum negative contribution because the shot was taken from a long range, far from the goal.. This feature reduced the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum positive contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature increased the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum positive contribution because the goalkeeper was positioned far from the goal. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken from an intermediate vertical distance. This feature increased the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.",1.0,negative,negative,True
+eda821c2-d7db-4ce1-8ce3-7ca767474d92,"Pascal Groß's shot from Germany didn't result in a goal. This shot had an xG value of 0.03, which means that we estimate the chance of scoring from this situation as 3%. This was a slim chance of scoring. The shot was with the right foot.
+The shot was taken after a corner.
+It was taken reasonably centrally.
+It was taken from a moderate distance from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum negative contribution because the shot was heavily contested, with multiple opponents blocking the path.. This feature reduced the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken from an intermediate vertical distance. This feature reduced the xG of the shot.
+Another impactful feature is euclidean distance to goal, which had the maximum negative contribution because the shot was taken from a long range, far from the goal. This feature reduced the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum positive contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.
+Another impactful feature is shot after corner, which had the maximum negative contribution because the shot was taken after a corner. This feature reduced the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum negative contribution because the goalkeeper was very close to the goal. This feature reduced the xG of the shot.",1.0,negative,negative,True
+3cfb67dd-cbcf-4ef9-b321-324853ee0d60,"Joshua Kimmich's shot from Germany didn't result in a goal. This shot had an xG value of 0.02, which means that we estimate the chance of scoring from this situation as 2%. This was a slim chance of scoring. The shot was with the right foot.
+The shot was taken after a corner.
+It was taken quite a long way from the centre of the pitch.
+It was taken from long range, far from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a broad angle towards the goalkeeper being on the right.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum negative contribution because the shot was taken from a long range, far from the goal.. This feature reduced the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken far from the center, closer to the touchline. This feature reduced the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum positive contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature increased the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.
+Another impactful feature is shot after corner, which had the maximum negative contribution because the shot was taken after a corner. This feature reduced the xG of the shot.",1.0,negative,negative,True
+77fb43fc-884b-4eb2-979e-dd357aefd287,"Florian Wirtz's shot from Germany didn't result in a goal. This shot had an xG value of 0.14, which means that we estimate the chance of scoring from this situation as 14%. This was a high-quality chance, with a good probability of scoring. The shot was with the right foot.
+The shot was taken after a corner.
+It was taken reasonably centrally.
+It was taken from a close range, near the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were some opposition players blocking the path, but there was space for a well-placed shot.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a broad angle towards the goalkeeper being on the right.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a moderate distance to the goal.. This feature increased the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was taken with some opposition blocking the path. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken from an intermediate vertical distance. This feature reduced the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.
+Another impactful feature is angle to goalkeepr, which had the maximum negative contribution because the shot was taken from a broad angle to the right of the goalkeeper. This feature reduced the xG of the shot.
+Another impactful feature is shot after corner, which had the maximum negative contribution because the shot was taken after a corner. This feature reduced the xG of the shot.",,positive,positive,True
+376a9e54-5edc-4609-b244-2961b5d5805e,"İlkay Gündoğan's shot from Germany didn't result in a goal. This shot had an xG value of 0.20, which means that we estimate the chance of scoring from this situation as 20%. This was a high-quality chance, with a good probability of scoring. The shot was with the left foot.
+The shot was taken during open play.
+It was taken from very close to the center of the pitch.
+It was taken from a close range, near the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a close range, near the goal.. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken closer to the center of the pitch (less vertical distance). This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature reduced the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum positive contribution because the goalkeeper was positioned far from the goal. This feature increased the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.",2.0,positive,positive,True
+5019be9b-d88e-4338-b9ea-96e195b91513,"Maximilian Mittelstädt's shot from Germany didn't result in a goal. This shot had an xG value of 0.04, which means that we estimate the chance of scoring from this situation as 4%. This was a low chance of scoring. The shot was with the left foot.
+The shot was taken during open play.
+It was taken reasonably centrally.
+It was taken from a moderate distance from the goal.
+It was taken under heavy pressure, with several opponents within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a broad angle towards the goalkeeper being on the left, making it difficult to score.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with moderate pressure from an opponent nearby.. This feature reduced the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken far from the center, closer to the touchline. This feature reduced the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature increased the xG of the shot.
+Another impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a moderate distance to the goal. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.
+Another impactful feature is nearby opponents within 3 meters, which had the maximum negative contribution because the shot was taken under heavy pressure, with several opponents close by within 3 meters. This feature reduced the xG of the shot.",2.0,positive,positive,True
+7c4c08d0-0051-44aa-85b2-000ed47a34d7,"Florian Wirtz's shot from Germany didn't result in a goal. This shot had an xG value of 0.06, which means that we estimate the chance of scoring from this situation as 6%. This was a decent chance. The shot was with the right foot.
+The shot was taken during open play.
+It was taken from very close to the center of the pitch.
+It was taken from long range, far from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum negative contribution because the shot was taken from a long range, far from the goal.. This feature reduced the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken closer to the center of the pitch (less vertical distance). This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum positive contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature increased the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.",2.0,negative,negative,True
+72a0a25a-24fe-4488-9253-c664a01449b2,"Leroy Sané's shot from Germany didn't result in a goal. This shot had an xG value of 0.06, which means that we estimate the chance of scoring from this situation as 6%. This was a decent chance. The shot was with the left foot.
+The shot was taken from a From Counter.
+It was taken quite a long way from the centre of the pitch.
+It was taken from a moderate distance from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were some opposition players blocking the path, but there was space for a well-placed shot.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a broad angle towards the goalkeeper being on the right.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was taken with some opposition blocking the path.. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken far from the center, closer to the touchline. This feature reduced the xG of the shot.
+Another impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a moderate distance to the goal. This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature reduced the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum positive contribution because the goalkeeper was positioned far from the goal. This feature increased the xG of the shot.",,positive,positive,True
+5ce91816-2190-48f7-affc-10abadd2fb3c,"Maximilian Mittelstädt's shot from Germany didn't result in a goal. This shot had an xG value of 0.06, which means that we estimate the chance of scoring from this situation as 6%. This was a decent chance. The shot was with the left foot.
+The shot was taken after a corner.
+It was taken reasonably centrally.
+It was taken from a moderate distance from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is distance to nearest opponent, which had the maximum positive contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away.. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken from an intermediate vertical distance. This feature reduced the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum negative contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature reduced the xG of the shot.
+Another impactful feature is euclidean distance to goal, which had the maximum negative contribution because the shot was taken from a moderate distance to the goal. This feature reduced the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.
+Another impactful feature is shot after corner, which had the maximum negative contribution because the shot was taken after a corner. This feature reduced the xG of the shot.",2.0,negative,negative,True
+feaec00c-41c5-463b-a037-4282f3f2ec36,"Niclas Füllkrug's shot from Germany didn't result in a goal. This shot had an xG value of 0.12, which means that we estimate the chance of scoring from this situation as 12%. This was a high-quality chance, with a good probability of scoring. The shot was with the right foot.
+The shot was taken after a throw-in.
+It was taken from very close to the center of the pitch.
+It was taken from a moderate distance from the goal.
+It was taken under heavy pressure, with several opponents within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum positive contribution because the shot was taken from a moderate distance to the goal.. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken closer to the center of the pitch (less vertical distance). This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature reduced the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum negative contribution because the goalkeeper was very close to the goal. This feature reduced the xG of the shot.
+Another impactful feature is nearby opponents within 3 meters, which had the maximum negative contribution because the shot was taken under heavy pressure, with several opponents close by within 3 meters. This feature reduced the xG of the shot.",2.0,positive,positive,True
+2be33cb2-8c4a-472f-8e1b-471ba899fdbf,"Maximilian Mittelstädt's shot from Germany didn't result in a goal. This shot had an xG value of 0.02, which means that we estimate the chance of scoring from this situation as 2%. This was a slim chance of scoring. The shot was with the left foot.
+The shot was taken after a corner.
+It was taken quite a long way from the centre of the pitch.
+It was taken from a moderate distance from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with no immediate pressure from any close opponent, with the nearest opponent far away.
+The shot was taken from a broad angle towards the goalkeeper being on the left, making it difficult to score.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum negative contribution because the shot was heavily contested, with multiple opponents blocking the path.. This feature reduced the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken far from the center, closer to the touchline. This feature reduced the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.
+Another impactful feature is shot after corner, which had the maximum negative contribution because the shot was taken after a corner. This feature reduced the xG of the shot.",1.0,negative,negative,True
+defe8eb9-a518-4385-aca4-b33556d27463,"Leroy Sané's shot from Germany didn't result in a goal. This shot had an xG value of 0.02, which means that we estimate the chance of scoring from this situation as 2%. This was a slim chance of scoring. The shot was with the left foot.
+The shot was taken during open play.
+It was taken quite a long way from the centre of the pitch.
+It was taken from long range, far from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were some opposition players blocking the path, but there was space for a well-placed shot.
+The goalkeeper was very close to the goal.
+The shot was taken with strong pressure from a very close opponent.
+The shot was taken from a broad angle towards the goalkeeper being on the right.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is vertical distance to center, which had the maximum negative contribution because the shot was taken far from the center, closer to the touchline.. This feature reduced the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was taken with some opposition blocking the path. This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with moderate pressure from an opponent nearby. This feature reduced the xG of the shot.
+Another impactful feature is euclidean distance to goal, which had the maximum negative contribution because the shot was taken from a long range, far from the goal. This feature reduced the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.",,negative,negative,True
+39107e2c-b6b5-490b-a5e1-b55296af1202,"Leroy Sané's shot from Germany was a goal! This shot had an xG value of 0.06, which means that we estimate the chance of scoring from this situation as 6%. This was a decent chance. The shot was with the left foot.
+The shot was taken from a From Counter.
+It was taken from very close to the center of the pitch.
+It was taken from long range, far from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were some opposition players blocking the path, but there was space for a well-placed shot.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is euclidean distance to goal, which had the maximum negative contribution because the shot was taken from a long range, far from the goal.. This feature reduced the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum positive contribution because the shot was taken with some opposition blocking the path. This feature increased the xG of the shot.
+Another impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken closer to the center of the pitch (less vertical distance). This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature reduced the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum positive contribution because the goalkeeper was positioned far from the goal. This feature increased the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum negative contribution because the shot was with the left foot. This feature reduced the xG of the shot.",2.0,negative,negative,True
+6ed1aa99-3539-41d1-9dcd-27badaa5e837,"Emre Can's shot from Germany didn't result in a goal. This shot had an xG value of 0.07, which means that we estimate the chance of scoring from this situation as 7%. This was a decent chance. The shot was with the right foot.
+The shot was taken during open play.
+It was taken from very close to the center of the pitch.
+It was taken from a moderate distance from the goal.
+It was taken with moderate pressure, with one opponent within 3 meters.
+There were multiple opponents blocking the path.
+The goalkeeper was very close to the goal.
+The shot was taken with moderate pressure from an opponent nearby.
+The shot was taken from a relatively good angle, allowing for a decent chance.
+
+The contributions of the features to the xG of the shot, sorted by their magnitude from largest to smallest, are as follows:
+
+The most impactful feature is vertical distance to center, which had the maximum positive contribution because the shot was taken closer to the center of the pitch (less vertical distance).. This feature increased the xG of the shot.
+Another impactful feature is distance to goal of the goalkeeper, which had the maximum negative contribution because the goalkeeper was very close to the goal. This feature reduced the xG of the shot.
+Another impactful feature is number of opponents in triangle formed by shot location and goalposts, which had the maximum negative contribution because the shot was heavily contested, with multiple opponents blocking the path. This feature reduced the xG of the shot.
+Another impactful feature is shot taken with left foot, which had the maximum positive contribution because the shot was with the right foot. This feature increased the xG of the shot.
+Another impactful feature is distance to nearest opponent, which had the maximum negative contribution because the shot was taken with no immediate pressure, as the nearest opponent was far away. This feature reduced the xG of the shot.",1.0,negative,positive,False

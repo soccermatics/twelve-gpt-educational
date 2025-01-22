@@ -99,9 +99,9 @@ is intended as an illustration of the methods. This work is a derivative of the 
       | Tournament                              | ROC (%) | Brier Score | Log-Loss |
       |-----------------------------------------|---------|-------------|----------|
       | EURO Men 2024                           | 81      | 0.05        | 0.19     |
-      | EURO Men 2022                           | 79      | 0.08        | 0.28     |
-      | Women's Super League (FAWSL) 2017-18    | 76      | 0.09        | 0.30     |
-      | National Women's Soccer League 2018     | 77      | 0.06        | 0.22     |
+      | EURO Men 2022                           | 81      | 0.08        | 0.27     |
+      | Women's Super League (FAWSL) 2017-18    | 76      | 0.09        | 0.31     |
+      | National Women's Soccer League 2018     | 78      | 0.06        | 0.22     |
       | FIFA 2022                               | 77      | 0.08        | 0.29     |
       | Africa Cup of Nations (AFCON) 2023      | 84      | 0.05        | 0.20     |
 
@@ -144,8 +144,22 @@ is intended as an illustration of the methods. This work is a derivative of the 
 
 ### **Example Visualization and Output**
 
-**Figure 1:** Visualization of shot situations and generated text output.
-![Figure 1: Visualization of shot situations and generated text output.](https://github.com/soccermatics/twelve-gpt-educational/blob/main/model%20cards/out+vis.png)
+- Test 1: Rank this text on a scale 0 to 5 as interesting and engaging. Where 0 is boring and 5 is very engaging. 
+  
+- Test 2: Was X a positive, negative or not contributing factor? Return ['positive','negative','not contributing']
+
+**Figure 1:** Score and Interest Testes.
+
+![Figure 1: Score and Interest Testes.](https://github.com/soccermatics/twelve-gpt-educational/blob/main/model%20cards/output.png)
+
+
+      | Case                                             | Test 1: Score | Test 2: Accuracy | 
+      |--------------------------------------------------|---------------|------------------|
+      | Case 1: Synthetized text without contribution    | 1.17          | 64.71%           |
+      | Case 2: Synthetized text                         | 1.5           | 94.12%           |
+      | Case 3: LLM text without examples                | 2.21          | 60.00%           |
+      | Case 4: LLM text with examples                   | 2.29          | 66.67%           |
+
 
 - **Description:** 
   - The figure includes a graphical representation of shot scenarios overlaid on a football pitch, highlighting critical features such as shot location, nearest opponents, and event context. 

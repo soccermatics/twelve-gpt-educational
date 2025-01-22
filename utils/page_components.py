@@ -95,6 +95,7 @@ def add_page_selector():
     # # page.show()  # Assume each page has a `show()` function to display its content
 
     st.page_link("pages/shots.py", label="Shot xG Analysis")
+    st.page_link("pages/eval.py", label="Shot Evaluation")
     
 
 def add_common_page_elements():
