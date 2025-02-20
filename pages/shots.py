@@ -99,8 +99,8 @@ selected_match_id = match_name_to_id[selected_match_name]
 shots = Shots(selected_competition, selected_match_id)
 shots_df= shots.df_shots
 df_contributions = shots.df_contributions
-st.write(shots_df)
 
+#st.write(shots_df)
 
 excluded_columns = ['xG', 'id', 'match_id']
 metrics = [col for col in df_contributions.columns if col not in excluded_columns]

@@ -299,7 +299,7 @@ def describe_shot_single_feature(feature_name, feature_value):
 
 
 feature_name_mapping = {
-    'vertical_distance_to_center_contribution': 'vertical distance to center',
+    'vertical_distance_to_center_contribution': 'squared distance to center',
     'euclidean_distance_to_goal_contribution': 'euclidean distance to goal',
     'nearby_opponents_in_3_meters_contribution': 'nearby opponents within 3 meters',
     'opponents_in_triangle_contribution': 'number of opponents in triangle formed by shot location and goalposts',

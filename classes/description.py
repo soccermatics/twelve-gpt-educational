@@ -73,7 +73,7 @@ class Description(ABC):
             {
                 "role": "system",
                 "content": (
-                    "You are a data analysis bot. "
+                    "You are a football commentator whose job is to write interesting texts about actions. "
                     "You provide succinct and to the point explanations about data using data. "
                     "You use the information given to you from the data and answers "
                     "to earlier user/assistant pairs to give summaries of players."
@@ -333,10 +333,12 @@ class ShotDescription(Description):
     @property
     def gpt_examples_path(self):
         return f"{self.gpt_examples_base}/action/shots.xlsx"
+        #return []
 
     @property
     def describe_paths(self):
         return [f"{self.describe_base}/action/shots.xlsx"]
+        #return []
     
     def __init__(self, shots, shot_id, competition):
         self.shots = shots

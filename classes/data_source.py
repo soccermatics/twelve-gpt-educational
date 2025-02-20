@@ -688,6 +688,7 @@ class Shots(Data):
                         'regular_play': 'shot_during_regular_play'
                     }
         model_vars = model_vars.rename(columns=variable_names)
+        model_vars.fillna(0, inplace=True) 
 
 
         return model_vars

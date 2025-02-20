@@ -99,12 +99,12 @@ class Visual:
             autosize=True,
             height=500,
             margin=dict(l=side_margin, r=side_margin, b=70, t=top_margin, pad=pad),
-            paper_bgcolor=rgb_to_color(self.dark_green),
-            plot_bgcolor=rgb_to_color(self.dark_green),
+            paper_bgcolor=rgb_to_color(self.white),
+            plot_bgcolor=rgb_to_color(self.white),
             legend=dict(
                 orientation="h",
                 font={
-                    "color": rgb_to_color(self.white),
+                    "color": rgb_to_color(self.dark_green),
                     "family": "Gilroy-Light",
                     "size": 11 * self.font_size_multiplier,
                 },
@@ -118,7 +118,7 @@ class Visual:
             ),
             xaxis=dict(
                 tickfont={
-                    "color": rgb_to_color(self.white, 0.5),
+                    "color": rgb_to_color(self.dark_green, 0.5),
                     "family": "Gilroy-Light",
                     "size": 12 * self.font_size_multiplier,
                 },
@@ -133,7 +133,7 @@ class Visual:
                 "text": f"<span style='font-size: {15*self.font_size_multiplier}px'>{title}</span><br>{subtitle}",
                 "font": {
                     "family": "Gilroy-Medium",
-                    "color": rgb_to_color(self.white),
+                    "color": rgb_to_color(self.dark_green),
                     "size": 12 * self.font_size_multiplier,
                 },
                 "x": 0.05,
@@ -152,7 +152,7 @@ class Visual:
             text=text,
             showarrow=False,
             font={
-                "color": rgb_to_color(self.white, 0.5),
+                "color": rgb_to_color(self.dark_green, 0.5),
                 "family": "Gilroy-Light",
                 "size": 12 * self.font_size_multiplier,
             },
@@ -166,7 +166,7 @@ class DistributionPlot(Visual):
         self.annotate = annotate
         self.row_distance = row_distance
         self.marker_color = (
-            c for c in [Visual.white, Visual.bright_yellow, Visual.bright_blue]
+            c for c in [Visual.dark_green, Visual.bright_yellow, Visual.bright_blue]
         )
         self.marker_shape = (s for s in ["square", "hexagon", "diamond"])
         super().__init__(*args, **kwargs)
@@ -175,14 +175,35 @@ class DistributionPlot(Visual):
         else:
             self._setup_axes()
 
+    def _get_x_range(self):
+        """
+        Determine the minimum and maximum x-values across all traces in the figure.
+        """
+        x_values = []
+        for trace in self.fig.data:
+            if 'x' in trace:  # Check if the trace has x-values
+                x_values.extend(trace['x'])  # Append all x-values from the trace
+
+        # Return the min and max, or use defaults if no data is present
+        #return (min(x_values) if x_values else -7, max(x_values) if x_values else 7)
+        return (-1,1)
+
+
     def _setup_axes(self, labels=["Negative", "Average Contribution to xG", "Positive"]):
 
-        self.fig.update_layout(width=400)
+        x_min, x_max = self._get_x_range()  # Function to calculate min and max x values
+        dynamic_width = max(100, (x_max - x_min) * 100)
+
+        self.fig.update_layout(
+            autosize=False,
+            width=dynamic_width,  # Set figure width dynamically
+            margin=dict(l=10, r=10, t=10, b=10),  # Minimize margins
+    )
         self.fig.update_xaxes(
-            range=[-7, 7],
+            range=[x_min, x_max],
             fixedrange=True,
             tickmode="array",
-            tickvals=[-3, 0, 3],
+            tickvals=[(x_min + x_max) / 2 - 3, (x_min + x_max) / 2, (x_min + x_max) / 2 + 3],
             ticktext=labels,
         )
         self.fig.update_yaxes(
@@ -194,6 +215,7 @@ class DistributionPlot(Visual):
 
     def add_group_data(self, df_plot, plots, names, legend, hover="", hover_string=""):
         showlegend = True
+        x_min, x_max = self._get_x_range()
 
         for i, col in enumerate(self.columns):
             temp_hover_string = hover_string
@@ -217,6 +239,16 @@ class DistributionPlot(Visual):
                     customdata=df_plot[col + hover],
                     name=legend,
                     showlegend=showlegend,
+                )
+            )
+            # **NEW: Add a horizontal line for each row**
+            self.fig.add_trace(
+                go.Scatter(
+                    x=[x_min, x_max],
+                    y=[i, i],  # Fixed y position for each row
+                    mode="lines",
+                    line=dict(color="gray", width=1, dash=None),  # Line style
+                    showlegend=False,  # Hide from legend
                 )
             )
             showlegend = False
@@ -271,7 +303,7 @@ class DistributionPlot(Visual):
                     ),
                     showarrow=False,
                     font={
-                        "color": rgb_to_color(self.white),
+                        "color": rgb_to_color(self.dark_green),
                         "family": "Gilroy-Light",
                         "size": 12 * self.font_size_multiplier,
                     },
@@ -516,7 +548,7 @@ class ShotContributionPlot(DistributionPlot):
                 text=f"{format_metric(feature_column)}: {feature_text}",
                 showarrow=False,
                 font={
-                    "color": rgb_to_color(self.white),
+                    "color": rgb_to_color(self.dark_green),
                     "family": "Gilroy-Light",
                     "size": 12 * self.font_size_multiplier,
                 },
@@ -626,7 +658,7 @@ class PitchVisual(Visual):
         )
         shapes = self._get_shapes()
         for shape in shapes:
-            shape.update(dict(line={"color": "white", "width": 2}, xref="x", yref="y", ))
+            shape.update(dict(line={"color": "green", "width": 2}, xref="x", yref="y", ))
             self.fig.add_shape(**shape)
 
     def _get_shapes(self):
@@ -661,11 +693,11 @@ class PitchVisual(Visual):
             ),
             # Own penalty spot
             dict(
-                type="circle", x0=11.2, y0=49.5, x1=11.8, y1=50.5, fillcolor="white"
+                type="circle", x0=11.2, y0=49.5, x1=11.8, y1=50.5, fillcolor="green"
             ),
             # Opponent penalty spot
             dict(
-                type="circle", x0=89.2, y0=49.5, x1=89.8, y1=50.5, fillcolor="white"
+                type="circle", x0=89.2, y0=49.5, x1=89.8, y1=50.5, fillcolor="green"
             ),
             # Penalty arc
             # Not sure why we need to multiply the radii by 1.35, but it seems to work
@@ -746,7 +778,7 @@ class PitchVisual(Visual):
                         hovertemplate=name + '<br>Zone: ' + key.capitalize() + "<br>" + hover_string + '<extra></extra>',
                         text=describe_level(ser_hover[key][0]).capitalize(),
                         textposition="middle center",
-                        textfont={"color": rgb_to_color(self.white), "family": "Gilroy-Light",
+                        textfont={"color": rgb_to_color(self.dark_green), "family": "Gilroy-Light",
                                   "size": 10 * self.font_size_multiplier},
                         customdata=[ser_hover[key]],
                         showlegend=False,
@@ -835,7 +867,7 @@ class VerticalPitchVisual(PitchVisual):
         shapes = self._get_shapes()
         for shape in shapes:
             if shape["type"] != "path":
-                shape.update(dict(line={"color": "white", "width": 2}, xref="x", yref="y", ))
+                shape.update(dict(line={"color": "green", "width": 2}, xref="x", yref="y", ))
                 shape["x0"], shape["x1"], shape["y0"], shape["y1"] = shape["y0"], shape["y1"], shape["x0"], shape["x1"]
                 self.fig.add_shape(**shape)
 
@@ -852,7 +884,7 @@ class VerticalPitchVisual(PitchVisual):
             )]
 
         for arc in arcs:
-            arc.update(dict(line={"color": "white", "width": 2}, xref="x", yref="y", ))
+            arc.update(dict(line={"color": "green", "width": 2}, xref="x", yref="y", ))
             self.fig.add_shape(**arc)
 
     def iter_zones(self):
@@ -877,7 +909,7 @@ class VerticalPitchVisual(PitchVisual):
 
 class ShotVisual(VerticalPitchVisual):
     def __init__(self, *args, **kwargs):
-        self.line_color = 'white'
+        self.line_color = 'green'
         self.line_width = 3
         self.shot_color = rgb_to_color(self.bright_blue)
         self.failed_color = rgb_to_color(self.bright_yellow)
@@ -905,10 +937,10 @@ class ShotVisual(VerticalPitchVisual):
 
         masks = [shots_df['goal'] == False, shots_df['goal']== True]
         markers = [
-            {"symbol": "circle-open", "color": rgb_to_color(self.white, opacity=1),
-             "line": {"color": rgb_to_color(self.white, opacity=1), "width": 2}},
+            {"symbol": "circle-open", "color": rgb_to_color(self.dark_green, opacity=1),
+             "line": {"color": rgb_to_color(self.dark_green, opacity=1), "width": 2}},
             {"symbol": "circle", "color": rgb_to_color(self.bright_green),
-             "line": {"color": rgb_to_color(self.white), "width": 2}}]
+             "line": {"color": rgb_to_color(self.dark_green), "width": 2}}]
 
         names = ["Shot", "Goal"]
         filtered_data = [shots_df[mask] for mask in masks]
@@ -1015,8 +1047,8 @@ class ShotVisual(VerticalPitchVisual):
                 x=[None],  # Invisible marker
                 y=[None],
                 mode="lines+markers",
-                line=dict(color="white", width=2),  # Line matching the arrow style
-                marker=dict(size=10, color="white", symbol="arrow-bar-up"),  # Arrow symbol
+                line=dict(color="green", width=2),  # Line matching the arrow style
+                marker=dict(size=10, color="green", symbol="arrow-bar-up"),  # Arrow symbol
                 name="Shot Direction",  # Legend label
                 showlegend=True
             )
@@ -1036,7 +1068,7 @@ class ShotVisual(VerticalPitchVisual):
             arrowhead=2,  # Type of arrowhead
             arrowsize=1.5,  # Scale of the arrow
             arrowwidth=2,  # Width of the arrow line
-            arrowcolor="white",  # Color of the arrow
+            arrowcolor="green",  # Color of the arrow
             showarrow=True
         )
 
@@ -1069,7 +1101,7 @@ class ShotVisual(VerticalPitchVisual):
         self.fig.update_layout(
             title={
                 'text': f"Shot by {player} from {team} | Outcome: {'Goal' if goal_status else 'No Goal'} | xG: {xG_value:.2f}",
-                'font': {'color': 'white'}  # Set the title color to white
+                'font': {'color': 'green'}  # Set the title color to white
             },
             legend=dict(y=-0.05),
 )

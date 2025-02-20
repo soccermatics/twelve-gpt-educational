@@ -109,15 +109,15 @@ class GenerateDescriptions:
             'shot_after_throw_in', 'shot_after_corner', 'shot_after_free_kick'
         ]
 
-        #for shot_id in tqdm(shots.df_shots['id'], desc="Processing Shots"):
-        for shot_id in tqdm(shots.df_shots['id'].tail(1), desc="Processing Shots"):
+        for shot_id in tqdm(shots.df_shots['id'], desc="Processing Shots"):
+        #for shot_id in tqdm(shots.df_shots['id'].head(3), desc="Processing Shots"):
 
             contribution = shots.df_contributions.loc[shots.df_contributions['id'] == shot_id, 'euclidean_distance_to_goal_contribution'].values
             # Determine the contribution sign (positive, negative, or not contributing)
             if contribution.size > 0:
-                if contribution[0] > 0:
+                if contribution[0] > 0.1:
                     contribution_sign = 'positive'
-                elif contribution[0] < 0:
+                elif contribution[0] < -0.1:   
                     contribution_sign = 'negative'
                 else:
                     contribution_sign = 'not contributing'
@@ -133,13 +133,13 @@ class GenerateDescriptions:
                 try:
                     summaries = descriptions_with_prompt.stream_gpt()
                     # Run the tests on the generated text
-                    test_1_result = self.run_test_1(summaries)
+                    #test_1_result = self.run_test_1(summaries)
                     test_2_result = self.run_test_2(summaries, factor="euclidean distance to goal")
 
                     results_with_prompt.append({
                         "shot_id": shot_id,
                         "description": summaries,
-                        "test_1_score": test_1_result,  # Store the score
+                        #"test_1_score": test_1_result,  # Store the score
                         "test_2_result": test_2_result,
                         "ground_truth_contribution_sign": contribution_sign
                     })
@@ -158,13 +158,13 @@ class GenerateDescriptions:
             descriptions_without_prompt_text = descriptions_with_prompt.synthesize_text()
 
             # Run the tests on the generated text
-            test_1_result_no_prompt = self.run_test_1(descriptions_without_prompt_text)
+            #test_1_result_no_prompt = self.run_test_1(descriptions_without_prompt_text)
             test_2_result_no_prompt = self.run_test_2(descriptions_without_prompt_text, factor="euclidean distance to goal")
 
             results_without_prompt.append({
                 "shot_id": shot_id,
                 "description": descriptions_without_prompt_text,
-                "test_1_score": test_1_result_no_prompt,  # Store the score
+                #"test_1_score": test_1_result_no_prompt,  # Store the score
                 "test_2_result": test_2_result_no_prompt,
                 "ground_truth_contribution_sign": contribution_sign
             })
@@ -178,7 +178,6 @@ class GenerateDescriptions:
         # Create DataFrames
         df_with_prompt = pd.DataFrame(results_with_prompt)
         df_without_prompt = pd.DataFrame(results_without_prompt)
-        st.write(df_with_prompt)
         # feature_columns = shot_features + ['ground_truth_contribution_sign', 'test_2_result']
         # feature_values_df = pd.DataFrame(feature_values, columns=feature_columns)
 
@@ -220,7 +219,7 @@ class GenerateDescriptions:
         """
         test_message = (
             f"In the following text, was {factor} a positive, negative, or not contributing factor? "
-            f"Respond with one of ['positive', 'negative'].\n\n{shot_description_text}"
+            f"Respond with one of ['positive', 'negative', 'not contributing'].\n\n{shot_description_text}"
         )
         retries = 5  # Increase the retry count
         for attempt in range(retries):
@@ -299,14 +298,14 @@ def generate_descriptions_page():
 
 
     # Display DataFrames
-    st.subheader("Case 4: LLM text with examples")
+    st.subheader("Case 3 and 4: LLM text with and without examples")
     df_with_prompt['ground_truth_contribution_sign'] = df_with_prompt['ground_truth_contribution_sign'].str.strip().str.lower()
     df_with_prompt['test_2_result'] = df_with_prompt['test_2_result'].str.strip().str.lower()
     df_with_prompt['correct_prediction'] = df_with_prompt['ground_truth_contribution_sign'] == df_with_prompt['test_2_result']
     st.dataframe(df_with_prompt)
-    average_score = df_with_prompt['test_1_score'].astype(float).mean()  # Ensure it's float for accurate calculation
-    st.subheader("Average Test 1 Score for Descriptions with Prompt")
-    st.write(f"The average score from Test 1 is: {average_score:.2f}")
+    #average_score = df_with_prompt['test_1_score'].astype(float).mean()  # Ensure it's float for accurate calculation
+    #st.subheader("Average Test 1 Score for Descriptions with Prompt")
+    #st.write(f"The average score from Test 1 is: {average_score:.2f}")
 
     # Calculate accuracy
     accuracy = df_with_prompt['correct_prediction'].mean() * 100  # Percentage of correct predictions
@@ -315,20 +314,20 @@ def generate_descriptions_page():
     st.subheader("Accuracy of Test 2 Results")
     st.write(f"The accuracy of Test 2 (ground truth vs prediction) is: {accuracy:.2f}%")
 
-    st.subheader("Case 2: Synthetized text")
-    df_without_prompt['ground_truth_contribution_sign'] = df_without_prompt['ground_truth_contribution_sign'].str.strip().str.lower()
-    df_without_prompt['test_2_result'] = df_without_prompt['test_2_result'].str.strip().str.lower()
-    df_without_prompt['correct_prediction'] = df_without_prompt['ground_truth_contribution_sign'] == df_without_prompt['test_2_result']
-    st.dataframe(df_without_prompt)
-    average_score_no_prompt = df_without_prompt['test_1_score'].astype(float).mean()  # Ensure it's float for accurate calculation
-    st.subheader("Average Test 1 Score for Descriptions without Prompt")
-    st.write(f"The average score from Test 1 is: {average_score_no_prompt:.2f}")
-    # Calculate accuracy
-    accuracy = df_without_prompt['correct_prediction'].mean() * 100  # Percentage of correct predictions
+    # st.subheader("Case 1 and 2: Synthetized text with and without contributions")
+    # df_without_prompt['ground_truth_contribution_sign'] = df_without_prompt['ground_truth_contribution_sign'].str.strip().str.lower()
+    # df_without_prompt['test_2_result'] = df_without_prompt['test_2_result'].str.strip().str.lower()
+    # df_without_prompt['correct_prediction'] = df_without_prompt['ground_truth_contribution_sign'] == df_without_prompt['test_2_result']
+    # st.dataframe(df_without_prompt)
+    # #average_score_no_prompt = df_without_prompt['test_1_score'].astype(float).mean()  # Ensure it's float for accurate calculation
+    # #st.subheader("Average Test 1 Score for Descriptions without Prompt")
+    # #st.write(f"The average score from Test 1 is: {average_score_no_prompt:.2f}")
+    # # Calculate accuracy
+    # accuracy = df_without_prompt['correct_prediction'].mean() * 100  # Percentage of correct predictions
 
-    # Display accuracy
-    st.subheader("Accuracy of Test 2 Results")
-    st.write(f"The accuracy of Test 2 (ground truth vs prediction) is: {accuracy:.2f}%")
+    # # Display accuracy
+    # st.subheader("Accuracy of Test 2 Results")
+    # st.write(f"The accuracy of Test 2 (ground truth vs prediction) is: {accuracy:.2f}%")
 
     # Option to download results as CSV
     st.download_button(
@@ -338,12 +337,12 @@ def generate_descriptions_page():
         mime="text/csv"
     )
 
-    st.download_button(
-        label="Download Descriptions without Prompt",
-        data=df_without_prompt.to_csv(index=False).encode('utf-8'),
-        file_name=f"descriptions_without_prompt_{selected_match_name}.csv",
-        mime="text/csv"
-    )
+    # st.download_button(
+    #     label="Download Descriptions without Prompt",
+    #     data=df_without_prompt.to_csv(index=False).encode('utf-8'),
+    #     file_name=f"descriptions_without_prompt_{selected_match_name}.csv",
+    #     mime="text/csv"
+    # )
     # st.download_button(
     #     label="Download Descriptions Feature Values",
     #     data=feature_values_df.to_csv(index=False).encode('utf-8'),
