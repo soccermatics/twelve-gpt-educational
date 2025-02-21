@@ -10,3 +10,4 @@ google-generativeai==0.7.2
 tiktoken
 python-jose==3.3.0
 customerio==2.1
+statsmodels==0.14.4
