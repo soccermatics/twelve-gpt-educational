@@ -15,7 +15,7 @@ from classes.chat import ModelChat
 from classes.data_source import Model
 from classes.data_point import Individual
 from classes.train_model import TrainModel
-from classes.visual import DistributionModelPlot, RidgelinePlot
+from classes.visual import DistributionModelPlot
 from classes.description import (
     IndividualDescription,
 )
