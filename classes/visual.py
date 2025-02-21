@@ -641,3 +641,26 @@ class DistributionModelPlot(DistributionPlot):
             legend=f"Other individuals  ", #space at end is important
             target=target
         )
+import matplotlib.pyplot as plt
+import seaborn as sns
+class RidgelinePlot(Visual):
+    def __init__(self, data: pd.DataFrame, metrics: list, target: str, individual_data: dict):
+        self.data = data
+        self.metrics = metrics
+        self.target = target  
+        self.individual_data = individual_data
+
+    def plot_population(self, group=None):
+        if group:
+            data=self.data[self.data[self.target] == group]
+        else:
+            data=self.data 
+        fig, axes= plt.subplots(len(self.metrics),1,figsize=(10,6), sharex=False)
+
+        for i, metric in enumerate(self.metrics):
+            sns.kdeplot(data[metric], ax=axes[i], shade=True, color="blue", alpha=0.5)
+           
+            axes[i].set_title(f"{metric} Distribution")
+            axes[i].set_xlabel(metric)
+            axes[i].set_ylabel("Density")
+        st.pyplot(fig)

@@ -15,7 +15,7 @@ from classes.chat import ModelChat
 from classes.data_source import Model
 from classes.data_point import Individual
 from classes.train_model import TrainModel
-from classes.visual import DistributionModelPlot
+from classes.visual import DistributionModelPlot, RidgelinePlot
 from classes.description import (
     IndividualDescription,
 )
@@ -44,11 +44,17 @@ global data, model_features
 def setup_model(train=False):
     st.write("Upload a CSV file to use as the data source.")
     uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="data_file")
+    # Default file for testing
+    uploaded_file = open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/bmi_train_data_70000_Ind.csv", "rb")
+    
+    
     
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
         st.write("Upload a CSV file to explaining the features.")
         feature_file = st.file_uploader("Choose a CSV file", type="csv", key="feature_file")
+        # Default file for testing
+        feature_file= open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/train_data_explanation.csv", "rb")
         if feature_file is not None:
             feature_data = pd.read_csv(feature_file)
             categorical_interpretations=None
@@ -56,6 +62,8 @@ def setup_model(train=False):
             if has_categorical == "Yes":
                 st.write("Upload a JSON file detailing the interpretations of the categorical data.")
                 json_file = st.file_uploader("Choose a JSON file", type="json", key="category_json_file")
+                # Default file for testing
+                json_file = open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/train_data_categorical_features.json", "rb")
                 if json_file is not None:
                     categorical_interpretations = json.load(json_file)
                     # st.write("Categorical Interpretations:", categorical_interpretations)
@@ -86,15 +94,30 @@ def setup_model(train=False):
                         except Exception as e:
                             st.error(f"An error occurred while training the model: {e} Pick a traget column that is binary.")
                             return
-                        # model.selectFeatures()
+                        
                         # merge explantions with coef_df on matching feature names
                         coef_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
                         model.coef_df['Explanation'] = model.coef_df['Parameter'].map(coef_explanations)
+                        model.coef_df['P-Value'] = model.coef_df['Parameter'].map(model.p_values)
                         st.write("Training Output:", model.coef_df)
+
+                        feature_selection=st.radio("Do you want to perform feature selection using stepwise backward elimination?", ("No", "Yes"), key="feature_selection")
+                        if feature_selection == "Yes":
+                            st.write("Performing stepwise backward elimination")
+                            model.selectFeatures()
+     
+                            # merge explantions with coef_df on matching feature names
+                            coef_explanations = {row['Parameter']: row['Explanation'] for _, row in feature_data.iterrows()}
+                            model.coef_df['Explanation'] = model.coef_df['Parameter'].map(coef_explanations)
+                            model.coef_df['P-Value'] = model.coef_df['Parameter'].map(model.p_values)
+                            st.write("New Training Output:", model.coef_df)
+
+                        else:
+                            st.write("No feature selection performed")
+                        
                         # Keep only the Intercept, target, and parameters in model.coef_df in data
                         columns_to_keep = [target] + [param for param in model.coef_df['Parameter'].tolist() if param in data.columns]
                         data = data[columns_to_keep]
-                        data = data.head(200)
                         if categorical_interpretations is not None:
                             return (data, model.coef_df, target,categorical_interpretations)
                         else:
@@ -102,10 +125,12 @@ def setup_model(train=False):
     
 def setup_chat(data, model_features, categorical_interpretations=None, target=None):
     model=Model()
-    model.set_data(data, model_features)
+    model.set_data(data.head(1000), model_features)
     model.process_data()
     model.weight_contributions()
-    st.write("Dataframe used:", model.df)
+    bins=model.risk_thresholds()
+    
+    st.expander("Dataframe used", expanded=False).write(model.df)
     
     # # Now select the focal player
     columns = ["ID", target]
@@ -114,7 +139,8 @@ def setup_chat(data, model_features, categorical_interpretations=None, target=No
     # st.write("Feature Contributions Variance")
     # st.write(model.std_contributions.sort_values(ascending=False))
     st.write("The most variable feature is",model.std_contributions.idxmax())
-    st.write("The thresholds value are",str(thresholds))
+    st.write("The thresholds values for the fixed description are",str(thresholds), "based on the most variable feature", model.std_contributions.idxmax())
+    # st.write("The bins value are",str(bins))
 
     # Chat state hash determines whether or not we should load a new chat or continue an old one
     # We can add or remove variables to this hash to change conditions for loading a new chat
@@ -134,8 +160,11 @@ def setup_chat(data, model_features, categorical_interpretations=None, target=No
         visual.add_individuals(model, metrics=metrics, target=target)
         visual.add_individual(individual, len(model.df), metrics=metrics)
 
+        # visual= RidgelinePlot(model.df, metrics=metrics, target=target, individual_data=individual)
+        # visual.plot_population()
+
         # Now call the description class to get the summary of the player
-        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, categorical_interpretations= categorical_interpretations , thresholds = [10, 5, 2, -2,-5,-10], target=target)
+        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, categorical_interpretations= categorical_interpretations , thresholds= thresholds, target=target, bins=bins)
         summary = description.stream_gpt()
 
         # Add the visual and summary to the chat

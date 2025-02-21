@@ -681,19 +681,20 @@ class IndividualDescription(Description):
 
     @property
     def gpt_examples_path(self):
-        return f"{self.gpt_examples_base}/Anuerysm.xlsx"
+        return f"{self.gpt_examples_base}/Cardio.xlsx"
 
     @property
     def describe_paths(self):
         return [f"{self.describe_base}/Anuerysm.xlsx"]
 
-    def __init__(self, individual: Individual,metrics,parameter_explanation, categorical_interpretations , thresholds, target):
+    def __init__(self, individual: Individual,metrics,parameter_explanation, categorical_interpretations , thresholds, target, bins):
         self.metrics = metrics
         self.individual = individual
         self.parameter_explanation = parameter_explanation
         self.categorical_interpretations = categorical_interpretations
         self.thresholds = thresholds
         self.target = target
+        self.bins = bins
         super().__init__()
 
 
@@ -728,17 +729,10 @@ class IndividualDescription(Description):
 
         individual=self.individual
         metrics = self.metrics
-        description = f"Here is a statistical description of the factors related to anuerysm for the patient patient. \n\n "
-        
-        # need to convert categorical values back to value here!
-    
-        # for column, category_feature in self.categorical_interpretations.items():
-        #     if column in individual.ser_metrics:
-        #         individual.ser_metrics[column] = category_feature.get(str(int(individual.ser_metrics[column])), individual.ser_metrics[column])
-        
-        # subject_p, object_p, possessive_p = sentences.pronouns(gender)
+        description = f"Here is a statistical description of the factors related to {self.target} issues for the patient. \n\n "
         
         for metric in metrics:
+            
             if self.categorical_interpretations and metric in self.categorical_interpretations:
                 # if categorical interpretation is available, look up the value in the interpretation dictionary
                 value = self.categorical_interpretations[metric].get(str(int(individual.ser_metrics[metric])), individual.ser_metrics[metric])
@@ -746,20 +740,45 @@ class IndividualDescription(Description):
             else:
                 # if no interpretation is available, just use the value
                 description+= sentences.article(self.parameter_explanation[metric].lower()) + f" {self.parameter_explanation[metric].lower()} of {sentences.format_numbers(individual.ser_metrics[metric])} "
-            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"], thresholds=self.thresholds)
-            description += f" of developing {self.target} issues compared to other patients that come into the clinic. "
             
+            # self.thresholds.reverse()
+            words=["implies a strongly reduced risk", "implies a moderately reduced risk","implies no significant effect", "implies a moderately increased risk", "implies a strongly increased risk"]
+            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"], thresholds=self.thresholds, words=words)
+            description += f" of developing {self.target} issues."
+            
+        # Add a sentence about the overall risk
+        words=["strongly reduced", "moderately reduced","average", "moderately increased", "strongly increased"]
+        description += f" The patient's overall risk of developing {self.target} issues is {sentences.describe_contributions(individual.ser_metrics['total_risk_contribution'], thresholds=self.bins['total_risk_contribution'],words=words)} compared to other patients who come into the clinic."
+        st.expander("Description with fixed thresholds", expanded=False).write(description)
 
-        st.write(description)
-
+        description = f"Here is a statistical description of the factors related to {self.target} issues for the patient. \n\n "
+        for metric in metrics:
+            
+            if self.categorical_interpretations and metric in self.categorical_interpretations:
+                # if categorical interpretation is available, look up the value in the interpretation dictionary
+                value = self.categorical_interpretations[metric].get(str(int(individual.ser_metrics[metric])), individual.ser_metrics[metric])
+                description+= f" {value} "
+            else:
+                # if no interpretation is available, just use the value
+                description+= sentences.article(self.parameter_explanation[metric].lower()) + f" {self.parameter_explanation[metric].lower()} of {sentences.format_numbers(individual.ser_metrics[metric])} "
+            
+            # self.thresholds.reverse()
+            words=["implies a strongly reduced risk", "implies a moderately reduced risk","implies no significant effect", "implies a moderately increased risk", "implies a strongly increased risk"]
+            description += sentences.describe_contributions(individual.ser_metrics[metric +"_contribution"], thresholds=self.bins[metric +"_contribution"], words=words)
+            description += f" of developing {self.target} issues."
+            
+        # Add a sentence about the overall risk
+        words=["strongly reduced", "moderately reduced","average", "moderately increased", "strongly increased"]
+        description += f" The patient's overall risk of developing {self.target} issues is {sentences.describe_contributions(individual.ser_metrics['total_risk_contribution'], thresholds=self.bins['total_risk_contribution'],words=words)} compared to other patients who come into the clinic."
+        st.expander("Description with variable thresholds", expanded=False).write(description)
         return description
 
     def get_prompt_messages(self):
         prompt = (
-            f"Please use the statistical description enclosed with ``` to give a concise, 4 sentence summary of the player's playing style, strengths and weaknesses. "
-            f"The first sentence should use varied language to give an overview of the player. "
-            "The second sentence should describe the player's specific strengths based on the metrics. "
-            "The third sentence should describe aspects in which the player is average and/or weak based on the statistics. "
-            "Finally, summarise exactly how the player compares to others in the same position. "
+            f"Please use the statistical description enclosed with ``` to give a concise summary of the patients health metrics focusing on factors that negatively and postively affect their risk of developing {self.target} issues. Use second person language to address the patient. "
+            f"The first sentence should use varied language to give an overview of the patients health status. "
+            "The second sentence should describe specific factors that descrease or reduce risks based on the metrics. "
+            "The third sentence should describe specific factors that increase the risk based on the metrics. "
+            "Finally, suggest what the patient can do to reduce their risk of developing {self.target} issues."
         )
         return [{"role": "user", "content": prompt}]

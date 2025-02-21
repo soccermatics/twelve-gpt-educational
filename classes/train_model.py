@@ -24,8 +24,11 @@ class TrainModel():
         coef_df['index'].replace('const', 'Intercept', inplace=True)
         coef_df.columns = ['Parameter', 'Value']
         self.coef_df = coef_df
+        self.p_values = result.pvalues
+        st.expander("Summary of the trained model", expanded=False).write(result.summary())
 
     def selectFeatures(self):
+        # Backward elimination
         significance_level= 0.05
         current_features= self.features
         while len(current_features) >1 :
@@ -36,11 +39,15 @@ class TrainModel():
             p_values= model.pvalues
             highest_p_value= p_values.max()
             feature_to_remove=p_values.idxmax()
+            st.write("P-values of the features",p_values)
 
             if highest_p_value >significance_level:
-                print(f"Removing {feature_to_remove} with p-value {highest_p_value}")
+                st.write(f"Removing feature {feature_to_remove} with p-value {highest_p_value}")
                 current_features.remove(feature_to_remove)  # Remove the predictor
             else:
+                print("All p-values are below the significance level")
+                print("Final features",current_features)
+                print("Final p-values",model.pvalues) 
                 break  # Stop if all p-values are below the significance level
         # Final model with selected features
         

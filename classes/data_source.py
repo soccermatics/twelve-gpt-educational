@@ -686,18 +686,33 @@ class Model(Data):
 
         self.df = df
         
+        # total risk 
+        df['total_risk_contribution'] = df[[col for col in df.columns if '_contribution' in col]].sum(axis=1)
+
+        
 
     def most_variable_data(self):
         df = self.df
-        contribution_columns = [col for col in df.columns if '_contribution' in col]
+        contribution_columns = [col for col in df.columns if '_contribution' in col and col != 'total_risk_contribution']
         self.std_contributions = df[contribution_columns].std()
         most_vairable_column= self.std_contributions.idxmax()
         most_variable_data = self.df[most_vairable_column]
         mean, std = np.mean(most_variable_data),np.std(most_variable_data)
 
-        thresholds = [round(mean + i * std, 2) for i in range(-3, 4) if i != 0]
+        thresholds = [round(mean + i * std, 2) for i in range(-2, 3) if i != 0]  #range (-3,4) for 6 thresholds
         return thresholds
-    
+    def risk_thresholds(self):
+        bins_dict = {}
+        for col in self.df.columns:
+            if 'contribution' in col:
+                bins =  list(np.percentile(self.df[col], [10, 30, 70, 90])) 
+                # print(f"{col}:")
+                # print(f"  Bins: {bins}")    
+                bins_dict[col] = bins
+        # print(bins_dict)
+        return bins_dict
+        
+
 
     def to_data_point(self, columns=None ) -> data_point.Individual:
         
