@@ -15,7 +15,7 @@ from classes.chat import ModelChat
 from classes.data_source import Model
 from classes.data_point import Individual
 from classes.train_model import TrainModel
-from classes.visual import DistributionModelPlot, RidgelinePlot
+from classes.visual import DistributionModelPlot
 from classes.description import (
     IndividualDescription,
 )
@@ -45,7 +45,7 @@ def setup_model(train=False):
     st.write("Upload a CSV file to use as the data source.")
     uploaded_file = st.file_uploader("Choose a CSV file", type="csv", key="data_file")
     # Default file for testing
-    uploaded_file = open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/bmi_train_data_70000_Ind.csv", "rb")
+    # uploaded_file = open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/bmi_train_data_70000_Ind.csv", "rb")
     
     
     
@@ -54,7 +54,7 @@ def setup_model(train=False):
         st.write("Upload a CSV file to explaining the features.")
         feature_file = st.file_uploader("Choose a CSV file", type="csv", key="feature_file")
         # Default file for testing
-        feature_file= open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/train_data_explanation.csv", "rb")
+        # feature_file= open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/train_data_explanation.csv", "rb")
         if feature_file is not None:
             feature_data = pd.read_csv(feature_file)
             categorical_interpretations=None
@@ -63,7 +63,7 @@ def setup_model(train=False):
                 st.write("Upload a JSON file detailing the interpretations of the categorical data.")
                 json_file = st.file_uploader("Choose a JSON file", type="json", key="category_json_file")
                 # Default file for testing
-                json_file = open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/train_data_categorical_features.json", "rb")
+                # json_file = open("C:/Users/beimn/Documents/workdir/Python for Data Science/anuerysm/train_data_categorical_features.json", "rb")
                 if json_file is not None:
                     categorical_interpretations = json.load(json_file)
                     # st.write("Categorical Interpretations:", categorical_interpretations)
