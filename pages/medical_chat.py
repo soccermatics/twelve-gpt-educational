@@ -125,7 +125,7 @@ def setup_model(train=False):
     
 def setup_chat(data, model_features, categorical_interpretations=None, target=None):
     model=Model()
-    model.set_data(data.head(1000), model_features)
+    model.set_data(data.head(5000), model_features)
     model.process_data()
     model.weight_contributions()
     bins=model.risk_thresholds()
@@ -164,7 +164,9 @@ def setup_chat(data, model_features, categorical_interpretations=None, target=No
         # visual.plot_population()
 
         # Now call the description class to get the summary of the player
-        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, categorical_interpretations= categorical_interpretations , thresholds= thresholds, target=target, bins=bins)
+        
+        description = IndividualDescription(individual,metrics,parameter_explanation=model.parameter_explanation, categorical_interpretations= categorical_interpretations , thresholds= thresholds, target=target, bins=bins, model_features=model_features)
+        
         summary = description.stream_gpt()
 
         # Add the visual and summary to the chat

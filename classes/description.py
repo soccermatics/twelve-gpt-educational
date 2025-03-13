@@ -162,7 +162,7 @@ class Description(ABC):
         messages += [
             {
                 "role": "user",
-                "content": f"Now do the same thing with the following: ```{self.synthesized_text}```",
+                "content": f"Now do the same thing with the following 2 descriptions. : ```{self.synthesized_text}```",
             }
         ]
         return messages
@@ -687,7 +687,7 @@ class IndividualDescription(Description):
     def describe_paths(self):
         return [f"{self.describe_base}/Anuerysm.xlsx"]
 
-    def __init__(self, individual: Individual,metrics,parameter_explanation, categorical_interpretations , thresholds, target, bins):
+    def __init__(self, individual: Individual,metrics,parameter_explanation, categorical_interpretations , thresholds, target, bins, model_features):
         self.metrics = metrics
         self.individual = individual
         self.parameter_explanation = parameter_explanation
@@ -695,6 +695,7 @@ class IndividualDescription(Description):
         self.thresholds = thresholds
         self.target = target
         self.bins = bins
+        self.model_features = model_features
         super().__init__()
 
 
@@ -729,7 +730,9 @@ class IndividualDescription(Description):
 
         individual=self.individual
         metrics = self.metrics
-        description = f"Here is a statistical description of the factors related to {self.target} issues for the patient. \n\n "
+        
+        description = f"Here is the first statistical description of the factors related to {self.target} issues for the patient. \n\n "
+        calculated_age= self.calculate_risk_age()
         
         for metric in metrics:
             
@@ -749,9 +752,18 @@ class IndividualDescription(Description):
         # Add a sentence about the overall risk
         words=["strongly reduced", "moderately reduced","average", "moderately increased", "strongly increased"]
         description += f" The patient's overall risk of developing {self.target} issues is {sentences.describe_contributions(individual.ser_metrics['total_risk_contribution'], thresholds=self.bins['total_risk_contribution'],words=words)} compared to other patients who come into the clinic."
-        st.expander("Description with fixed thresholds", expanded=False).write(description)
+        if(individual.ser_metrics['total_risk_contribution'] > self.bins['total_risk_contribution'][1]):    
+            max_metric = max(
+                {k: v for k, v in individual.ser_metrics.items() if k.endswith("_contribution") and k != "total_risk_contribution"},
+                key=individual.ser_metrics.get 
+            )
+            max_metric = max_metric.replace("_contribution", "")
+            description += f" The highest contribution factor for developing {self.target} issues is the patient's {self.parameter_explanation[max_metric].lower()}."
+        description += f" The patient's risk of developing {self.target} is equivalent to that of a {calculated_age:.1f} year old."
+        first_description=description
+        st.expander("Description with one fixed threshold", expanded=False).write(description)
 
-        description = f"Here is a statistical description of the factors related to {self.target} issues for the patient. \n\n "
+        description = f"Here is the second statistical description of the factors related to {self.target} issues for the patient. \n\n "
         for metric in metrics:
             
             if self.categorical_interpretations and metric in self.categorical_interpretations:
@@ -770,8 +782,16 @@ class IndividualDescription(Description):
         # Add a sentence about the overall risk
         words=["strongly reduced", "moderately reduced","average", "moderately increased", "strongly increased"]
         description += f" The patient's overall risk of developing {self.target} issues is {sentences.describe_contributions(individual.ser_metrics['total_risk_contribution'], thresholds=self.bins['total_risk_contribution'],words=words)} compared to other patients who come into the clinic."
-        st.expander("Description with variable thresholds", expanded=False).write(description)
-        return description
+        if(individual.ser_metrics['total_risk_contribution'] > self.bins['total_risk_contribution'][1]):    
+            max_metric = max(
+                {k: v for k, v in individual.ser_metrics.items() if k.endswith("_contribution") and k != "total_risk_contribution"},
+                key=individual.ser_metrics.get 
+            )
+            max_metric = max_metric.replace("_contribution", "")
+            description += f" The highest contribution factor for developing {self.target} issues is the patient's {self.parameter_explanation[max_metric].lower()}."
+        description += f" The patient's risk of developing {self.target} is equivalent to that of a {calculated_age:.1f} year old."
+        st.expander("Description with feature specific thresholds", expanded=False).write(description)
+        return first_description + description
 
     def get_prompt_messages(self):
         prompt = (
@@ -780,5 +800,21 @@ class IndividualDescription(Description):
             "The second sentence should describe specific factors that descrease or reduce risks based on the metrics. "
             "The third sentence should describe specific factors that increase the risk based on the metrics. "
             "Finally, suggest what the patient can do to reduce their risk of developing {self.target} issues."
+            "Use varied language to describe how the different features contribute to the patient's overall risk."
         )
         return [{"role": "user", "content": prompt}]
+
+    def calculate_risk_age(self):
+        model_features = self.model_features[['Parameter', 'Value']]
+        individual = self.individual
+        
+        beta_age = model_features.loc[model_features['Parameter'] == 'age', 'Value'].values[0]
+
+        other_feature_contributions = sum(
+            value for key, value in individual.ser_metrics.items()
+            if key.endswith("_contribution") and key not in ["age_contribution", "total_risk_contribution"]
+        )   
+        # Compute risk equivalent age
+        calucalted_risk_age= individual.ser_metrics['age'] + (other_feature_contributions/ beta_age)
+        return calucalted_risk_age
+
