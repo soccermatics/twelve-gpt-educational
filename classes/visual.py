@@ -194,6 +194,12 @@ class DistributionPlot(Visual):
             zerolinecolor=rgb_to_color(self.medium_green),
         )
 
+        # Add a vertical line at x=0
+        self.fig.add_shape(
+            type="line",
+            x0=0, y0=0, x1=0, y1=len(self.columns) * self.row_distance,
+            line=dict(color="gray", width=1, dash="dot"),
+        )
     def add_group_data(self, df_plot, plots, names, legend, hover="", hover_string=""):
         showlegend = True
 
