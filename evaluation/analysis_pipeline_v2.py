@@ -1,4 +1,4 @@
-# Goal: reconstruct data from response.
+# Goal: Evaluate if the wordalisation accurately reflects teh synthetic text.
 # Run this script to generate responses for the data points
 # This code uses exponential backoff to handle rate limiting errors from the API.
 # The code will also cycle through API keys if the max delay is reached.
@@ -7,7 +7,7 @@
 # 1. secrets.json - containing a valid Gemini API key(s)
 # 2. data/{ttype}_texts.csv - containing the entity names and the corresponding text to be used in 3. (see generate_data_for_evaluation.py)
 # 3. prompts/prompt_v1_{ttype}.json - prompt to use for generating responses (copy of chat used in app with modification to discourage "decline to answer" responses, i.e. example with no data.)
-# 4. prompts/reconstruct_v1_{ttype}.json - prompt to use for reconstructing the data from the responses 3.
+# 4. prompts/reconstruct_v2_{ttype}.json - prompt to use for reconstructing the data from the responses 3.
 # 5. data/{ttype}_ground_truth.csv - data to be used as ground truth for the factors. (see generate_data_for_evaluation.py)
 
 # Output:
@@ -15,13 +15,11 @@
 
 import json
 import pandas as pd
-import pickle
 import google.generativeai as genai
 import datetime
 import os
 import random
 import time
-from nltk.translate.bleu_score import sentence_bleu
 import re
 from tqdm import tqdm
 
@@ -41,10 +39,11 @@ GEMINI_API_KEYS = [
     for x in [
         "GEMINI_API_KEY",
         "GEMINI_API_KEY_V",
-        "GEMINI_API_KEY_N",
         "GEMINI_API_KEY_B",
+        "GEMINI_API_KEY_N",
     ]
 ]
+
 current_key = 0
 genai.configure(api_key=GEMINI_API_KEYS[current_key])
 GEMINI_CHAT_MODEL = "gemini-1.5-flash"
@@ -56,8 +55,12 @@ generationConfig = {
 }
 
 
-ttypes = ["player", "person", "country"]  # entity types, different applications
-dt = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+ttypes = [
+    "country",
+    "person",
+    "player",
+]  # entity types, different applications
+dt = "2025-04-05"  # datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 prompt_files = []
 prompts = []
@@ -78,7 +81,14 @@ for ttype in ttypes:
 
     ####################
 
-    rec_prompt_file = f"reconstruct_v1_{ttype}.json"
+    # rec_prompt_file = f"reconstruct_v1_{ttype}.json"
+    # # read prompt from json
+    # with open(path + "prompts/" + rec_prompt_file) as f:
+    #     msgs = json.load(f)
+    # reconstruct_prompt_files.append(rec_prompt_file)
+    # reconstruct_prompts.append(msgs)
+
+    rec_prompt_file = f"reconstruct_v2_{ttype}.json"
     # read prompt from json
     with open(path + "prompts/" + rec_prompt_file) as f:
         msgs = json.load(f)
@@ -201,6 +211,7 @@ def retry_with_exponential_backoff(
 
 def get_response(msgs, text):
 
+    genai.configure(api_key=GEMINI_API_KEYS[current_key])
     model = genai.GenerativeModel(
         model_name=GEMINI_CHAT_MODEL,
         system_instruction=msgs["system_instruction"],
@@ -218,6 +229,73 @@ def completions_with_backoff(**kwargs):
     return get_response(**kwargs)
 
 
+# label_factor_dict = {}
+# label_factor_dict["country"] = {
+#     "factors": [
+#         "traditional vs secular values",
+#         "survival vs self-expression values",
+#         "neutrality",
+#         "fairness",
+#         "skepticism",
+#         "societal tranquility",
+#     ],
+#     "labels": [
+#         "far above average",
+#         "above average",
+#         "average",
+#         "below average",
+#         "far below average",
+#         "None",
+#     ],
+# }
+
+# label_factor_dict["player"] = {
+#     "factors": [
+#         "non-penalty expected goals",
+#         "goals",
+#         "assists",
+#         "key passes",
+#         "smart passes",
+#         "final third passes",
+#         "final third receptions",
+#         "ground duels",
+#         "air duels",
+#     ],
+#     "labels": [
+#         "outstanding",
+#         "excellent",
+#         "good",
+#         "average",
+#         "below average",
+#         "poor",
+#         "None",
+#     ],
+# }
+# label_factor_dict["person"] = {
+#     "factors": [
+#         "extraversion",
+#         "neuroticism",
+#         "agreeableness",
+#         "conscientiousness",
+#         "openness",
+#     ],
+#     "labels": {
+#         "extraversion": ["solitary and reserved", "outgoing and energetic", "None"],
+#         "neuroticism": ["sensitive and nervous", "resilient and confident", "None"],
+#         "agreeableness": [
+#             "critical and rational",
+#             "friendly and compassionate",
+#             "None",
+#         ],
+#         "conscientiousness": [
+#             "extravagant and careless",
+#             "efficient and organized",
+#             "None",
+#         ],
+#         "openness": ["inventive and curious", "consistent and cautious", "None"],
+#     },
+# }
+
 label_factor_dict = {}
 label_factor_dict["country"] = {
     "factors": [
@@ -229,11 +307,9 @@ label_factor_dict["country"] = {
         "societal tranquility",
     ],
     "labels": [
-        "far above average",
-        "above average",
-        "average",
-        "below average",
-        "far below average",
+        "representative",
+        "misrepresentation",
+        "omitted",
         "None",
     ],
 }
@@ -251,12 +327,9 @@ label_factor_dict["player"] = {
         "air duels",
     ],
     "labels": [
-        "outstanding",
-        "excellent",
-        "good",
-        "average",
-        "below average",
-        "poor",
+        "representative",
+        "misrepresentation",
+        "omitted",
         "None",
     ],
 }
@@ -268,21 +341,12 @@ label_factor_dict["person"] = {
         "conscientiousness",
         "openness",
     ],
-    "labels": {
-        "extraversion": ["solitary and reserved", "outgoing and energetic", "None"],
-        "neuroticism": ["sensitive and nervous", "resilient and confident", "None"],
-        "agreeableness": [
-            "critical and rational",
-            "friendly and compassionate",
-            "None",
-        ],
-        "conscientiousness": [
-            "extravagant and careless",
-            "efficient and organized",
-            "None",
-        ],
-        "openness": ["inventive and curious", "consistent and cautious", "None"],
-    },
+    "labels": [
+        "representative",
+        "misrepresentation",
+        "omitted",
+        "None",
+    ],
 }
 
 for t in ttypes:
@@ -409,7 +473,14 @@ for (
                             0
                         ],
                     )
-                    response_text = response.candidates[0].content.parts[0].text
+
+                    # ######
+                    # response_text = response.candidates[0].content.parts[0].text
+                    # ######
+                    fact = entity_texts[entity_texts[ttype] == name]["text"].values[0]
+                    hyp = response.candidates[0].content.parts[0].text
+                    response_text = f"Factual statistical description:\n{fact}\n\nDescriptive text:\n{hyp}\n"
+                    ######
 
                     response_rec = completions_with_backoff(
                         msgs=msg_rec,

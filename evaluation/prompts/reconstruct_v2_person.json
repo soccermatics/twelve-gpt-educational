@@ -1,0 +1,37 @@
+{
+    "system_instruction": "You are a data analyst that reconstructs dictionaries from text.",
+    "history": [
+        {
+            "role": "user",
+            "parts": "Each of the following 5 categories:\n[\n'extraversion'\n        'neuroticism'\n        'agreeableness'\n        'conscientiousness'\n        'openness'\n    ]\nhere are the possible options: [\n        'representative',\n        'misrepresentation',\n        'omitted'\n    ],\n where 'representative' refers to accurate and mostly accurate statements, while 'misrepresentation' means inaccurate and misleading. The option 'omitted'  refers to the absence of any information.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Factual statistical description:\nThe candidate is extremely solitary and reserved. In particular they said that they dont talk a lot. The candidate is very resilient and confident. The candidate tends to feel less negative emotions anxiety. In particular they said that they get stressed out easily. The candidate is relatively friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. The candidate is very extravagant and careless. The candidate tends to be less careful or diligent. In particular they said that they make a mess of things. The candidate is relatively consistent and cautious. The candidate tends to be less open.\n\nDescriptive text:\nThis candidate is a highly energetic and outgoing individual who takes initiative in social settings. They are known for starting conversations and engaging with others. While they can be sensitive and prone to nervousness, particularly when it comes to anxiety and negative emotions, they consistently demonstrate a strong sense of compassion and friendliness. Their cooperative, polite, and kind nature complements their efficiency and organizational skills, as they are always meticulous and pay close attention to detail. While they demonstrate a strong sense of reliability and consistency, they tend to be less open to new or unfamiliar concepts and ideas.\n"
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'extraversion':'misrepresentation',\n'neuroticism':'representative',\n'agreeableness':'representative',\n'conscientiousness':'misrepresentation',\n'openness':'representative'\n}```"
+        },
+        {
+            "role": "user",
+            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Factual statistical description:\nThe candidate is very outgoing and energetic. In particular they said that they start conversations. The candidate is quite sensitive and nervous. The candidate tends to feel more negative emotions anxiety. The candidate is quite friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. The candidate is very efficient and organized. The candidate tends to be more careful or diligent. In particular they said that they pay attention to details. The candidate is relatively consistent and cautious. The candidate tends to be less open. \n\nDescriptive text:\nPlease provide the statistical description for the candidate. I need the relevant data to give you a summary.\n"
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'extraversion':'omitted',\n'neuroticism':'omitted',\n'agreeableness':'omitted',\n'conscientiousness':'omitted',\n'openness':'omitted'\n}```"
+        }
+    ],
+    "content": {
+        "role": "user",
+        "parts": " "
+    }
+}

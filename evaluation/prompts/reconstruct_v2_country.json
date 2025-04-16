@@ -1,0 +1,37 @@
+{
+    "system_instruction": "You are a data analyst.",
+    "history": [
+        {
+            "role": "user",
+            "parts": "For each of the following 6 categories [\n'Traditional vs Secular Values',\n        'Survival vs Self-expression Values',\n        'Neutrality',\n        'Fairness',\n        'Skepticism'\n        'Societal Tranquility'\n    ]\nhere are the possible options: [\n        'representative',\n        'misrepresentation',\n        'omitted'\n    ],\n where 'representative' refers to accurate and mostly accurate statements, while 'misrepresentation' means inaccurate and misleading. The option 'omitted'  refers to the absence of any information.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Factual statistical description:\n```Here is a statistical description of the societal values of Peru.\n\nAccording to the WVS, Peru was found to have neither an above nor a below average Traditional vs Secular Values score compared to other countries in the same wave. \n\nAccording to the WVS, Peru was found to have below average Survival vs Self-expression Values score (e.i. value survival more compared to the average) compared to other countries in the same wave. In response to the question 'How important is work to you?', on average participants indicating that work is 'very important' . \n\nAccording to the WVS, Peru was found to be averagely neutral compared to other countries in the same wave. \n\nAccording to the WVS, Peru was found to have an average value of fairness compared to other countries in the same wave.  \n\nAccording to the WVS, Peru was found to be above averagely skeptical compared to other countries in the same wave. In response to the question 'How much confidence do you have in the parliament?', on average participants indicated that they have 'none at all' .  \n\nAccording to the WVS, Peru was found to be neither above nor below averagely tranquil compared to other countries in the same wave. ```\n\nDescriptive text:\nPeru was found to have below average Survival vs Self-expression Values score, suggesting that participants were more survival orientated. One contributing factor was that on average participants indicated that work was very important to them. \n\nAccording to the WVS, Peru was found to have neither an above nor a below average Traditional vs Secular Values score, to be averagely neutral, to have an average value of fairness, and to be below averagely tranquil compared to other countries in the same wave.\n"
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'Traditional vs Secular Values': 'representative',\n'Survival vs Self-expression Values': 'representative',\n'Neutrality': 'representative', \n'Fairness': 'representative',\n'Skepticism': 'omitted',\n'Societal Tranquility': 'misrepresentation'\n}```"
+        },
+        {
+            "role": "user",
+            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Factual statistical description:\n```Here is a statistical description of the societal values of India.\n\nAccording to the WVS, India was found to have neither an above nor a below average Traditional vs Secular Values score compared to other countries in the same wave. \n\nAccording to the WVS, India was found to have neither an above nor a below average Survival vs Self-expression Values score compared to other countries in the same wave. \n\nAccording to the WVS, India was found to be below averagely neutral compared to other countries in the same wave. In response to the question 'Are you a member of a self-help or mutual aid group?', on average participants indicated that they 'don't belong' . \n\nAccording to the WVS, India was found to have an average value of fairness compared to other countries in the same wave. \n\nAccording to the WVS, India was found to be below averagely skeptical compared to other countries in the same wave. In response to the question 'How much confidence do you have in the civil services', on average participants indicated that they have 'a great deal' . \n\nAccording to the WVS, India was found to be neither above nor below averagely tranquil compared to other countries in the same wave. ```\n\nDescriptive text:\nPlease provide the statistical description for the country. I need the relevant data to give you a summary.\n"
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'Traditional vs Secular Values': 'omitted',\n'Survival vs Self-expression Values': 'omitted',\n'Neutrality': 'omitted', \n'Fairness': 'omitted',\n'Skepticism': 'omitted',\n'Societal Tranquility': 'omitted'\n}```"
+        }
+    ],
+    "content": {
+        "role": "user",
+        "parts": " "
+    }
+}

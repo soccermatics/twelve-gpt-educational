@@ -1,0 +1,37 @@
+{
+    "system_instruction": "You are a data analyst.",
+    "history": [
+        {
+            "role": "user",
+            "parts": "For each of the following 9 categories [\n'non-penalty expected goals',\n        'goals',\n        'assists',\n        'key passes',\n        'smart passes',\n        'final third passes',\n        'final third receptions',\n        'ground duels',\n        'air duels'\n    ]\nhere are the possible options: [\n        'representative',\n        'misrepresentation',\n        'omitted'\n    ],\n where 'representative' refers to accurate and mostly accurate statements, while 'misrepresentation' means inaccurate and misleading. The option 'omitted'  refers to the absence of any information.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Factual statistical description:\nHere is a statistical description of W. Bony, who played for 756 minutes as a Forward. He was below average in non-penalty expected goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was poor in final third passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was poor in final third receptions adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in ground duels won adjusted for possession per 90 minutes compared to other players in the same playing position. He was excellent in air duels won adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in smart passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was poor in assists adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in key passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was poor in Minutes minutes compared to other players in the same playing position.\n\nDescriptive text:\nBony is a forward who relies on winning aerial duels to have an impact in the final third. He is an excellent header of the ball and he wins a lot of the aerial duels he competes in. However, he struggles in other areas of the game and he doesn't find himself in great positions or manage to create chances for himself or teammates. He also isn't a particularly technical footballer as his stats for smart passes, key passes, and passes in the final third are below average. Compared to other strikers, he is not a reliable forward.\n"
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'non-penalty expected goals':'representative',\n'goals':'omitted',\n'assists':'representative',\n'key passes':'representative',\n'smart passes':'misrepresentation',\n'final third passes':'representative',\n'final third receptions':'omitted',\n'ground duels':'omitted',\n'air duels':'representative'\n}```"
+        },
+        {
+            "role": "user",
+            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
+        },
+        {
+            "role": "user",
+            "parts": "Factual statistical description:\nHere is a statistical description of T. Hemed, who played for 883 minutes as a Forward. He was average in non-penalty expected goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was poor in final third passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in final third receptions adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in ground duels won adjusted for possession per 90 minutes compared to other players in the same playing position. He was outstanding in air duels won adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in smart passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in assists adjusted for possession per 90 minutes compared to other players in the same playing position. He was poor in key passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was poor in Minutes minutes compared to other players in the same playing position.\n\nDescriptive text:\nPlease provide the statistical description for T. Hemed. I need the data to give you a summary of his playing style and strengths and weaknesses.\n"
+        },
+        {
+            "role": "model",
+            "parts": "```json\n{\n'non-penalty expected goals':'omitted',\n'goals':'omitted',\n'assists':'omitted',\n'key passes':'omitted',\n'smart passes':'omitted',\n'final third passes':'omitted',\n'final third receptions':'omitted',\n'ground duels':'omitted',\n'air duels':'omitted'\n}```"
+        }
+    ],
+    "content": {
+        "role": "user",
+        "parts": ""
+    }
+}
