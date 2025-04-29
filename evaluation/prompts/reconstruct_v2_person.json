@@ -3,31 +3,15 @@
     "history": [
         {
             "role": "user",
-            "parts": "Each of the following 5 categories:\n[\n'extraversion'\n        'neuroticism'\n        'agreeableness'\n        'conscientiousness'\n        'openness'\n    ]\nhere are the possible options: [\n        'representative',\n        'misrepresentation',\n        'omitted'\n    ],\n where 'representative' refers to accurate and mostly accurate statements, while 'misrepresentation' means inaccurate and misleading. The option 'omitted'  refers to the absence of any information.\n"
+            "parts": "Each of the following 5 categories:\n[\n'extraversion'\n        'neuroticism'\n        'agreeableness'\n        'conscientiousness'\n        'openness'\n    ]\nsay if the descriptive text contains implications or drawn conclusions that are not supported by the statistical description. Options are [\n        'yes',\n        'no',\n        'omitted'\n    ],\n where option 'omitted' refers to the absence of any information.\nAnswer should be formatted as a dictionary.\n"
         },
         {
             "role": "user",
-            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
-        },
-        {
-            "role": "user",
-            "parts": "Factual statistical description:\nThe candidate is extremely solitary and reserved. In particular they said that they dont talk a lot. The candidate is very resilient and confident. The candidate tends to feel less negative emotions anxiety. In particular they said that they get stressed out easily. The candidate is relatively friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. The candidate is very extravagant and careless. The candidate tends to be less careful or diligent. In particular they said that they make a mess of things. The candidate is relatively consistent and cautious. The candidate tends to be less open.\n\nDescriptive text:\nThis candidate is a highly energetic and outgoing individual who takes initiative in social settings. They are known for starting conversations and engaging with others. While they can be sensitive and prone to nervousness, particularly when it comes to anxiety and negative emotions, they consistently demonstrate a strong sense of compassion and friendliness. Their cooperative, polite, and kind nature complements their efficiency and organizational skills, as they are always meticulous and pay close attention to detail. While they demonstrate a strong sense of reliability and consistency, they tend to be less open to new or unfamiliar concepts and ideas.\n"
+            "parts": "Factual statistical description:\n```The candidate is relatively solitary and reserved. The candidate tends to be less social. The candidate is very sensitive and nervous. The candidate tends to feel more negative emotions and anxiety. In particular they said that they are relaxed most of the time. The candidate is relatively critical and rational. The candidate tends to be less cooperative polite kind and friendly. The candidate is quite extravagant and careless. The candidate tends to be less careful or diligent. The candidate is very inventive and curious. The candidate tends to be more open to new ideas and experiences. In particular they said that they have a rich vocabulary.\n| Factor | Z-score | Relevant question |\n|:------|------:|:--------------------|\n| extraversion | -0.230 |   |\n| neuroticism | 1.866 | In particular they said that they are relaxed most of the time.  |\n| agreeableness | -0.266 |   |\n| conscientiousness | -0.658 |   |\n| openness | 1.416 | In particular they said that they have a rich vocabulary. |```\nDescriptive text:\n```The candidate presents a psychological profile marked by emotional sensitivity and intellectual curiosity. They score very high on neuroticism, indicating a tendency toward anxiety and negative emotions, though they also describe themselves as relaxed most of the time—suggesting a complex emotional landscape. At the same time, they are highly open to new ideas and experiences, with a strong sense of curiosity and creativity. This is reinforced by their self-reported rich vocabulary, pointing to a well-developed imaginative and intellectual side.\n\nOn the other hand, the candidate appears more reserved in social settings, scoring below average on extraversion. They tend to be solitary and introspective rather than outgoing or energetic. Their scores also suggest very low levels of conscientiousness, which may indicate a tendency to be less organized or detail-oriented.```"
         },
         {
             "role": "model",
-            "parts": "```json\n{\n'extraversion':'misrepresentation',\n'neuroticism':'representative',\n'agreeableness':'representative',\n'conscientiousness':'misrepresentation',\n'openness':'representative'\n}```"
-        },
-        {
-            "role": "user",
-            "parts": "Reconstruct the data dictionary by comparing the factual statistical description and descriptive text.\n"
-        },
-        {
-            "role": "user",
-            "parts": "Factual statistical description:\nThe candidate is very outgoing and energetic. In particular they said that they start conversations. The candidate is quite sensitive and nervous. The candidate tends to feel more negative emotions anxiety. The candidate is quite friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. The candidate is very efficient and organized. The candidate tends to be more careful or diligent. In particular they said that they pay attention to details. The candidate is relatively consistent and cautious. The candidate tends to be less open. \n\nDescriptive text:\nPlease provide the statistical description for the candidate. I need the relevant data to give you a summary.\n"
-        },
-        {
-            "role": "model",
-            "parts": "```json\n{\n'extraversion':'omitted',\n'neuroticism':'omitted',\n'agreeableness':'omitted',\n'conscientiousness':'omitted',\n'openness':'omitted'\n}```"
+            "parts": "```json\n{\n'extraversion':'no',\n'neuroticism':'no',\n'agreeableness':'omitted',\n'conscientiousness':'yes',\n'openness':'no'\n}```"
         }
     ],
     "content": {

@@ -4,7 +4,9 @@ __pycache__/
 Lib/*
 Scripts/*
 pyvenv.cfg
-.streamlit/secrets.toml
+.streamlit/secrets.*
+.streamlit/token.json
+.streamlit/client_secret.json
 etc/*
 share/*
 .DS_Store

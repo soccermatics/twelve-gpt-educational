@@ -24,29 +24,23 @@ import re
 from tqdm import tqdm
 
 path = "C:/Users/Amy/Desktop/Green_Git/twelve-gpt-educational/evaluation/"
-N = 10  # Min number of (non-"None") labels per factor per data point
-
-additional_text = (
-    f"\n If no data is provided answer anyway, using your prior statistical knowledge."
-)
+N = 1  # Min number of (non-"None") labels per factor per data point
 
 # read secrets.json
-with open(path + "secrets.json") as f:
+with open(".streamlit/secrets.json") as f:
     secrets = json.load(f)
 
 GEMINI_API_KEYS = [
     secrets[x]
     for x in [
-        "GEMINI_API_KEY",
-        "GEMINI_API_KEY_V",
-        "GEMINI_API_KEY_B",
         "GEMINI_API_KEY_N",
+        "GEMINI_API_KEY",
     ]
 ]
 
 current_key = 0
 genai.configure(api_key=GEMINI_API_KEYS[current_key])
-GEMINI_CHAT_MODEL = "gemini-1.5-flash"
+GEMINI_CHAT_MODEL = "gemini-2.0-flash"
 generationConfig = {
     "temperature": 1.0,
     # "topK": 1, # variable names?
@@ -60,7 +54,7 @@ ttypes = [
     "person",
     "player",
 ]  # entity types, different applications
-dt = "2025-04-05"  # datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+dt = "2025-04-29"  # datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # "2025-04-05"  #
 
 prompt_files = []
 prompts = []
@@ -106,13 +100,9 @@ for ttype in ttypes:
     ####################
 
     # read country specify text from csv
-    entity_texts = pd.read_csv(path + "data/" + f"{ttype}_texts.csv")
+    entity_texts = pd.read_csv(path + "data/" + f"{ttype}_texts.csv")  # .head(3)
+    entity_names = entity_texts[ttype].tolist()  # [:3]
 
-    entity_names = entity_texts[ttype].tolist()
-
-    entity_texts["text_empty"] = entity_texts["text_empty"].apply(
-        lambda x: x + additional_text
-    )
     entity_names_list.append(entity_names)
     entity_texts_list.append(entity_texts)
 
@@ -307,8 +297,8 @@ label_factor_dict["country"] = {
         "societal tranquility",
     ],
     "labels": [
-        "representative",
-        "misrepresentation",
+        "yes",
+        "no",
         "omitted",
         "None",
     ],
@@ -327,8 +317,8 @@ label_factor_dict["player"] = {
         "air duels",
     ],
     "labels": [
-        "representative",
-        "misrepresentation",
+        "yes",
+        "no",
         "omitted",
         "None",
     ],
@@ -342,8 +332,8 @@ label_factor_dict["person"] = {
         "openness",
     ],
     "labels": [
-        "representative",
-        "misrepresentation",
+        "yes",
+        "no",
         "omitted",
         "None",
     ],
@@ -403,8 +393,8 @@ def get_metrics(entity, text, labels, factors):
 
 
 start = time.time()
-to_do = 0
-max_tries = 20  # max number of tries to generate a response
+# to_do = 0
+max_retries = 1  # max number of tries to generate a response
 
 for (
     ttype,
@@ -431,11 +421,11 @@ for (
         data_points = {}
 
     for name in tqdm(entity_names):
-        for t, tt in zip(["text", "text_empty"], ["with data", "no data"]):
+        for t, tt in zip(
+            ["text_empty", "text", "table"], ["control", "textual", "numerical"]
+        ):
 
             count = -1
-            text = entity_texts[entity_texts[ttype] == name][t].values[0]
-
             factors = label_factor_dict[ttype]["factors"]
             keys = [k for k in data_points.keys() if name + "_" + tt in k]
             factor_counts = {
@@ -459,28 +449,27 @@ for (
             # continue
             #####################
 
+            text = entity_texts[entity_texts[ttype] == name][t].values[0]
+            fact = entity_texts[entity_texts[ttype] == name]["description_text"].values[
+                0
+            ]
+
             # while the factor count of any factor is less than 5 continue to generate responses
-            while any([x < N for x in factor_counts.values()]) and count < max_tries:
+            while any([x < N for x in factor_counts.values()]) and count < max_retries:
                 count += 1
                 if "_".join([name, tt, str(count)]) in keys:
                     # print("_".join([name, tt, str(count)]), "already completed")
                     pass
                 else:
+
                     #####################
                     response = completions_with_backoff(
                         msgs=msg,
-                        text=entity_texts[entity_texts[ttype] == name]["text"].values[
-                            0
-                        ],
+                        text=text,
                     )
 
-                    # ######
-                    # response_text = response.candidates[0].content.parts[0].text
-                    # ######
-                    fact = entity_texts[entity_texts[ttype] == name]["text"].values[0]
                     hyp = response.candidates[0].content.parts[0].text
                     response_text = f"Factual statistical description:\n{fact}\n\nDescriptive text:\n{hyp}\n"
-                    ######
 
                     response_rec = completions_with_backoff(
                         msgs=msg_rec,
@@ -497,6 +486,7 @@ for (
                     #####################
                     # response_text = ""
                     # response_text_rec = ""
+                    # hyp = ""
                     # metrics = {
                     #     f: ground_truth_df[ground_truth_df[ttype] == name][f].values[0]
                     #     for f in factors
@@ -509,11 +499,13 @@ for (
                             factor_counts[factor] += 1
 
                     data_points["_".join([name, tt, str(count)])] = {
-                        ttype: name,
+                        "entity": name,
                         "type": tt,
                         "count": count,
-                        "response": response_text,
-                        "response_rec": response_text_rec,
+                        "text": text,
+                        "wordalisation": hyp,
+                        "description": fact,
+                        "response_dict": response_text_rec,
                     }
                     for factor in factors:
                         data_points["_".join([name, tt, str(count)])][
@@ -531,9 +523,9 @@ for (
             with open(folder_name + "data_points.json", "w") as f:
                 json.dump(data_points, f)
 
-            if count >= max_tries:
-                print("Max tries reached.", "_".join([name, tt, str(count)]))
+            # if count >= max_retries:
+            #     print("Max tries reached.", "_".join([name, tt, str(count)]))
 
 end = time.time()
 print(f"Time taken: {end-start} seconds")
-print(to_do)
+# print(to_do)

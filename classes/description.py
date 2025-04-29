@@ -15,12 +15,12 @@ from classes.data_source import PersonStat
 
 import json
 
-from settings import USE_GEMINI
+# from settings import USE_GEMINI
 
-if USE_GEMINI:
-    from settings import USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
-else:
-    from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
+# if USE_GEMINI:
+#     from settings import USE_GEMINI, GEMINI_API_KEY, GEMINI_CHAT_MODEL
+# else:
+#     from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 import streamlit as st
 import random
@@ -168,53 +168,53 @@ class Description(ABC):
         ]
         return messages
 
-    def stream_gpt(self, temperature=1):
-        """
-        Run the GPT model on the messages and stream the output.
+    # def stream_gpt(self, temperature=1):
+    #     """
+    #     Run the GPT model on the messages and stream the output.
 
-        Arguments:
-        temperature: optional float
-            The temperature of the GPT model.
+    #     Arguments:
+    #     temperature: optional float
+    #         The temperature of the GPT model.
 
-        Yields:
-            str
-        """
+    #     Yields:
+    #         str
+    #     """
 
-        st.expander("Chat transcript", expanded=False).write(self.messages)
+    #     st.expander("Chat transcript", expanded=False).write(self.messages)
 
-        if USE_GEMINI:
-            import google.generativeai as genai
+    #     if USE_GEMINI:
+    #         import google.generativeai as genai
 
-            converted_msgs = convert_messages_format(self.messages)
+    #         converted_msgs = convert_messages_format(self.messages)
 
-            # # save converted messages to json
-            # with open("data/wvs/msgs_0.json", "w") as f:
-            #     json.dump(converted_msgs, f)
+    #         # # save converted messages to json
+    #         # with open("data/wvs/msgs_0.json", "w") as f:
+    #         #     json.dump(converted_msgs, f)
 
-            genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel(
-                model_name=GEMINI_CHAT_MODEL,
-                system_instruction=converted_msgs["system_instruction"],
-            )
-            chat = model.start_chat(history=converted_msgs["history"])
-            response = chat.send_message(content=converted_msgs["content"])
+    #         genai.configure(api_key=GEMINI_API_KEY)
+    #         model = genai.GenerativeModel(
+    #             model_name=GEMINI_CHAT_MODEL,
+    #             system_instruction=converted_msgs["system_instruction"],
+    #         )
+    #         chat = model.start_chat(history=converted_msgs["history"])
+    #         response = chat.send_message(content=converted_msgs["content"])
 
-            answer = response.text
-        else:
-            # Use OpenAI API
-            openai.api_base = GPT_BASE
-            openai.api_version = GPT_VERSION
-            openai.api_key = GPT_KEY
+    #         answer = response.text
+    #     else:
+    #         # Use OpenAI API
+    #         openai.api_base = GPT_BASE
+    #         openai.api_version = GPT_VERSION
+    #         openai.api_key = GPT_KEY
 
-            response = openai.ChatCompletion.create(
-                engine=GPT_ENGINE,
-                messages=self.messages,
-                temperature=temperature,
-            )
+    #         response = openai.ChatCompletion.create(
+    #             engine=GPT_ENGINE,
+    #             messages=self.messages,
+    #             temperature=temperature,
+    #         )
 
-            answer = response["choices"][0]["message"]["content"]
+    #         answer = response["choices"][0]["message"]["content"]
 
-        return answer
+    #     return answer
 
 
 class PlayerDescription(Description):
@@ -277,7 +277,7 @@ class PlayerDescription(Description):
 
         player = self.player
         metrics = self.player.relevant_metrics
-        description = f"Here is a statistical description of {player.name}, who played for {player.minutes_played} minutes as a {player.position}. \n\n "
+        description = f"Here is a statistical description of {player.name}, who played for {player.minutes_played} minutes as a {player.position}. \n\n"
 
         subject_p, object_p, possessive_p = sentences.pronouns(player.gender)
 
@@ -361,7 +361,9 @@ class CountryDescription(Description):
 
         for metric in self.country.relevant_metrics:
 
-            description += f"\n\nAccording to the WVS, {self.country.name.capitalize()} was found to "
+            description += (
+                f" According to the WVS, {self.country.name.capitalize()} was found to "
+            )
             description += sentences.describe_level(
                 self.country.ser_metrics[metric + "_Z"],
                 thresholds=self.thresholds_dict[metric],
@@ -369,7 +371,24 @@ class CountryDescription(Description):
             )
             description += " compared to other countries in the same wave. "
 
-            if metric in self.country.drill_down_metrics:
+            if metric.lower() in self.country.drill_down_metrics:
+                if self.country.ser_metrics[metric + "_Z"] > 0:
+                    index = 1
+                else:
+                    index = 0
+
+                question, value = self.country.drill_down_metrics[metric.lower()]
+                question, value = question[index], value[index]
+                description += "In response to the question '"
+                description += self.relevant_questions[metric][question][0]
+                description += "', on average participants "
+                description += self.relevant_questions[metric][question][1]
+                description += " '"
+                description += self.relevant_questions[metric][question][2][str(value)]
+                description += "' "
+                description += self.relevant_questions[metric][question][3]
+                description += ". "
+            elif metric in self.country.drill_down_metrics:
 
                 if self.country.ser_metrics[metric + "_Z"] > 0:
                     index = 1
@@ -502,10 +521,11 @@ class PersonDescription(Description):
         cat_1 = "outgoing and energetic. "
 
         if extraversion > 0:
-            text_t = (self.categorie_description(extraversion) 
-            + cat_1
-            + "The candidate tends to be more social. "
-                     )
+            text_t = (
+                self.categorie_description(extraversion)
+                + cat_1
+                + "The candidate tends to be more social. "
+            )
             if extraversion > 1:
                 index_max = person_metrics[0:10].idxmax()
                 text_2 = (
@@ -513,10 +533,11 @@ class PersonDescription(Description):
                 )
                 text_t += text_2
         else:
-            text_t = (self.categorie_description(extraversion) 
-            + cat_0
-            + "The candidate tends to be less social. "
-                     )
+            text_t = (
+                self.categorie_description(extraversion)
+                + cat_0
+                + "The candidate tends to be less social. "
+            )
             if extraversion < -1:
                 index_min = person_metrics[0:10].idxmin()
                 text_2 = (

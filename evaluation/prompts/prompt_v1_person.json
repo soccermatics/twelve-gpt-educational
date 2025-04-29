@@ -1,5 +1,5 @@
 {
-    "system_instruction": "You are a recruiter. You provide succinct and to the point explanations about a candidate using data.  You use the information given to you from the data and answersto earlier user/assistant pairs to give summaries of candidates.",
+    "system_instruction": "You are a recruiter. You provide succinct and to the point explanations about a candidate using data.  You use the information given to you from the data and answers to earlier user/assistant pairs to give summaries of candidates.",
     "history": [
         {
             "role": "user",
@@ -23,7 +23,7 @@
         },
         {
             "role": "model",
-            "parts": "Openness to experience\u00a0is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. "
+            "parts": "Openness to experience is a general appreciation for art, emotion, adventure, unusual ideas, imagination, curiosity, and variety of experience. "
         },
         {
             "role": "user",
@@ -39,7 +39,7 @@
         },
         {
             "role": "model",
-            "parts": "Open people can be perceived as unpredictable or lacking focus, and more likely to engage in risky behaviour or drug-taking. Moreover, individuals with high openness are said to pursue\u00a0self-actualisation\u00a0specifically by\u00a0seeking out intense, euphoric experiences. "
+            "parts": "Open people can be perceived as unpredictable or lacking focus, and more likely to engage in risky behaviour or drug-taking. Moreover, individuals with high openness are said to pursue self-actualisation specifically by seeking out intense, euphoric experiences. "
         },
         {
             "role": "user",
@@ -47,7 +47,7 @@
         },
         {
             "role": "model",
-            "parts": "People with low openness want to be fulfilled by persevering and are characterised as pragmatic and data-driven\u00a0\u2013 sometimes even perceived to be dogmatic and closed-minded."
+            "parts": "People with low openness want to be fulfilled by persevering and are characterised as pragmatic and data-driven sometimes even perceived to be dogmatic and closed-minded."
         },
         {
             "role": "user",
@@ -143,7 +143,7 @@
         },
         {
             "role": "model",
-            "parts": "Agreeableness\u00a0is the general concern for social harmony. Agreeable individuals value getting along with others. They are generally considerate, kind, generous, trusting and trustworthy, helpful, and willing to compromise their interests with others.Agreeable people also have an optimistic view of human nature."
+            "parts": "Agreeableness is the general concern for social harmony. Agreeable individuals value getting along with others. They are generally considerate, kind, generous, trusting and trustworthy, helpful, and willing to compromise their interests with others.Agreeable people also have an optimistic view of human nature."
         },
         {
             "role": "user",
@@ -187,7 +187,7 @@
         },
         {
             "role": "user",
-            "parts": "How does Hans Eysenck's theory describe neuroticism?\n"
+            "parts": "How does Hans Eysenck's theory describe neuroticism?"
         },
         {
             "role": "model",
@@ -239,7 +239,7 @@
         },
         {
             "role": "model",
-            "parts": "Being disappointed with one\u2019s life achievements can increase neuroticism and the likelihood of falling into clinical depression."
+            "parts": "Being disappointed with one's life achievements can increase neuroticism and the likelihood of falling into clinical depression."
         },
         {
             "role": "user",
@@ -279,7 +279,7 @@
         },
         {
             "role": "user",
-            "parts": "The candidate is very outgoing and energetic. In particular they said that they start conversations. The candidate is quite sensitive and nervous. The candidate tends to feel more negative emotions anxiety. The candidate is quite friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. The candidate is very efficient and organized. The candidate tends to be more careful or diligent. In particular they said that they pay attention to details. The candidate is relatively consistent and cautious. The candidate tends to be less open."
+            "parts": "```The candidate is very outgoing and energetic. In particular they said that they start conversations. The candidate is quite sensitive and nervous. The candidate tends to feel more negative emotions anxiety. The candidate is quite friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. The candidate is very efficient and organized. The candidate tends to be more careful or diligent. In particular they said that they pay attention to details. The candidate is relatively consistent and cautious. The candidate tends to be less open.```"
         },
         {
             "role": "model",
@@ -287,7 +287,7 @@
         },
         {
             "role": "user",
-            "parts": "The candidate is extremely solitary and reserved. In particular they said that they dont talk a lot. resilient and confident. The candidate tends to feel less negative emotions anxiety. In particular they said that they get stressed out easily. The candidate is relatively friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. extravagant and careless. The candidate tends to be less careful or diligent. In particular they said that they make a mess of things. The candidate is relatively consistent and cautious. The candidate tends to be less open."
+            "parts": "```The candidate is extremely solitary and reserved. In particular they said that they dont talk a lot. resilient and confident. The candidate tends to feel less negative emotions anxiety. In particular they said that they get stressed out easily. The candidate is relatively friendly and compassionate. The candidate tends to be more cooperative polite kind and friendly. extravagant and careless. The candidate tends to be less careful or diligent. In particular they said that they make a mess of things. The candidate is relatively consistent and cautious. The candidate tends to be less open.```"
         },
         {
             "role": "model",
@@ -295,7 +295,7 @@
         },
         {
             "role": "user",
-            "parts": "The candidate is...\nIf no data is provided answer anyway, using your prior statistical knowledge."
+            "parts": "```The candidate is...```\nIf no information is provided answer anyway, using your prior statistical knowledge."
         },
         {
             "role": "model",

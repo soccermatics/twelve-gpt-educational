@@ -175,7 +175,7 @@
         },
         {
             "role": "user",
-            "parts": "Here is a statistical description of Pedro, who played for 1592 minutes as a forward.\nHe was below average in non-penalty expected goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in assists adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in key passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in smart passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was good in final third passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was good in final third receptions adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in ground duels won adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in air duels won adjusted for possession per 90 minutes compared to other players in the same playing position."
+            "parts": "```Here is a statistical description of Pedro, who played for 1592 minutes as a forward.\n\nHe was below average in non-penalty expected goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in goals adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in assists adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in key passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in smart passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was good in final third passes adjusted for possession per 90 minutes compared to other players in the same playing position. He was good in final third receptions adjusted for possession per 90 minutes compared to other players in the same playing position. He was average in ground duels won adjusted for possession per 90 minutes compared to other players in the same playing position. He was below average in air duels won adjusted for possession per 90 minutes compared to other players in the same playing position.```"
         },
         {
             "role": "model",
@@ -183,11 +183,11 @@
         },
         {
             "role": "user",
-            "parts": "Here is a statistical description of O. Giroud...\n If no data is provided answer anyway, using your prior statistical knowledge."
+            "parts": "```Here is a statistical description of O. Giroud.```\nIf no information is provided answer anyway, using your prior statistical knowledge."
         },
         {
             "role": "model",
-            "parts": "Giroud is a clinical forward, receiving the ball in the final third and scoring goals. His exceptional non-penalty expected goals demonstrate that it is not by chance that he has scored so many goals this season: when he gets the ball in the final third, he often finds a way to create a good chance. While he is strong in the air, he doesn\u2019t win the ball much on the ground and he tends to score himself rather than assisting others. Giroud is one of the absolute best goal-scoring forwards in the league."
+            "parts": "Giroud is a clinical forward, receiving the ball in the final third and scoring goals. His exceptional non-penalty expected goals demonstrate that it is not by chance that he has scored so many goals this season: when he gets the ball in the final third, he often finds a way to create a good chance. While he is strong in the air, he doesn't win the ball much on the ground and he tends to score himself rather than assisting others. Giroud is one of the absolute best goal-scoring forwards in the league."
         }
     ],
     "content": {

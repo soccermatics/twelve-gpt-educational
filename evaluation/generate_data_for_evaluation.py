@@ -40,6 +40,70 @@
 
 
 # %%
+
+
+def series_to_markdown(
+    series, questions, header="| Factor | Z-score | Relevant question |"
+):
+    if questions is None:
+        separator = "|:------|------:|"
+        rows = [
+            f"| {idx} | {val:.3f} |" for idx, val in zip(series.index, series.values)
+        ]
+    else:
+        separator = "|:------|------:|:--------------------|"
+        rows = [
+            f"| {idx} | {val:.3f} | {q} |"
+            for idx, val, q in zip(series.index, series.values, questions)
+        ]
+    return "\n".join([header, separator] + rows)
+
+
+def get_questions(metric, c_description, entity):
+
+    if metric.lower() in entity.drill_down_metrics:
+        if entity.ser_metrics[metric + "_Z"] > 0:
+            index = 1
+        else:
+            index = 0
+
+        question, value = entity.drill_down_metrics[metric.lower()]
+        question, value = question[index], value[index]
+        description = "Question: '"
+        description += c_description.relevant_questions[metric][question][0]
+        description += "' Average answer:"
+        description += c_description.relevant_questions[metric][question][1]
+        description += " '"
+        description += c_description.relevant_questions[metric][question][2][str(value)]
+        description += "' "
+        description += c_description.relevant_questions[metric][question][3]
+        description += "."
+
+    elif metric in entity.drill_down_metrics:
+
+        if entity.ser_metrics[metric + "_Z"] > 0:
+            index = 1
+        else:
+            index = 0
+
+        question, value = entity.drill_down_metrics[metric]
+        question, value = question[index], value[index]
+        description = "Question: '"
+        description += c_description.relevant_questions[metric][question][0]
+        description += "' Average answer: "
+        description += c_description.relevant_questions[metric][question][1]
+        description += " '"
+        description += c_description.relevant_questions[metric][question][2][str(value)]
+        description += "' "
+        description += c_description.relevant_questions[metric][question][3]
+        description += "."
+    else:
+        description = ""
+    return description
+
+
+# %%
+
 # Generate country specific data for evaluation
 
 from classes.data_source import CountryStats
@@ -47,6 +111,7 @@ from classes.description import CountryDescription
 import copy
 import json
 import pandas as pd
+from tqdm import tqdm
 
 countries = CountryStats()
 
@@ -56,7 +121,7 @@ countries.calculate_statistics(metrics=metrics)
 
 country_names = countries.df["country"].values.tolist()
 
-with open("../data/wvs/description_dict.json", "r") as f:
+with open("./data/wvs/description_dict.json", "r") as f:
     description_dict = json.load(f)
 
 thresholds_dict = dict(
@@ -92,29 +157,54 @@ def select_country(countries, country_name):
 
 texts = []
 texts_empty = []
-for country_name in country_names:
-    try:
-        tmp_country = select_country(countries, country_name)
-        c_description = CountryDescription(
-            tmp_country,
-            description_dict=description_dict,
-            thresholds_dict=thresholds_dict,
-        )
+tables = []
+d_texts = []
+for country_name in tqdm(country_names):
+    # try:
+    tmp_country = select_country(countries, country_name)
+    c_description = CountryDescription(
+        tmp_country,
+        description_dict=description_dict,
+        thresholds_dict=thresholds_dict,
+    )
 
-        text = f"Now do the same thing with the following: ```{c_description.synthesize_text()}```"
-        text_empty = f"Now do the same thing with the following: ```Here is a statistical description of the societal values of {tmp_country.name.capitalize()}.\n\n```"
+    text = f"```{c_description.synthesize_text()}```"
+    data = c_description.country.ser_metrics
+    # select only rows ending in "_Z"
+    data = data[[col for col in data.index if col.endswith("_Z")]]
+    # remove "_Z" from the index
+    data.index = [col[:-2] for col in data.index]
+    questions = [
+        get_questions(x, c_description, c_description.country) for x in data.index
+    ]
 
-        texts.append(text)
-        texts_empty.append(text_empty)
-    except:
-        texts.append("")
-        texts_empty.append("")
-        print(f"Error with {country_name}")
+    table = f"```Here is a statistical description of the societal values of {tmp_country.name.capitalize()}.\n{series_to_markdown(data, questions)}```"
+    text_empty = f"```Here is a statistical description of the societal values of {tmp_country.name.capitalize()}.```"
+    d_text = f"```{c_description.synthesize_text()}\n{series_to_markdown(data, questions)}```"
 
+    texts.append(text)
+    tables.append(table)
+    texts_empty.append(text_empty)
+    d_texts.append(d_text)
+    # except:
+    #     texts.append("")
+    #     tables.append("")
+    #     texts_empty.append("")
+    #     print(f"Error with {country_name}")
+
+# %%
 
 # zip country names and texts into a dataframe and save
-df = pd.DataFrame({"country": country_names, "text": texts, "text_empty": texts_empty})
-df.to_csv("data/country_texts.csv", index=False)
+df = pd.DataFrame(
+    {
+        "country": country_names,
+        "text": texts,
+        "table": tables,
+        "text_empty": texts_empty,
+        "description_text": d_texts,
+    }
+)
+df.to_csv("evaluation/data/country_texts.csv", index=False)
 # %%
 
 # Generate country specific ground truth
@@ -181,7 +271,7 @@ def select_country(countries, country_name):
 
 
 factors = []
-for country_name in country_names:
+for country_name in tqdm(country_names):
     tmp_country = select_country(countries, country_name)
     data = [tmp_country.name]
     for metric in tmp_country.relevant_metrics:
@@ -200,7 +290,7 @@ for country_name in country_names:
 
 # create a dataframe with columns 'country' and and each factor from tmp_country.relevant_metrics
 df = pd.DataFrame(factors, columns=["country"] + tmp_country.relevant_metrics)
-df.to_csv("data/country_ground_truth.csv", index=False)
+df.to_csv("evaluation/data/country_ground_truth.csv", index=False)
 # %%
 # %%
 # Generate player specific data for evaluation
@@ -255,20 +345,47 @@ def select_player(players, player_name):
     return player
 
 
+name_map = {
+    "npxG_adjusted_per90": "non-penalty expected goals",
+    "goals_adjusted_per90": "goals",
+    "assists_adjusted_per90": "assists",
+    "key_passes_adjusted_per90": "key passes",
+    "smart_passes_adjusted_per90": "smart passes",
+    "final_third_passes_adjusted_per90": "final third passes",
+    "final_third_receptions_adjusted_per90": "final third receptions",
+    "ground_duels_won_adjusted_per90": "ground duels",
+    "air_duels_won_adjusted_per90": "air duels",
+}
+
+
 texts = []
 texts_empty = []
-for player_name in player_names:
+tables = []
+d_texts = []
+for player_name in tqdm(player_names):
     # try:
     tmp_player = select_player(players, player_name)
     c_description = PlayerDescription(
         tmp_player,
     )
 
-    text = c_description.synthesize_text()
-    text_empty = f"Here is a statistical description of {tmp_player.name}...```"
+    text = f"```{c_description.synthesize_text()}```"
+    data = c_description.player.ser_metrics
+    # select only rows ending in "_Z"
+    data = data[[col for col in data.index if col.endswith("_Z")]]
+    # remove "_Z" from the index
+    data.index = [col[:-2] for col in data.index]
+    # rename index to be more readable
+    data.index = [name_map.get(col, col) for col in data.index]
+    questions = None
 
+    table = f"```Here is a statistical description of {tmp_player.name}.\n{series_to_markdown(data, questions, header='| Factor | Z-score |')}```\nIf no information is provided answer anyway, using your prior statistical knowledge."
+    text_empty = f"```Here is a statistical description of {tmp_player.name}.```\nIf no information is provided answer anyway, using your prior statistical knowledge."
+    d_text = f"```{c_description.synthesize_text()}\n{series_to_markdown(data, questions, header='| Factor | Z-score |')}```"
     texts.append(text)
+    tables.append(table)
     texts_empty.append(text_empty)
+    d_texts.append(d_text)
     # except:
     #     texts.append("")
     #     texts_empty.append("")
@@ -276,11 +393,19 @@ for player_name in player_names:
 
 
 # zip country names and texts into a dataframe and save
-df = pd.DataFrame({"player": player_names, "text": texts, "text_empty": texts_empty})
-df.to_csv("data/player_texts.csv", index=False)
+df = pd.DataFrame(
+    {
+        "player": player_names,
+        "text": texts,
+        "table": tables,
+        "description_text": d_texts,
+        "text_empty": texts_empty,
+    }
+)
+df.to_csv("evaluation/data/player_texts.csv", index=False)
 
 factors = []
-for name in player_names:
+for name in tqdm(player_names):
     tmp_player = select_player(players, name)
     data = [tmp_player.name]
     for metric in tmp_player.relevant_metrics:
@@ -299,7 +424,7 @@ for name in player_names:
 
 # create a dataframe with columns 'player' and and each factor from tmp_player.relevant_metrics
 df = pd.DataFrame(factors, columns=["player"] + tmp_player.relevant_metrics)
-df.to_csv("data/player_ground_truth.csv", index=False)
+df.to_csv("evaluation/data/player_ground_truth.csv", index=False)
 # %%
 
 # Generate player specific data for evaluation
@@ -310,7 +435,7 @@ import copy
 import json
 import pandas as pd
 import utils.sentences as sentences
-
+from tqdm import tqdm
 
 people = PersonStat()
 
@@ -335,20 +460,85 @@ def select_person(people, player_name):
     return person
 
 
+def get_questions(metric, c_description, entity):
+    questions = PersonStat().get_questions()
+    description = " "
+
+    if metric == "extraversion":
+        if entity.ser_metrics[metric + "_Z"] > 1:
+            index = entity.ser_metrics[0:10].idxmax()
+            description = "In particular they said that " + questions[index][0] + "."
+        if entity.ser_metrics[metric + "_Z"] < -1:
+            index = entity.ser_metrics[0:10].idxmin()
+            description = "In particular they said that " + questions[index][0] + "."
+    elif metric == "neuroticism":
+        if entity.ser_metrics[metric + "_Z"] > 1:
+            index = entity.ser_metrics[10:20].idxmax()
+            description = "In particular they said that " + questions[index][0] + ". "
+        if entity.ser_metrics[metric + "_Z"] < -1:
+            index = entity.ser_metrics[10:20].idxmin()
+            description = "In particular they said that " + questions[index][0] + "."
+    elif metric == "agreeableness":
+        if entity.ser_metrics[metric + "_Z"] > 1:
+            index = entity.ser_metrics[20:30].idxmax()
+            description = "In particular they said that " + questions[index][0] + "."
+        if entity.ser_metrics[metric + "_Z"] < -1:
+            index = entity.ser_metrics[20:30].idxmin()
+            description = "In particular they said that " + questions[index][0] + "."
+    elif metric == "conscientiousness":
+        if entity.ser_metrics[metric + "_Z"] > 1:
+            index = entity.ser_metrics[30:40].idxmax()
+            description = "In particular they said that " + questions[index][0] + "."
+        if entity.ser_metrics[metric + "_Z"] < -1:
+            index = entity.ser_metrics[30:40].idxmin()
+            description = "In particular they said that " + questions[index][0] + "."
+    elif metric == "openness":
+        if entity.ser_metrics[metric + "_Z"] > 1:
+            index = entity.ser_metrics[40:50].idxmax()
+            description = "In particular they said that " + questions[index][0] + "."
+        if entity.ser_metrics[metric + "_Z"] < -1:
+            index = entity.ser_metrics[40:50].idxmin()
+            description = "In particular they said that " + questions[index][0] + "."
+
+    return description
+
+
 texts = []
 texts_empty = []
-for player_name in people_names:
+tables = []
+d_texts = []
+for player_name in tqdm(people_names):
     # try:
     tmp_person = select_person(people, player_name)
     c_description = PersonDescription(
         tmp_person,
     )
 
-    text = c_description.synthesize_text()
-    text_empty = f"The candidate is..."
+    text = f"```{c_description.synthesize_text()}```"
+    data = c_description.person.ser_metrics
+    # select only rows ending in "_Z"
+    cols = [
+        "extraversion_Z",
+        "neuroticism_Z",
+        "agreeableness_Z",
+        "conscientiousness_Z",
+        "openness_Z",
+    ]
+    data = data[[col for col in data.index if col in cols]]
+    # remove "_Z" from the index
+    data.index = [col[:-2] for col in data.index]
+    questions = [
+        get_questions(x, c_description, c_description.person) for x in data.index
+    ]
+
+    table = f"```Here is a statistical description of the candidate.\n{series_to_markdown(data, questions)}```"
+    text_empty = f"```The candidate is...```"
+    d_text = f"```{c_description.synthesize_text()}\n{series_to_markdown(data, questions)}```"
 
     texts.append(text)
+    tables.append(table)
     texts_empty.append(text_empty)
+    d_texts.append(d_text)
     # except:
     #     texts.append("")
     #     texts_empty.append("")
@@ -356,12 +546,20 @@ for player_name in people_names:
 
 
 # zip country names and texts into a dataframe and save
-df = pd.DataFrame({"person": people_names, "text": texts, "text_empty": texts_empty})
-df.to_csv("data/personality_texts.csv", index=False)
+df = pd.DataFrame(
+    {
+        "person": people_names,
+        "text": texts,
+        "text_empty": texts_empty,
+        "table": tables,
+        "description_text": d_texts,
+    }
+)
+df.to_csv("evaluation/data/person_texts.csv", index=False)
 
 
 factors = []
-for name in people_names:
+for name in tqdm(people_names):
     tmp_person = select_person(people, name)
     data = [tmp_person.name]
 
@@ -420,6 +618,6 @@ df = pd.DataFrame(
     columns=["person"]
     + ["extraversion", "neuroticism", "agreeableness", "conscientiousness", "openness"],
 )
-df.to_csv("data/personality_ground_truth.csv", index=False)
+df.to_csv("evaluation/data/person_ground_truth.csv", index=False)
 
 # %%

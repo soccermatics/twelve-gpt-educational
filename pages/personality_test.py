@@ -10,20 +10,24 @@ import plotly.express as px
 from classes.data_source import PersonStat
 from classes.data_point import Person
 from classes.description import PersonDescription
-from classes.visual import DistributionPlot,DistributionPlotPersonality
+from classes.visual import DistributionPlot, DistributionPlotPersonality
 
 from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 from classes.chat import PersonChat
 import utils.sentences as sentences
 
-from utils.page_components import (add_common_page_elements)
+from utils.page_components import add_common_page_elements
 
 import traceback
 import copy
 
 
-from utils.page_components import (add_common_page_elements,select_person,create_chat,)
+from utils.page_components import (
+    add_common_page_elements,
+    select_person,
+    create_chat,
+)
 
 sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
@@ -33,7 +37,13 @@ st.divider()
 
 persons = PersonStat()
 # Define the metrics we are interested in and calculates them
-metrics = ['extraversion', 'neuroticism', 'agreeableness', 'conscientiousness', 'openness']
+metrics = [
+    "extraversion",
+    "neuroticism",
+    "agreeableness",
+    "conscientiousness",
+    "openness",
+]
 persons.calculate_statistics(metrics=metrics)
 
 with st.expander("Dataframe"):
@@ -55,11 +65,11 @@ if chat.state == "empty":
     # We reverse the order of the elements in metrics for plotting (because they plot from bottom to top)
     visual = DistributionPlotPersonality(metrics[::-1])
     visual.add_title_from_person(person)
-    visual.add_persons(persons,metrics=metrics)
-    visual.add_person(person, len(persons.df),metrics=metrics)
+    visual.add_persons(persons, metrics=metrics)
+    visual.add_person(person, len(persons.df), metrics=metrics)
 
     # Now call the description class to get the summary of the player
-    description =  PersonDescription(person)
+    description = PersonDescription(person)
     summary = description.stream_gpt()
 
     # Add the visual and summary to the chat

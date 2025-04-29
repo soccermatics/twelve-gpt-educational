@@ -1,17 +1,17 @@
 {
     "Traditional vs Secular Values": [
-        "have far above average Traditional vs Secular Values score (e.i. far more secular compared to the average)",
-        "have above average Traditional vs Secular Values score (e.i. more secular compared to the average)",
+        "have far above average Traditional vs Secular Values score (i.e. far more secular compared to the average)",
+        "have above average Traditional vs Secular Values score (i.e. more secular compared to the average)",
         "have neither an above nor a below average Traditional vs Secular Values score",
-        "have below average Traditional vs Secular Values score (e.i. more traditional compared to the average)",
-        "have far below average Traditional vs Secular Values score (e.i. far more traditional compared to the average)"
+        "have below average Traditional vs Secular Values score (i.e. more traditional compared to the average)",
+        "have far below average Traditional vs Secular Values score (i.e. far more traditional compared to the average)"
     ],
     "Survival vs Self-expression Values": [
-        "have far above average Survival vs Self-expression values score (e.i. value self-expression far more compared to the average)",
-        "have above average Survival vs Self-expression Values score (e.i. value self-expression more compared to the average)",
+        "have far above average Survival vs Self-expression values score (i.e. value self-expression far more compared to the average)",
+        "have above average Survival vs Self-expression Values score (i.e. value self-expression more compared to the average)",
         "have neither an above nor a below average Survival vs Self-expression Values score",
-        "have below average Survival vs Self-expression Values score (e.i. value survival more compared to the average)",
-        "have far below average Survival vs Self-expression Values score (e.i. value survival far more compared to the average)"
+        "have below average Survival vs Self-expression Values score (i.e. value survival more compared to the average)",
+        "have far below average Survival vs Self-expression Values score (i.e. value survival far more compared to the average)"
     ],
     "Neutrality": [
         "be far above averagely neutral",

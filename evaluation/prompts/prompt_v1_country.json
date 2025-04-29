@@ -75,7 +75,7 @@
         },
         {
             "role": "user",
-            "parts": "What does \u201cNeutrality\u201d measure in the context of the WVS?"
+            "parts": "What does \"Neutrality\" measure in the context of the WVS?"
         },
         {
             "role": "model",
@@ -155,15 +155,15 @@
         },
         {
             "role": "user",
-            "parts": "Please use the statistical description enclosed with ``` to give a concise, 2 short paragraph summary of the social values held by population of the country. The first paragraph should focus on any factors or values for which the country is above or bellow average. If the country is neither above nor below average in any values, mention that. The remaining paragraph should mention any specific values or factors that are neither high nor low compared to the average. "
+            "parts": "Please use the statistical description enclosed with ``` to give a concise, 2 short paragraph summary of the social values held by population of the country. The first paragraph should focus on any factors or values for which the country is above or bellow average. The second paragraph should mention any specific values or factors that are neither high nor low compared to the average. "
         },
         {
             "role": "user",
-            "parts": "Now do the same thing with the following: ```Here is a statistical description of the societal values of Peru. \n\n```\n If no data is provided answer anyway, using your prior statistical knowledge."
+            "parts": "```Here is a statistical description of the societal values of Peru.```\nIf no information is provided answer anyway, using your prior statistical knowledge."
         },
         {
             "role": "model",
-            "parts": "Peru was found to have below average Survival vs Self-expression Values score, suggesting that participants were more survival orientated. One contributing factor was that on average participants indicated that work was very important to them. Further, Peru was found to be above averagely skeptical, with participant on average indicating that they have no trust at all in parliament. \n\nAccording to the WVS, Peru was found to have neither an above nor a below average Traditional vs Secular Values score, to be averagely neutral, to have an average value of fairness, and to be neither above nor below averagely tranquil compared to other countries in the same wave."
+            "parts": "Peru was found to have below average Survival vs Self-expression Values score, suggesting that participants were more survival orientated. One contributing factor was that on average participants indicated that work was very important to them. Further, Peru was found to be above averagely skeptical, with participant on average indicating that they have no trust at all in parliament.\n\nAccording to the WVS, Peru was found to have neither an above nor a below average Traditional vs Secular Values score, to be averagely neutral, to have an average value of fairness, and to be neither above nor below averagely tranquil compared to other countries in the same wave."
         }
     ],
     "content": {
