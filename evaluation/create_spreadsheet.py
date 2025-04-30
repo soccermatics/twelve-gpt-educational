@@ -19,7 +19,7 @@ nltk.download("punkt_tab")
 import os
 
 # --- Configuration ---
-ttype = "country"
+ttype = "player"
 JSON_FILE_PATH = f"C:/Users/Amy/Desktop/Green_Git/twelve-gpt-educational/evaluation/2025-04-29/prompt_v1_{ttype}/data_points.json"  # <--- CHANGE THIS TO YOUR JSON FILE NAME
 SPREADSHEET_NAME = f"2025-04-05_{ttype}"  # <--- Name for the new Google Sheet
 # WORKSHEET_NAME = f"{ttype}"
@@ -334,11 +334,18 @@ for item_id, item_data in data.items():
 
                 # d is the part of full_description matching | factor_name | ... | ... |
                 # We can use regex to extract the relevant part of the description, not case sensitive
-                d = re.search(
-                    rf"\| {re.escape(factor_name)} \|.*?\| .*?\|",
-                    full_description,
-                    re.IGNORECASE,
-                )
+                if ttype == "player":
+                    d = re.search(
+                        rf"\| {re.escape(factor_name)} \|.*?\|",
+                        full_description,
+                        re.IGNORECASE,
+                    )
+                else:
+                    d = re.search(
+                        rf"\| {re.escape(factor_name)} \|.*?\| .*?\|",
+                        full_description,
+                        re.IGNORECASE,
+                    )
                 if d:
                     d = d.group(0).strip()
                 else:
@@ -356,6 +363,15 @@ for item_id, item_data in data.items():
                 )
         else:
             # No factor matched well enough, create a row with "None"
+            if ttype == "player":
+                tmp = full_description.split("|:------|------:|\n")[1]
+            else:
+                tmp = (
+                    full_description.split("|:------|------:|:--------------------|\n")[
+                        1
+                    ],
+                )
+
             all_rows.append(
                 {
                     "id": item_id,
@@ -364,9 +380,7 @@ for item_id, item_data in data.items():
                     "factor": "None",
                     "true_value": "None",  # As per requirement
                     "evaluation": "None",  # As per requirement
-                    "full_description": full_description.split(
-                        "|:------|------:|:--------------------|\n"
-                    )[1],
+                    "full_description": tmp,
                 }
             )
 

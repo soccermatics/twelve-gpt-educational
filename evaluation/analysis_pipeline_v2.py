@@ -393,7 +393,7 @@ def get_metrics(entity, text, labels, factors):
 
 
 start = time.time()
-# to_do = 0
+to_do = 0
 max_retries = 1  # max number of tries to generate a response
 
 for (
@@ -439,14 +439,14 @@ for (
             }
 
             #####################
-            # to_do_list = [N - factor_counts[factor] for factor in factors]
-            # to_do += max(to_do_list)
+            to_do_list = [N - factor_counts[factor] for factor in factors]
+            to_do += max(to_do_list)
 
-            # # if any([x < N for x in factor_counts.values()]):
-            # #     print(name, tt)
-            # #     print(factor_counts)
+            # if any([x < N for x in factor_counts.values()]):
+            #     print(name, tt)
+            #     print(factor_counts)
 
-            # continue
+            continue
             #####################
 
             text = entity_texts[entity_texts[ttype] == name][t].values[0]
@@ -528,4 +528,4 @@ for (
 
 end = time.time()
 print(f"Time taken: {end-start} seconds")
-# print(to_do)
+print(to_do)
