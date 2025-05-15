@@ -1,3 +1,34 @@
+MISSING = [
+    "C_29_control",
+    "C_52_control",
+    "C_0_control",
+    "C_3_control",
+    "C_48_control",
+    "C_23_control",
+    "C_24_control",
+    "C_36_control",
+    "C_90_control",
+    "C_72_control",
+    "C_46_control",
+    "C_6_control",
+    "C_2_control",
+    "C_78_control",
+    "C_31_control",
+    "C_97_control",
+    "C_18_control",
+    "C_88_control",
+    "C_7_control",
+    "C_39_control",
+    "C_25_control",
+    "C_66_control",
+    "C_57_control",
+    "C_8_control",
+    "C_51_control",
+    "C_91_control",
+    "C_56_control",
+    "C_41_control",
+]
+
 # Goal: Evaluate if the wordalisation accurately reflects teh synthetic text.
 # Run this script to generate responses for the data points
 # This code uses exponential backoff to handle rate limiting errors from the API.
@@ -394,7 +425,7 @@ def get_metrics(entity, text, labels, factors):
 
 start = time.time()
 to_do = 0
-max_retries = 1  # max number of tries to generate a response
+max_retries = 10  # max number of tries to generate a response
 
 for (
     ttype,
@@ -431,7 +462,12 @@ for (
             factor_counts = {
                 factor: sum(
                     [
-                        1 if data_points[k][factor + "_pred"] != "None" else 0
+                        (
+                            1
+                            if (data_points[k][factor + "_pred"] != "None")
+                            and (data_points[k][factor + "_pred"] != "omitted")
+                            else 0
+                        )
                         for k in keys
                     ]
                 )
@@ -439,14 +475,15 @@ for (
             }
 
             #####################
-            to_do_list = [N - factor_counts[factor] for factor in factors]
-            to_do += max(to_do_list)
+            # to_do_list = [N == factor_counts[factor] for factor in factors]
+            # to_do += max(to_do_list)
 
-            # if any([x < N for x in factor_counts.values()]):
-            #     print(name, tt)
-            #     print(factor_counts)
+            # # if any([x < N for x in factor_counts.values()]):
+            # #     print(name, tt)
+            # #     print(factor_counts)
 
-            continue
+            # continue
+
             #####################
 
             text = entity_texts[entity_texts[ttype] == name][t].values[0]
@@ -462,66 +499,74 @@ for (
                     pass
                 else:
 
-                    #####################
-                    response = completions_with_backoff(
-                        msgs=msg,
-                        text=text,
-                    )
+                    if "_".join([name, tt]) in MISSING:
 
-                    hyp = response.candidates[0].content.parts[0].text
-                    response_text = f"Factual statistical description:\n{fact}\n\nDescriptive text:\n{hyp}\n"
+                        print("\n", "_".join([name, tt, str(count)]))
 
-                    response_rec = completions_with_backoff(
-                        msgs=msg_rec,
-                        text=response_text,
-                    )
-                    response_text_rec = response_rec.candidates[0].content.parts[0].text
+                        #####################
+                        response = completions_with_backoff(
+                            msgs=msg,
+                            text=text,
+                        )
 
-                    metrics = get_metrics(
-                        entity=name,
-                        text=response_text_rec,
-                        labels=label_factor_dict[ttype]["labels"],
-                        factors=factors,
-                    )
-                    #####################
-                    # response_text = ""
-                    # response_text_rec = ""
-                    # hyp = ""
-                    # metrics = {
-                    #     f: ground_truth_df[ground_truth_df[ttype] == name][f].values[0]
-                    #     for f in factors
-                    # }
-                    #####################
+                        hyp = response.candidates[0].content.parts[0].text
+                        response_text = f"Factual statistical description:\n{fact}\n\nDescriptive text:\n{hyp}\n"
 
-                    # increase factor counts if the response is not None
-                    for factor in factors:
-                        if metrics[factor] != "None":
-                            factor_counts[factor] += 1
+                        response_rec = completions_with_backoff(
+                            msgs=msg_rec,
+                            text=response_text,
+                        )
+                        response_text_rec = (
+                            response_rec.candidates[0].content.parts[0].text
+                        )
 
-                    data_points["_".join([name, tt, str(count)])] = {
-                        "entity": name,
-                        "type": tt,
-                        "count": count,
-                        "text": text,
-                        "wordalisation": hyp,
-                        "description": fact,
-                        "response_dict": response_text_rec,
-                    }
-                    for factor in factors:
-                        data_points["_".join([name, tt, str(count)])][
-                            factor + "_true"
-                        ] = ground_truth_df[ground_truth_df[ttype] == name][
-                            factor
-                        ].values[
-                            0
-                        ]
-                        data_points["_".join([name, tt, str(count)])][
-                            factor + "_pred"
-                        ] = metrics[factor]
+                        metrics = get_metrics(
+                            entity=name,
+                            text=response_text_rec,
+                            labels=label_factor_dict[ttype]["labels"],
+                            factors=factors,
+                        )
+                        #####################
+                        # response_text = ""
+                        # response_text_rec = ""
+                        # hyp = ""
+                        # metrics = {
+                        #     f: ground_truth_df[ground_truth_df[ttype] == name][f].values[0]
+                        #     for f in factors
+                        # }
+                        #####################
 
-            # save data_points to json
-            with open(folder_name + "data_points.json", "w") as f:
-                json.dump(data_points, f)
+                        # increase factor counts if the response is not None
+                        for factor in factors:
+                            if (metrics[factor] != "None") and (
+                                metrics[factor] != "omitted"
+                            ):
+                                factor_counts[factor] += 1
+
+                        data_points["_".join([name, tt, str(count)])] = {
+                            "entity": name,
+                            "type": tt,
+                            "count": count,
+                            "text": text,
+                            "wordalisation": hyp,
+                            "description": fact,
+                            "response_dict": response_text_rec,
+                        }
+                        for factor in factors:
+                            data_points["_".join([name, tt, str(count)])][
+                                factor + "_true"
+                            ] = ground_truth_df[ground_truth_df[ttype] == name][
+                                factor
+                            ].values[
+                                0
+                            ]
+                            data_points["_".join([name, tt, str(count)])][
+                                factor + "_pred"
+                            ] = metrics[factor]
+
+                        # save data_points to json
+                        with open(folder_name + "data_points.json", "w") as f:
+                            json.dump(data_points, f)
 
             # if count >= max_retries:
             #     print("Max tries reached.", "_".join([name, tt, str(count)]))
