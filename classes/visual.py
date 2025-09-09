@@ -291,19 +291,6 @@ class DistributionPlot(Visual):
                 },
             )
 
-    # def add_player(self, player: Player, n_group,metrics):
-
-    #     # Make list of all metrics with _Z and _Rank added at end
-    #     metrics_Z = [metric + "_Z" for metric in metrics]
-    #     metrics_Ranks = [metric + "_Ranks" for metric in metrics]
-
-    #     self.add_data_point(
-    #         ser_plot=player.ser_metrics,
-    #         plots = '_Z',
-    #         name=player.name,
-    #         hover='_Ranks',
-    #         hover_string="Rank: %{customdata}/" + str(n_group)
-    #     )
 
     def add_player(self, player: Union[Player, Country], n_group, metrics):
 
