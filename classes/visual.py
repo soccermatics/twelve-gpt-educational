@@ -1,3 +1,4 @@
+from turtle import write
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
@@ -197,9 +198,10 @@ class DistributionPlot(Visual):
         # Add a vertical line at x=0
         self.fig.add_shape(
             type="line",
-            x0=0, y0=0, x1=0, y1=len(self.columns) * self.row_distance,
+            x0=0, y0=0, x1=0, y1=len(self.columns),
             line=dict(color="gray", width=1, dash="dot"),
         )
+
     def add_group_data(self, df_plot, plots, names, legend, hover="", hover_string=""):
         showlegend = True
 
@@ -211,23 +213,27 @@ class DistributionPlot(Visual):
             temp_df = pd.DataFrame(df_plot[col + hover])
             temp_df["name"] = metric_name
 
+            x = df_plot[col + plots].tolist()
+            y = list(np.ones(len(x)) * i)
+
             self.fig.add_trace(
                 go.Scatter(
-                    x=df_plot[col + plots],
-                    y=np.ones(len(df_plot)) * i,
+                    x=x, 
+                    y=y,
                     mode="markers",
                     marker={
-                        "color": rgb_to_color(self.bright_green, opacity=0.2),
+                        "color": rgb_to_color(self.dark_green, opacity=0.2),
                         "size": 10,
+                        "line_width": 1.5,
+                        "line_color": rgb_to_color(self.bright_green),
                     },
                     hovertemplate="%{text}<br>" + temp_hover_string + "<extra></extra>",
                     text=names,
                     customdata=df_plot[col + hover],
-                    name=legend,
-                    showlegend=showlegend,
+                    showlegend=False,
                 )
             )
-            showlegend = False
+            
 
     def add_data_point(
         self, ser_plot, plots, name, hover="", hover_string="", text=None
