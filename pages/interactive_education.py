@@ -55,7 +55,7 @@ with open("model cards/model-card-CProgrammingagent.md", 'r',encoding='utf-8') a
 st.expander("Model card for CProgramming agent", expanded=False).markdown(model_card_text)
 
 
-overall='1.'
+overall='1'
 
 # Selcet random topics 
 if 'argumentsMade' not in st.session_state:
@@ -119,53 +119,53 @@ chat.save_state()
 #conn = st.connection("gsheets", type=GSheetsConnection)
 #st.write(st.session_state)
 #______________________________________________________________________________
-load_dotenv(find_dotenv())
-#tesu=load_dotenv()
-#st.write(tesu)
-path = "a.env"  #try .path[0] if 1 doesn't work
-load_dotenv(path)
-#config = dotenv_values(".env")
-#st.write(config)
-app_key= os.getenv("APP_KEY")
-app_secret = os.getenv("APP_SECRET")
-access_token=os.getenv("ACCESS_TOKEN")
-# Dropbox API credentials
+# load_dotenv(find_dotenv())
+# #tesu=load_dotenv()
+# #st.write(tesu)
+# path = "a.env"  #try .path[0] if 1 doesn't work
+# load_dotenv(path)
+# #config = dotenv_values(".env")
+# #st.write(config)
+# app_key= os.getenv("APP_KEY")
+# app_secret = os.getenv("APP_SECRET")
+# access_token=os.getenv("ACCESS_TOKEN")
+# # Dropbox API credentials
 
-try:
-    dbx = dropbox.Dropbox(access_token)
-    st.write("Successfully connected ")
-except Exception as e:
-    st.error(f"Failed to connect to Dropbox: {e}")
-#dbx = dropbox.Dropbox(access_token)
+# try:
+#     dbx = dropbox.Dropbox(access_token)
+#     st.write("Successfully connected ")
+# except Exception as e:
+#     st.error(f"Failed to connect to Dropbox: {e}")
+# #dbx = dropbox.Dropbox(access_token)
 
-dropbox_file_path = "/uploaded_dataframe.csv"
-
-
-if "messages" not in st.session_state:
-    st.session_state["messages"] = st.session_state["messages_to_display"],
-
-# Function to upload file to Dropbox
+# dropbox_file_path = "/uploaded_dataframe.csv"
 
 
-def upload_dataframe_to_dropbox(df, dropbox_path):
+# if "messages" not in st.session_state:
+#     st.session_state["messages"] = st.session_state["messages_to_display"],
+
+# # Function to upload file to Dropbox
+
+
+# def upload_dataframe_to_dropbox(df, dropbox_path):
     
-    # Convert DataFrame to CSV in-memory
-    csv_buffer = BytesIO()
-    df.to_csv(csv_buffer, index=False)
-    csv_buffer.seek(0)  # Reset buffer pointer to the beginning
+#     # Convert DataFrame to CSV in-memory
+#     csv_buffer = BytesIO()
+#     df.to_csv(csv_buffer, index=False)
+#     csv_buffer.seek(0)  # Reset buffer pointer to the beginning
 
-    try:
-        # Upload CSV content to Dropbox
-        dbx.files_upload(
-            csv_buffer.read(),
-            dropbox_path,
-            mode=dropbox.files.WriteMode.overwrite,
-        )
-        return True, f"File successfully uploaded to Dropbox at {dropbox_path}"
-    except dropbox.exceptions.ApiError as e:
-        return False, f"Dropbox API error: {e}"
-    except Exception as e:
-        return False, f"Unexpected error: {e}"
+#     try:
+#         # Upload CSV content to Dropbox
+#         dbx.files_upload(
+#             csv_buffer.read(),
+#             dropbox_path,
+#             mode=dropbox.files.WriteMode.overwrite,
+#         )
+#         return True, f"File successfully uploaded to Dropbox at {dropbox_path}"
+#     except dropbox.exceptions.ApiError as e:
+#         return False, f"Dropbox API error: {e}"
+#     except Exception as e:
+#         return False, f"Unexpected error: {e}"
 
 def save_chat_history():
     # Create the filename using the session ID
@@ -193,15 +193,15 @@ def save_chat_history():
     return filename
 
 
-if st.button("Finish"):
-    if st.session_state["messages"]:
-        # Append user input to chat history
-        if "chat_history" not in st.session_state:
-            st.session_state["chat_history"] = [] 
-        st.session_state["chat_history"].append({"role": "user", "content":st.session_state["messages"]})
+# if st.button("Finish"):
+#     if st.session_state["messages"]:
+#         # Append user input to chat history
+#         if "chat_history" not in st.session_state:
+#             st.session_state["chat_history"] = [] 
+#         st.session_state["chat_history"].append({"role": "user", "content":st.session_state["messages"]})
         
-        # Save chat history after every interaction
-    save_chat_history()
-    st.write("Congratulations on finishing the for loop lesson")
+#         # Save chat history after every interaction
+#     save_chat_history()
+#     st.write("Congratulations on finishing the for loop lesson")
 
 
