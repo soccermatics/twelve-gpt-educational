@@ -1,7 +1,7 @@
 user,assistant,step,topic,Next
 Overall topic,"I am glad you are interested in learning about for loops in C, They are a key concept.
 I am here to help you better understand them based on your knowlegde.
-To get started,  could you share what you know about for loops in C.",1.,Start,
+To get started,  could you share what you know about for loops in C.",1,Start,
 What is a for loop,"A for loop is a control structure used to repeat a block of code for a specific number of time.
 It is used when your know the total number of iterations beforehand.",1.1.,Defination,1.1.
 What is the syntax of the for loop,"for (initialization; condition; update) {
