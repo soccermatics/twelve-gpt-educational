@@ -40,7 +40,7 @@ from utils.page_components import (
 from classes.visual import TreePlot
 
 sidebar_container = add_common_page_elements()
-page_container = st.sidebar.container()
+#page_container = st.sidebar.container()
 sidebar_container = st.sidebar.container()
 
 st.divider()

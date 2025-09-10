@@ -81,7 +81,7 @@ def set_page_config():
 
 
 def add_page_selector():
-    st.image("data/ressources/img/TwelveEdu.png")
+    #st.image("data/ressources/img/TwelveEdu.png")
     #st.page_link("app.py", label="About")
     #st.page_link("pages/football_scout.py", label="Football Scout")
     #st.page_link("pages/embedder.py", label="Embdedding Tool")
@@ -106,15 +106,16 @@ def add_common_page_elements():
     page_selector_container = st.sidebar.container()
     sidebar_container = st.sidebar.container()
 
-    page_selector_container = st.sidebar.container()
-    sidebar_container = st.sidebar.container()
+    #page_selector_container = st.sidebar.container()
+    #sidebar_container = st.sidebar.container()
 
     with page_selector_container:
-        add_page_selector()
+       add_page_selector()
 
-    sidebar_container.divider()
+    #sidebar_container.divider()
 
-    return sidebar_container    
+    #return sidebar_container
+    return page_selector_container    
 
 
 def select_player(container,players,gender,position):

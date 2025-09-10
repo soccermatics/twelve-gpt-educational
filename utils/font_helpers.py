@@ -8,19 +8,19 @@ import settings
 
 class FontHelper:
 
-    # def __init__(self):
-    #     fontfamily_text = 'data/ressources/fonts/OpenSans-Regular.ttf'
-    #     opensans = font_manager.FontProperties(fname=fontfamily_text)
-    #     opensans._size = 12
-    #     # opensans._size = 12
-    #     self.sub_text_font = opensans
-    #
-    #     fontfamily_title = 'data/ressources/fonts/Montserrat-SemiBold.ttf'
-    #     montserrat = font_manager.FontProperties(fname=fontfamily_title)
-    #     montserrat._size = 24
-    #     # montserrat._size = 26
-    #     montserrat._weight = 'bold'
-    #     self.title_font = montserrat
+    def __init__(self):
+         fontfamily_text = 'data/ressources/fonts/OpenSans-Regular.ttf'
+         opensans = font_manager.FontProperties(fname=fontfamily_text)
+         opensans._size = 12
+         # opensans._size = 12
+         self.sub_text_font = opensans
+    
+         fontfamily_title = 'data/ressources/fonts/Montserrat-SemiBold.ttf'
+         montserrat = font_manager.FontProperties(fname=fontfamily_title)
+         montserrat._size = 24
+         # montserrat._size = 26
+         montserrat._weight = 'bold'
+         self.title_font = montserrat
 
     @staticmethod
     @functools.lru_cache(maxsize=128)
@@ -62,19 +62,18 @@ class FontHelper:
     def get_font_sub_title():
         return FontHelper.custom_font(14, 'bold', 'Monteserrat')
     #
-    # @staticmethod# Adjust the cache size as per your needs
-    # @functools.lru_cache(maxsize=128)
-    # def cache_image(font_size=12, font_weight='normal', font_name='Open Sans'):
+    @staticmethod# Adjust the cache size as per your needs
+    @functools.lru_cache(maxsize=128)
+    def cache_image(font_size=12, font_weight='normal', font_name='Open Sans'):
+        return FontHelper.custom_font(font_size=font_size, font_weight=font_weight, font_name=font_name)
+    def get_custom_font(self, font_size, font_weight, font_name='Open Sans'):
     #
-    #     return FontHelper.custom_font(font_size=font_size, font_weight=font_weight, font_name=font_name)
-    # def get_custom_font(self, font_size, font_weight, font_name='Open Sans'):
-    #
-    #     if font_name == 'Open Sans':
-    #         custom_font = self.sub_text_font
-    #
-    #     else:
-    #         custom_font = self.title_font
-    #
-    #     custom_font._size = font_size
-    #     custom_font._weight = font_weight
-    #     return custom_font
+         if font_name == 'Open Sans':
+             custom_font = self.sub_text_font
+    
+         else:
+             custom_font = self.title_font
+    
+         custom_font._size = font_size
+         custom_font._weight = font_weight
+         return custom_font

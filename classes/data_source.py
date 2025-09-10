@@ -286,7 +286,7 @@ class Lesson(Data):
             overall.append(current_view)  
 
         df['overall'] = overall
-        #st.write(df)
+       
 
         return df
 
